@@ -1,0 +1,11 @@
+*******************************************************************************
+*                                                                             *
+*              K1874BE96T C CROSS COMPILER Version 2.00.150328                *
+*                          Copyright (C) 2012 NIIET                           *
+*                                                                             *
+*******************************************************************************
+
+Warning[C180] .\TestLinear\adc_header.h(11,0): Empty translation unit
+
+.\TestLinear\adc_header.h: 0 byte(s), 2637 line(s), 0 error(s), 1 warning(s)
+

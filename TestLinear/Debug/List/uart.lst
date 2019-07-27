@@ -1,0 +1,372 @@
+*******************************************************************************
+*                                                                             *
+*              K1874BE96T C CROSS COMPILER Version 2.00.150328                *
+*                          Copyright (C) 2012 NIIET                           *
+*                                                                             *
+*******************************************************************************
+
+                   UART_Init:
+;FILE: .\TestLinear\uart.c
+;000031    void UART_Init()
+00000000    C800                           	PUSH  00h
+;000035      BAUD_RATE1 = 0x1F;  //38400
+00000002    B11F1C                         	LDB   _AL,#1Fh
+00000005    C70100001C                     	STB   _AL,BAUD_RATE1
+;000036      BAUD_RATE1 = 0x80;
+0000000A    B1801C                         	LDB   _AL,#80h
+0000000D    C70100001C                     	STB   _AL,BAUD_RATE1
+;000037      SP_CON1     = 0x19;
+00000012    B1191C                         	LDB   _AL,#19h
+00000015    C70100001C                     	STB   _AL,SP_CON1
+;000039      BAUD_RATE0 = 0x1F;  //38400
+0000001A    B11F00                         	LDB   BAUD_RATE0,#1Fh
+;000040      BAUD_RATE0 = 0x80;
+0000001D    B18000                         	LDB   BAUD_RATE0,#80h
+;000041      SP_CON0     = 0x19;
+00000020    B11900                         	LDB   SP_CON0,#19h
+;000043      WSR = 0x0F;      //swap to HWindow15
+00000023    B10F00                         	LDB   WSR,#0Fh
+;000044      INT_MASK1 |= 0x01;      //allow transmit interrupt
+00000026    910100                         	ORB   INT_MASK1,#01h
+;000045      WSR = 0x00;        //swap to HWindow0
+00000029    1100                           	CLRB  WSR
+;000046      WSR = 0x0F;
+0000002B    B10F00                         	LDB   WSR,#0Fh
+;000047      tmp = IOC1;
+0000002E    C7180000                       	STB   IOC1,tmp?UART_Init[_SP]
+;000048      WSR = 0x00;
+00000032    1100                           	CLRB  WSR
+;000049      IOC1 = tmp | 0x21;
+00000034    B318001C                       	LDB   _AL,tmp?UART_Init[_SP]
+00000038    91211C                         	ORB   _AL,#21h
+0000003B    B01C00                         	LDB   IOC1,_AL
+;000050      CLKC = 0xFF3F;
+0000003E    A13FFF1C                       	LD    _AX,#0FF3Fh
+00000042    C30100001C                     	ST    _AX,CLKC
+;000051      tmp = SP_STAT1;// очистка состояний статусных байтов
+00000047    B30100001C                     	LDB   _AL,SP_STAT1
+0000004C    C718001C                       	STB   _AL,tmp?UART_Init[_SP]
+;000052      tmp = SP_STAT0;// очистка состояний статусных байтов
+00000050    C7180000                       	STB   SP_STAT0,tmp?UART_Init[_SP]
+;000054      UartPTS.dst = (uint8*)&SBUF_TX0;
+00000054    A100001C                       	LD    _AX,#SBUF_TX0
+00000058    C30104001C                     	ST    _AX,(UartPTS+4)
+;000055      UartPTS.con = 0x9A;
+0000005D    B19A1C                         	LDB   _AL,#9Ah
+00000060    C70101001C                     	STB   _AL,(UartPTS+1)
+;000056      UartPTS.res[0] = UartPTS.res[1] = 0;
+00000065    111C                           	CLRB  _AL
+00000067    C70107001C                     	STB   _AL,(UartPTS+7)
+0000006C    C70106001C                     	STB   _AL,(UartPTS+6)
+;000057      _ei_();
+00000071    FB                             	EI    
+;000058      __EPTS();
+00000072    ED                             	EPTS  
+;000060    }
+00000073    CC00                           	POP   00h
+00000075    F0                             	RET   
+.ENDF
+                ?INTERRUPT08:
+              IRQ_uart_rx_tx:
+;000062    void IRQ_uart_rx_tx()
+00000000    F4                             	PUSHA 
+00000001    C81C                           	PUSH  _AX
+00000003    C81E                           	PUSH  _BX
+;000064      _di_(); // запрет обработки прерываний
+00000005    FA                             	DI    
+;000065      status_uart0 = SP_STAT0;
+00000006    C7010D0100                     	STB   SP_STAT0,status_uart0
+;000066      status_uart1 = SP_STAT1;
+0000000B    B30100001C                     	LDB   _AL,SP_STAT1
+00000010    C7010E011C                     	STB   _AL,status_uart1
+;000067      if (status_uart1 & 0x40) //oбрабатываем прерывание по приему
+00000015    361C42                         	JBC   _AL,6h,??_1_ELSE
+;000068        {
+;000069    		if (INT_PEND1 & 0x10) 
+00000018    34000C                         	JBC   INT_PEND1,4h,??_2_ELSE
+;000070    		{
+;000071    			len_rx1 = 0;
+0000001B    C7010C0100                     	STB   00h,len_rx1
+;000072    			UART1_RX_array[len_rx1] = SBUF_RX1; 
+00000020    AF010C011C                     	LDBZE _AX,len_rx1
+;000074    		}
+00000025    201A                           	SJMP  ??_17_COMMON
+                   ??_2_ELSE:
+;000075    		else if (len_rx1 > 63)
+00000027    B3010C011C                     	LDB   _AL,len_rx1
+0000002C    99401C                         	CMPB  _AL,#40h
+0000002F    D307                           	JNC   ??_3_ELSE
+;000076    		{
+;000077    			len_rx1 = 0;
+00000031    C7010C0100                     	STB   00h,len_rx1
+;000078    		}
+00000036    2013                           	SJMP  ??_3_END
+                   ??_3_ELSE:
+;000080    		{
+;000082    			len_rx1 ++;
+00000038    171C                           	INCB  _AL
+0000003A    C7010C011C                     	STB   _AL,len_rx1
+;000083    			UART1_RX_array[len_rx1] = SBUF_RX1;
+0000003F    111D                           	CLRB  _AH
+                ??_17_COMMON:
+00000041    B30100001E                     	LDB   _BL,SBUF_RX1
+00000046    C71D88001E                     	STB   _BL,UART1_RX_array[_AX]
+;000084    		}
+                    ??_3_END:
+;000085    		len_rx1 &= 0x3F;
+0000004B    B3010C011C                     	LDB   _AL,len_rx1
+00000050    713F1C                         	ANDB  _AL,#3Fh
+00000053    C7010C011C                     	STB   _AL,len_rx1
+;000086    		INT_PEND1 &= ~0x10;  //сброс флага переполнения таймера 2
+;000087    		TIMER2 = 0xCF2B;  //межпакетный интервал 2ms
+;000088         }
+00000058    2043                           	SJMP  ??_18_COMMON
+                   ??_1_ELSE:
+;000089    	else   if (status_uart0 & 0x40) //oбрабатываем прерывание по приему
+0000005A    B3010D011C                     	LDB   _AL,status_uart0
+0000005F    361C42                         	JBC   _AL,6h,??_4_ELSE
+;000090        {
+;000091    		if (INT_PEND1 & 0x10) 
+00000062    34000C                         	JBC   INT_PEND1,4h,??_5_ELSE
+;000092    		{
+;000093    			len_rx0 = 0;
+00000065    C7010B0100                     	STB   00h,len_rx0
+;000094    			UART0_RX_array[len_rx0] = SBUF_RX0;
+0000006A    AF010B011C                     	LDBZE _AX,len_rx0
+;000096    		}
+0000006F    201A                           	SJMP  ??_19_COMMON
+                   ??_5_ELSE:
+;000097    		else if (len_rx0 > 63)
+00000071    B3010B011C                     	LDB   _AL,len_rx0
+00000076    99401C                         	CMPB  _AL,#40h
+00000079    D307                           	JNC   ??_6_ELSE
+;000098    		{
+;000099    			len_rx0 = 0;
+0000007B    C7010B0100                     	STB   00h,len_rx0
+;000100    		}
+00000080    200E                           	SJMP  ??_6_END
+                   ??_6_ELSE:
+;000102    		{
+;000104    			len_rx0 ++;
+00000082    171C                           	INCB  _AL
+00000084    C7010B011C                     	STB   _AL,len_rx0
+;000105    			UART0_RX_array[len_rx0] = SBUF_RX0;
+00000089    111D                           	CLRB  _AH
+                ??_19_COMMON:
+0000008B    C71D080000                     	STB   SBUF_RX0,UART0_RX_array[_AX]
+;000106    		}
+                    ??_6_END:
+;000107    		len_rx0 &= 0x3F;
+00000090    B3010B011C                     	LDB   _AL,len_rx0
+00000095    713F1C                         	ANDB  _AL,#3Fh
+00000098    C7010B011C                     	STB   _AL,len_rx0
+;000108    		INT_PEND1 &= ~0x10;  //сброс флага переполнения таймера 2
+                ??_18_COMMON:
+0000009D    71EF00                         	ANDB  INT_PEND1,#0EFh
+;000109    		TIMER2 = 0xCF2B;  //межпакетный интервал 2ms
+000000A0    A12BCF00                       	LD    TIMER2,#0CF2Bh
+;000110         }
+                   ??_4_ELSE:
+;000112    	 {
+;000115    	 }
+;000116       _ei_(); //разрешение обработки прерываний
+000000A4    FB                             	EI    
+;000117    }
+000000A5    CC1E                           	POP   _BX
+000000A7    CC1C                           	POP   _AX
+000000A9    F5                             	POPA  
+000000AA    F0                             	RET   
+.ENDF
+                    UART1_RX:
+;000119    uint8 UART1_RX(char *buff)
+00000076    C824                           	PUSH  _EX
+;000121      uint8 len_tmp = 0;
+00000078    1124                           	CLRB  len_tmp?UART1_RX
+;000122      if((len_rx1 != 0) && ((INT_PEND1 & 0x10) != 0))
+0000007A    B3010C0120                     	LDB   _CL,len_rx1
+0000007F    980020                         	CMPB  _CL,0
+00000082    DF14                           	JE    ??_7_ELSE
+00000084    340011                         	JBC   INT_PEND1,4h,??_7_ELSE
+;000123      {
+;000124    	len_tmp =  len_rx1; 
+00000087    B02024                         	LDB   len_tmp?UART1_RX,_CL
+;000126        memcpy(buff, UART1_RX_array, len_rx1);
+0000008A    1121                           	CLRB  _CH
+0000008C    A188001E                       	LD    _BX,#UART1_RX_array
+00000090    EF6DFF                         	LCALL memcpy
+;000127    	len_rx1 = 0;
+00000093    C7010C0100                     	STB   00h,len_rx1
+;000128      }
+                   ??_7_ELSE:
+;000129      return len_tmp;
+00000098    2061                           	SJMP  COMMON?END_UART1_RX
+;000130    }
+.ENDF
+                    UART1_TX:
+;000132    uint8 UART1_TX(char *buff, uint8 len)
+0000009A    A01C22                         	LD    _DX,_AX
+;000135      SP_CON1 = 0x11;  //запрет приема
+0000009D    B1111F                         	LDB   _BH,#11h
+000000A0    C70100001F                     	STB   _BH,SP_CON1
+;000136      for (i = 0; i < len; i++)
+000000A5    111C                           	CLRB  i?UART1_TX
+000000A7    2022                           	SJMP  ??_9_CHECK
+                   ??_9_LOOP:
+;000137      {
+;000138        status_uart1 = SP_STAT1;
+000000A9    B30100001F                     	LDB   _BH,SP_STAT1
+000000AE    C7010E011F                     	STB   _BH,status_uart1
+;000139        while(!(status_uart1 & 0x08));//дожидаемся освобождения буфера
+                    ??_10_DO:
+000000B3    B3010E011F                     	LDB   _BH,status_uart1
+000000B8    331FF8                         	JBC   _BH,3h,??_10_DO
+;000140        SBUF_TX1 = buff[i];
+000000BB    AC1C20                         	LDBZE _CX,i?UART1_TX
+000000BE    642220                         	ADD   _CX,buff?UART1_TX
+000000C1    B2201F                         	LDB   _BH,[_CX]
+000000C4    C70100001F                     	STB   _BH,SBUF_TX1
+;000141      }
+000000C9    171C                           	INCB  i?UART1_TX
+                  ??_9_CHECK:
+000000CB    981E1C                         	CMPB  i?UART1_TX,len?UART1_TX
+000000CE    D3D9                           	JNC   ??_9_LOOP
+;000142      SP_CON1 = 0x19;  //разрешение приема приема
+000000D0    B1191F                         	LDB   _BH,#19h
+000000D3    C70100001F                     	STB   _BH,SP_CON1
+;000143      return i;
+;000144    }
+000000D8    F0                             	RET   
+.ENDF
+                    UART0_RX:
+;000146    uint8 UART0_RX(char *buff)
+000000D9    C824                           	PUSH  _EX
+;000148      uint8 len_tmp = 0;
+000000DB    1124                           	CLRB  len_tmp?UART0_RX
+;000149      if((len_rx0 != 0) && ((INT_PEND1 & 0x10) != 0))
+000000DD    B3010B0120                     	LDB   _CL,len_rx0
+000000E2    980020                         	CMPB  _CL,0
+000000E5    DF14                           	JE    ??_11_ELSE
+000000E7    340011                         	JBC   INT_PEND1,4h,??_11_ELSE
+;000150      {
+;000151    	len_tmp =  len_rx0; 
+000000EA    B02024                         	LDB   len_tmp?UART0_RX,_CL
+;000153        memcpy(buff, UART0_RX_array, len_rx0);
+000000ED    1121                           	CLRB  _CH
+000000EF    A108001E                       	LD    _BX,#UART0_RX_array
+000000F3    EF0AFF                         	LCALL memcpy
+;000154    	len_rx0 = 0;
+000000F6    C7010B0100                     	STB   00h,len_rx0
+;000155      }
+                  ??_11_ELSE:
+;000156      return len_tmp;
+         COMMON?END_UART1_RX:
+000000FB    B0241C                         	LDB   _AL,_EL
+;000157    }
+000000FE    CC24                           	POP   _EX
+00000100    F0                             	RET   
+.ENDF
+                    UART0_TX:
+;000159    uint8 UART0_TX(char *buff, uint8 len)
+00000101    A01C22                         	LD    _DX,_AX
+;000162      SP_CON0 = 0x11;  //запрет приема
+00000104    B11100                         	LDB   SP_CON0,#11h
+;000163      for (i = 0; i < len; i++)
+00000107    111C                           	CLRB  i?UART0_TX
+00000109    2018                           	SJMP  ??_13_CHECK
+                  ??_13_LOOP:
+;000164      {
+;000165        status_uart0 = SP_STAT0;
+0000010B    C7010D0100                     	STB   SP_STAT0,status_uart0
+;000166        while(!(status_uart0 & 0x08));//дожидаемся освобождения буфера
+                    ??_14_DO:
+00000110    B3010D011F                     	LDB   _BH,status_uart0
+00000115    331FF8                         	JBC   _BH,3h,??_14_DO
+;000167        SBUF_TX0 = buff[i];
+00000118    AC1C20                         	LDBZE _CX,i?UART0_TX
+0000011B    642220                         	ADD   _CX,buff?UART0_TX
+0000011E    B22000                         	LDB   SBUF_TX0,[_CX]
+;000168      }
+00000121    171C                           	INCB  i?UART0_TX
+                 ??_13_CHECK:
+00000123    981E1C                         	CMPB  i?UART0_TX,len?UART0_TX
+00000126    D3E3                           	JNC   ??_13_LOOP
+;000169      SP_CON0 = 0x19;  //запрет приема
+00000128    B11900                         	LDB   SP_CON0,#19h
+;000170      return i;
+;000171    }
+0000012B    F0                             	RET   
+.ENDF
+            UART0_SendPacket:
+;000173    void UART0_SendPacket(uint8 *buff, uint8 leng) {
+0000012C    C824                           	PUSH  _EX
+0000012E    B01E24                         	LDB   _EL,_BL
+00000131    A01C1E                         	LD    _BX,_AX
+;000174      SP_CON0 = 0x11;  //запрет приема
+00000134    B11100                         	LDB   SP_CON0,#11h
+;000175      UartPTS.dst = (uint8*)&SBUF_TX0;
+00000137    A1000020                       	LD    _CX,#SBUF_TX0
+0000013B    C301040020                     	ST    _CX,(UartPTS+4)
+;000176      WSR = 1;
+00000140    B10100                         	LDB   WSR,#01h
+;000177      while(PTSSEL & 0x100);  //ожидание конца передачи
+                    ??_15_DO:
+00000143    3801FD                         	JBS   (PTSSEL+1),0h,??_15_DO
+;000178      memcpy(UART0_TX_array, buff, leng);
+00000146    AC2420                         	LDBZE _CX,leng?UART0_SendPacket
+00000149    A148001C                       	LD    _AX,#UART0_TX_array
+0000014D    EFB0FE                         	LCALL memcpy
+;000179      UartPTS.src = (uint8*)&UART0_TX_array[1];
+00000150    A1490020                       	LD    _CX,#(UART0_TX_array+1)
+00000154    C301020020                     	ST    _CX,(UartPTS+2)
+;000180      UartPTS.count = leng-1;
+00000159    1524                           	DECB  leng?UART0_SendPacket
+0000015B    C701000024                     	STB   leng?UART0_SendPacket,UartPTS
+;000181      PTSSEL = 0x100;  //start Tx
+00000160    A1000100                       	LD    PTSSEL,#0100h
+;000182      WSR = 0;
+00000164    1100                           	CLRB  WSR
+;000183      SBUF_TX0 = UART0_TX_array[0];
+00000166    B301480000                     	LDB   SBUF_TX0,UART0_TX_array
+;000184    }
+0000016B    CC24                           	POP   _EX
+0000016D    F0                             	RET   
+.ENDF
+            UART1_SendPacket:
+;000186    void UART1_SendPacket(uint8 *buff, uint8 leng) {
+0000016E    C824                           	PUSH  _EX
+00000170    B01E24                         	LDB   _EL,_BL
+00000173    A01C1E                         	LD    _BX,_AX
+;000187      SP_CON1 = 0x11;  //запрет приема
+00000176    B11120                         	LDB   _CL,#11h
+00000179    C701000020                     	STB   _CL,SP_CON1
+;000188      UartPTS.dst = (uint8*)&SBUF_TX1;
+0000017E    A1000020                       	LD    _CX,#SBUF_TX1
+00000182    C301040020                     	ST    _CX,(UartPTS+4)
+;000189      WSR = 1;
+00000187    B10100                         	LDB   WSR,#01h
+;000190      while(PTSSEL & 0x100);  //ожидание конца передачи
+                    ??_16_DO:
+0000018A    3801FD                         	JBS   (PTSSEL+1),0h,??_16_DO
+;000191      memcpy(UART1_TX_array, buff, leng);
+0000018D    AC2420                         	LDBZE _CX,leng?UART1_SendPacket
+00000190    A1C8001C                       	LD    _AX,#UART1_TX_array
+00000194    EF69FE                         	LCALL memcpy
+;000192      UartPTS.src = (uint8*)&UART1_TX_array[1];
+00000197    A1C90020                       	LD    _CX,#(UART1_TX_array+1)
+0000019B    C301020020                     	ST    _CX,(UartPTS+2)
+;000193      UartPTS.count = leng-1;
+000001A0    1524                           	DECB  leng?UART1_SendPacket
+000001A2    C701000024                     	STB   leng?UART1_SendPacket,UartPTS
+;000194      PTSSEL = 0x100;  //start Tx
+000001A7    A1000100                       	LD    PTSSEL,#0100h
+;000195      WSR = 0;
+000001AB    1100                           	CLRB  WSR
+;000196      SBUF_TX1 = UART1_TX_array[0];
+000001AD    B301C8001F                     	LDB   _BH,UART1_TX_array
+000001B2    C70100001F                     	STB   _BH,SBUF_TX1
+;000197    }000001B7    CC24                           	POP   _EX
+000001B9    F0                             	RET   
+.ENDF
+
+.\TestLinear\uart.c: 613 byte(s), 2880 line(s), 0 error(s), 0 warning(s)
+

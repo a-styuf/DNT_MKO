@@ -1,0 +1,417 @@
+*******************************************************************************
+*                                                                             *
+*              K1874BE96T C CROSS COMPILER Version 2.00.150328                *
+*                          Copyright (C) 2012 NIIET                           *
+*                                                                             *
+*******************************************************************************
+
+Warning[C17] .\TestLinear\dnt_fun.c(80,20): Call to function 'abs' without prototype
+                    PWM_Init:
+;FILE: .\TestLinear\dnt_fun.c
+;000010    void PWM_Init()
+;000012      WSR = 0x01;
+00000000    B10100                         	LDB   WSR,#01h
+;000013      PWM1_CONTROL = 0;
+00000003    1100                           	CLRB  PWM1_CONTROL
+;000014      WSR = 0x00;
+00000005    1100                           	CLRB  WSR
+;000015    }
+00000007    F0                             	RET   
+.ENDF
+                    PWM_Duty:
+;000017    void PWM_Duty (uint8 Duty)
+;000019      if (Duty > 128) Duty = 128;
+00000008    99811C                         	CMPB  Duty?PWM_Duty,#81h
+0000000B    D303                           	JNC   ??_1_ELSE
+0000000D    B1801C                         	LDB   Duty?PWM_Duty,#80h
+                   ??_1_ELSE:
+;000021      WSR = 0x01;
+00000010    B10100                         	LDB   WSR,#01h
+;000022      PWM1_CONTROL = Duty;
+00000013    B01C00                         	LDB   PWM1_CONTROL,Duty?PWM_Duty
+;000023      WSR = 0x00;
+00000016    1100                           	CLRB  WSR
+;000024    }
+00000018    F0                             	RET   
+.ENDF
+                      PWM_FB:
+;000026    uint8 PWM_FB (uint16 MON_50V, uint8 Duty) // значение передается в 10   мВ
+00000019    A01C20                         	LD    _CX,_AX
+0000001C    B01E1C                         	LDB   _AL,_BL
+;000028      if (MON_50V/256 > 54) return Duty-1;
+0000001F    080820                         	SHR   MON_50V?PWM_FB,#08h
+00000022    89370020                       	CMP   MON_50V?PWM_FB,#0037h
+00000026    D303                           	JNC   ??_2_ELSE
+00000028    151C                           	DECB  Duty?PWM_FB
+0000002A    F0                             	RET   
+                   ??_2_ELSE:
+;000029      else if (MON_50V/256 < 50) return Duty+1;
+0000002B    89320020                       	CMP   _CX,#0032h
+0000002F    DB02                           	JC    ??_3_ELSE
+00000031    171C                           	INCB  Duty?PWM_FB
+                   ??_3_ELSE:
+;000030    }
+00000033    F0                             	RET   
+.ENDF
+                  Timer_Init:
+;000032    void Timer_Init()
+;000035      WSR = 0x0F;
+00000034    B10F00                         	LDB   WSR,#0Fh
+;000036      tmp = IOC1;
+00000037    B0001C                         	LDB   tmp?Timer_Init,IOC1
+;000037      WSR = 0x00;
+0000003A    1100                           	CLRB  WSR
+;000038      IOC1 = tmp | 0x0C; //разрешаем прерывания таймера 1 и 2
+0000003C    910C1C                         	ORB   tmp?Timer_Init,#0Ch
+0000003F    B01C00                         	LDB   IOC1,tmp?Timer_Init
+;000039      WSR = 0x01;
+00000042    B10100                         	LDB   WSR,#01h
+;000040      IOC3 |= 0x01;
+00000045    910100                         	ORB   IOC3,#01h
+;000041      WSR = 0x00;
+00000048    1100                           	CLRB  WSR
+;000042      INT_MASK |= 0x01;
+0000004A    910100                         	ORB   INT_MASK,#01h
+;000044      WSR = 0x00;
+;000045      INT_PEND1 &= ~0x10;
+0000004D    71EF00                         	ANDB  INT_PEND1,#0EFh
+;000046      INT_PEND &= ~0x01;
+00000050    71FE00                         	ANDB  INT_PEND,#0FEh
+;000047    }
+00000053    F0                             	RET   
+.ENDF
+                  COMAnsForm:
+;000049    uint16 COMAnsForm (uint8 req_id, uint8 self_id, uint8 sub_adress, uint8 *seq_num, uint8 com, uint8 leng, uint8* com_data, uint8* ans_com) //функция для формирования ответов на команды
+00000054    C824                           	PUSH  _EX
+00000056    C826                           	PUSH  _FX
+00000058    C828                           	PUSH  _GX
+0000005A    B01E1F                         	LDB   _BH,_BL
+0000005D    A3180A24                       	LD    _EX,0Ah[_SP]
+00000061    B02326                         	LDB   _FL,_DH
+00000064    A3180828                       	LD    _GX,08h[_SP]
+;000053      *seq_num += 1;
+00000068    B2201E                         	LDB   _BL,[seq_num?COMAnsForm]
+0000006B    171E                           	INCB  _BL
+0000006D    C6201E                         	STB   _BL,[seq_num?COMAnsForm]
+;000054      ans_com[0] = req_id & 0xFF;
+00000070    C6241C                         	STB   req_id?COMAnsForm,[ans_com?COMAnsForm]
+;000055      ans_com[1] = self_id & 0xFF;
+00000073    C724011D                       	STB   self_id?COMAnsForm,01h[ans_com?COMAnsForm]
+;000056      ans_com[2] = sub_adress & 0xFF;
+00000077    C724021F                       	STB   sub_adress?COMAnsForm,02h[ans_com?COMAnsForm]
+;000057      ans_com[3] = (*seq_num) & 0xFF; //не забываем проинкрементировать последовательный номер ответа
+0000007B    B2201C                         	LDB   _AL,[seq_num?COMAnsForm]
+0000007E    C724031C                       	STB   _AL,03h[ans_com?COMAnsForm]
+;000058      ans_com[4] = com & 0xFF;
+00000082    C7240422                       	STB   com?COMAnsForm,04h[ans_com?COMAnsForm]
+;000059      ans_com[5] = leng & 0xFF;
+00000086    C7240526                       	STB   leng?COMAnsForm,05h[ans_com?COMAnsForm]
+;000060      for(j=0; j < leng; j++)
+0000008A    1120                           	CLRB  j?COMAnsForm
+0000008C    2013                           	SJMP  ??_4_CHECK
+                   ??_4_LOOP:
+;000061      {
+;000062        ans_com[j+6] = com_data[j];
+0000008E    AC201E                         	LDBZE _BX,j?COMAnsForm
+00000091    44241E22                       	ADD   _DX,_BX,ans_com?COMAnsForm
+00000095    64281E                         	ADD   _BX,com_data?COMAnsForm
+00000098    B21E1C                         	LDB   _AL,[_BX]
+0000009B    C722061C                       	STB   _AL,06h[_DX]
+;000063      }
+0000009F    1720                           	INCB  j?COMAnsForm
+                  ??_4_CHECK:
+000000A1    982620                         	CMPB  j?COMAnsForm,leng?COMAnsForm
+000000A4    D3E8                           	JNC   ??_4_LOOP
+;000064      crc = crc16_ccitt(ans_com, leng+6);
+000000A6    5506261E                       	ADDB  _BL,leng?COMAnsForm,#06h
+000000AA    A0241C                         	LD    crc?COMAnsForm,ans_com?COMAnsForm
+000000AD    EF50FF                         	LCALL crc16_ccitt
+;000065      ans_com[leng+6] = (uint8)((crc>>8) & 0xFF);
+000000B0    1127                           	CLRB  _FH
+000000B2    4424261E                       	ADD   _BX,leng?COMAnsForm,ans_com?COMAnsForm
+000000B6    A01C20                         	LD    _CX,crc?COMAnsForm
+000000B9    080820                         	SHR   _CX,#08h
+000000BC    C71E0620                       	STB   _CL,06h[_BX]
+;000066      ans_com[leng+7] = (uint8)((crc>>0) & 0xFF);
+000000C0    C71E071C                       	STB   crc?COMAnsForm,07h[_BX]
+;000067      return leng+8;
+000000C4    450800261C                     	ADD   _AX,_FX,#0008h
+;000068    }
+000000C9    CC28                           	POP   _GX
+000000CB    CC26                           	POP   _FX
+000000CD    CC24                           	POP   _EX
+000000CF    F0                             	RET   
+.ENDF
+          CurrentCalculation:
+;000070    int16 CurrentCalculation(int16* dnt_result, int16* dnt_max, int16* dnt_min, uint16 *status)
+000000D0    C824                           	PUSH  _EX
+000000D2    C826                           	PUSH  _FX
+000000D4    C828                           	PUSH  _GX
+000000D6    C82A                           	PUSH  _HX
+000000D8    C800                           	PUSH  00h
+000000DA    A02224                         	LD    _EX,_DX
+000000DD    A02026                         	LD    _FX,_CX
+000000E0    A01E28                         	LD    _GX,_BX
+;000074        tmp_uint16 = dnt_result[0 + (*status)] - dnt_result[4 + (*status)];
+000000E3    A2242A                         	LD    _HX,[status?CurrentCalculation]
+000000E6    A02A1E                         	LD    _BX,_HX
+000000E9    09011E                         	SHL   _BX,#01h
+000000EC    441C1E20                       	ADD   _CX,_BX,dnt_result?CurrentCalculation
+000000F0    641C1E                         	ADD   _BX,dnt_result?CurrentCalculation
+000000F3    A22020                         	LD    _CX,[_CX]
+000000F6    6B1E0820                       	SUB   _CX,08h[_BX]
+000000FA    C3180020                       	ST    _CX,tmp_uint16?CurrentCalculation[_SP]
+;000077        switch (*status)
+000000FE    88002A                         	CMP   _HX,0
+00000101    D702                           	JNE   ??_5_CASE_0_BYPASS_101
+00000103    218D                           	SJMP  ??_5_CASE_0
+      ??_5_CASE_0_BYPASS_101:
+00000105    8901002A                       	CMP   _HX,#0001h
+00000109    D702                           	JNE   ??_5_CASE_1_BYPASS_109
+0000010B    20F2                           	SJMP  ??_5_CASE_1
+      ??_5_CASE_1_BYPASS_109:
+0000010D    8902002A                       	CMP   _HX,#0002h
+00000111    DF56                           	JE    ??_5_CASE_2
+00000113    8903002A                       	CMP   _HX,#0003h
+00000117    DF02                           	JE    ??_5_DEFAULT_BYPASS_117
+00000119    21C5                           	SJMP  ??_5_DEFAULT
+     ??_5_DEFAULT_BYPASS_117:
+;000078        {
+;000080                if ((abs(dnt_max[0])  > 16200) | (abs(dnt_max[1]) > 16200) | (abs(tmp_uint16)>6000)) *status = 2;
+0000011B    A328021C                       	LD    _AX,02h[dnt_max?CurrentCalculation]
+0000011F    EFDEFE                         	LCALL abs
+00000122    89493F1C                       	CMP   _AX,#3F49h
+00000126    DE05                           	JLT   ??_7_NOT
+00000128    AD0126                         	LDBZE _FX,#01h
+0000012B    2002                           	SJMP  ??_7_SKIP
+                    ??_7_NOT:
+0000012D    0126                           	CLR   _FX
+                   ??_7_SKIP:
+0000012F    A2281C                         	LD    _AX,[dnt_max?CurrentCalculation]
+00000132    EFCBFE                         	LCALL abs
+00000135    89493F1C                       	CMP   _AX,#3F49h
+00000139    DE05                           	JLT   ??_8_NOT
+0000013B    AD011E                         	LDBZE _BX,#01h
+0000013E    2002                           	SJMP  ??_8_SKIP
+                    ??_8_NOT:
+00000140    011E                           	CLR   _BX
+                   ??_8_SKIP:
+00000142    801E26                         	OR    _FX,_BX
+00000145    A318001C                       	LD    _AX,tmp_uint16?CurrentCalculation[_SP]
+00000149    EFB4FE                         	LCALL abs
+0000014C    8971171C                       	CMP   _AX,#1771h
+00000150    DE05                           	JLT   ??_9_NOT
+00000152    AD011E                         	LDBZE _BX,#01h
+00000155    2002                           	SJMP  ??_9_SKIP
+                    ??_9_NOT:
+00000157    011E                           	CLR   _BX
+                   ??_9_SKIP:
+00000159    801E26                         	OR    _FX,_BX
+0000015C    880026                         	CMP   _FX,0
+0000015F    DF06                           	JE    ??_6_ELSE
+00000161    AD021E                         	LDBZE _BX,#02h
+00000164    C2241E                         	ST    _BX,[status?CurrentCalculation]
+                   ??_6_ELSE:
+;000081                break;
+00000167    217A                           	SJMP  ??_5_BREAK
+                 ??_5_CASE_2:
+;000083                if ((abs(dnt_max[0])  > 16200) | (abs(dnt_max[1]) > 16200) | (abs(tmp_uint16)>6000)) *status = 1;
+00000169    A328021C                       	LD    _AX,02h[dnt_max?CurrentCalculation]
+0000016D    EF90FE                         	LCALL abs
+00000170    89493F1C                       	CMP   _AX,#3F49h
+00000174    DE05                           	JLT   ??_11_NOT
+00000176    AD012A                         	LDBZE _HX,#01h
+00000179    2002                           	SJMP  ??_11_SKIP
+                   ??_11_NOT:
+0000017B    012A                           	CLR   _HX
+                  ??_11_SKIP:
+0000017D    A2281C                         	LD    _AX,[dnt_max?CurrentCalculation]
+00000180    EF7DFE                         	LCALL abs
+00000183    89493F1C                       	CMP   _AX,#3F49h
+00000187    DE05                           	JLT   ??_12_NOT
+00000189    AD011E                         	LDBZE _BX,#01h
+0000018C    2002                           	SJMP  ??_12_SKIP
+                   ??_12_NOT:
+0000018E    011E                           	CLR   _BX
+                  ??_12_SKIP:
+00000190    801E2A                         	OR    _HX,_BX
+00000193    A318001C                       	LD    _AX,tmp_uint16?CurrentCalculation[_SP]
+00000197    EF66FE                         	LCALL abs
+0000019A    8971171C                       	CMP   _AX,#1771h
+0000019E    DE05                           	JLT   ??_13_NOT
+000001A0    AD011E                         	LDBZE _BX,#01h
+000001A3    2002                           	SJMP  ??_13_SKIP
+                   ??_13_NOT:
+000001A5    011E                           	CLR   _BX
+                  ??_13_SKIP:
+000001A7    801E2A                         	OR    _HX,_BX
+000001AA    88002A                         	CMP   _HX,0
+000001AD    DF02                           	JE    ??_31_COMMON_BYPASS_1AD
+000001AF    2127                           	SJMP  ??_31_COMMON
+     ??_31_COMMON_BYPASS_1AD:
+;000084                else if ((abs(dnt_min[0])  < 160) | (abs(dnt_min[1]) < 160) | (abs(tmp_uint16)<400)) *status = 3;
+000001B1    A326021C                       	LD    _AX,02h[dnt_min?CurrentCalculation]
+000001B5    EF48FE                         	LCALL abs
+000001B8    89A0001C                       	CMP   _AX,#00A0h
+000001BC    D605                           	JGE   ??_15_NOT
+000001BE    AD0128                         	LDBZE _GX,#01h
+000001C1    2002                           	SJMP  ??_15_SKIP
+                   ??_15_NOT:
+000001C3    0128                           	CLR   _GX
+                  ??_15_SKIP:
+000001C5    A2261C                         	LD    _AX,[dnt_min?CurrentCalculation]
+000001C8    EF35FE                         	LCALL abs
+000001CB    89A0001C                       	CMP   _AX,#00A0h
+000001CF    D605                           	JGE   ??_16_NOT
+000001D1    AD011E                         	LDBZE _BX,#01h
+000001D4    2002                           	SJMP  ??_16_SKIP
+                   ??_16_NOT:
+000001D6    011E                           	CLR   _BX
+                  ??_16_SKIP:
+000001D8    801E28                         	OR    _GX,_BX
+000001DB    A318001C                       	LD    _AX,tmp_uint16?CurrentCalculation[_SP]
+000001DF    EF1EFE                         	LCALL abs
+000001E2    8990011C                       	CMP   _AX,#0190h
+000001E6    D605                           	JGE   ??_17_NOT
+000001E8    AD011E                         	LDBZE _BX,#01h
+000001EB    2002                           	SJMP  ??_17_SKIP
+                   ??_17_NOT:
+000001ED    011E                           	CLR   _BX
+                  ??_17_SKIP:
+000001EF    801E28                         	OR    _GX,_BX
+000001F2    880028                         	CMP   _GX,0
+000001F5    DF06                           	JE    ??_14_ELSE
+000001F7    AD031E                         	LDBZE _BX,#03h
+000001FA    C2241E                         	ST    _BX,[status?CurrentCalculation]
+                  ??_14_ELSE:
+;000085                break;
+000001FD    20E4                           	SJMP  ??_5_BREAK
+                 ??_5_CASE_1:
+;000087                if ((abs(dnt_max[0])  > 16200) | (abs(dnt_max[1]) > 16200) | (abs(tmp_uint16)>6000)) *status = 0;
+000001FF    A328021C                       	LD    _AX,02h[dnt_max?CurrentCalculation]
+00000203    EFFAFD                         	LCALL abs
+00000206    89493F1C                       	CMP   _AX,#3F49h
+0000020A    DE05                           	JLT   ??_19_NOT
+0000020C    AD012A                         	LDBZE _HX,#01h
+0000020F    2002                           	SJMP  ??_19_SKIP
+                   ??_19_NOT:
+00000211    012A                           	CLR   _HX
+                  ??_19_SKIP:
+00000213    A2281C                         	LD    _AX,[dnt_max?CurrentCalculation]
+00000216    EFE7FD                         	LCALL abs
+00000219    89493F1C                       	CMP   _AX,#3F49h
+0000021D    DE05                           	JLT   ??_20_NOT
+0000021F    AD011E                         	LDBZE _BX,#01h
+00000222    2002                           	SJMP  ??_20_SKIP
+                   ??_20_NOT:
+00000224    011E                           	CLR   _BX
+                  ??_20_SKIP:
+00000226    801E2A                         	OR    _HX,_BX
+00000229    A318001C                       	LD    _AX,tmp_uint16?CurrentCalculation[_SP]
+0000022D    EFD0FD                         	LCALL abs
+00000230    8971171C                       	CMP   _AX,#1771h
+00000234    DE05                           	JLT   ??_21_NOT
+00000236    AD011E                         	LDBZE _BX,#01h
+00000239    2002                           	SJMP  ??_21_SKIP
+                   ??_21_NOT:
+0000023B    011E                           	CLR   _BX
+                  ??_21_SKIP:
+0000023D    801E2A                         	OR    _HX,_BX
+00000240    88002A                         	CMP   _HX,0
+00000243    DF02                           	JE    ??_30_COMMON_BYPASS_243
+00000245    2099                           	SJMP  ??_30_COMMON
+     ??_30_COMMON_BYPASS_243:
+;000088                else if ((abs(dnt_min[0])  < 160) | (abs(dnt_min[1]) < 160) | (abs(tmp_uint16)<400)) *status = 2;
+00000247    A326021C                       	LD    _AX,02h[dnt_min?CurrentCalculation]
+0000024B    EFB2FD                         	LCALL abs
+0000024E    89A0001C                       	CMP   _AX,#00A0h
+00000252    D605                           	JGE   ??_23_NOT
+00000254    AD0128                         	LDBZE _GX,#01h
+00000257    2002                           	SJMP  ??_23_SKIP
+                   ??_23_NOT:
+00000259    0128                           	CLR   _GX
+                  ??_23_SKIP:
+0000025B    A2261C                         	LD    _AX,[dnt_min?CurrentCalculation]
+0000025E    EF9FFD                         	LCALL abs
+00000261    89A0001C                       	CMP   _AX,#00A0h
+00000265    D605                           	JGE   ??_24_NOT
+00000267    AD011E                         	LDBZE _BX,#01h
+0000026A    2002                           	SJMP  ??_24_SKIP
+                   ??_24_NOT:
+0000026C    011E                           	CLR   _BX
+                  ??_24_SKIP:
+0000026E    801E28                         	OR    _GX,_BX
+00000271    A318001C                       	LD    _AX,tmp_uint16?CurrentCalculation[_SP]
+00000275    EF88FD                         	LCALL abs
+00000278    8990011C                       	CMP   _AX,#0190h
+0000027C    D605                           	JGE   ??_25_NOT
+0000027E    AD011E                         	LDBZE _BX,#01h
+00000281    2002                           	SJMP  ??_25_SKIP
+                   ??_25_NOT:
+00000283    011E                           	CLR   _BX
+                  ??_25_SKIP:
+00000285    801E28                         	OR    _GX,_BX
+00000288    880028                         	CMP   _GX,0
+0000028B    DF56                           	JE    ??_5_BREAK
+0000028D    AD021E                         	LDBZE _BX,#02h
+;000089                break;
+00000290    2049                           	SJMP  ??_32_COMMON
+                 ??_5_CASE_0:
+;000091                if ((abs(dnt_min[0])  < 160) | (abs(dnt_min[1]) < 160) | (abs(tmp_uint16)<400)) *status = 1;
+00000292    A326021C                       	LD    _AX,02h[dnt_min?CurrentCalculation]
+00000296    EF67FD                         	LCALL abs
+00000299    89A0001C                       	CMP   _AX,#00A0h
+0000029D    D605                           	JGE   ??_27_NOT
+0000029F    AD0128                         	LDBZE _GX,#01h
+000002A2    2002                           	SJMP  ??_27_SKIP
+                   ??_27_NOT:
+000002A4    0128                           	CLR   _GX
+                  ??_27_SKIP:
+000002A6    A2261C                         	LD    _AX,[dnt_min?CurrentCalculation]
+000002A9    EF54FD                         	LCALL abs
+000002AC    89A0001C                       	CMP   _AX,#00A0h
+000002B0    D605                           	JGE   ??_28_NOT
+000002B2    AD011E                         	LDBZE _BX,#01h
+000002B5    2002                           	SJMP  ??_28_SKIP
+                   ??_28_NOT:
+000002B7    011E                           	CLR   _BX
+                  ??_28_SKIP:
+000002B9    801E28                         	OR    _GX,_BX
+000002BC    A318001C                       	LD    _AX,tmp_uint16?CurrentCalculation[_SP]
+000002C0    EF3DFD                         	LCALL abs
+000002C3    8990011C                       	CMP   _AX,#0190h
+000002C7    D605                           	JGE   ??_29_NOT
+000002C9    AD011E                         	LDBZE _BX,#01h
+000002CC    2002                           	SJMP  ??_29_SKIP
+                   ??_29_NOT:
+000002CE    011E                           	CLR   _BX
+                  ??_29_SKIP:
+000002D0    801E28                         	OR    _GX,_BX
+000002D3    880028                         	CMP   _GX,0
+000002D6    DF0B                           	JE    ??_5_BREAK
+                ??_31_COMMON:
+000002D8    AD011E                         	LDBZE _BX,#01h
+                ??_32_COMMON:
+000002DB    C2241E                         	ST    _BX,[status?CurrentCalculation]
+;000092                break;
+000002DE    2003                           	SJMP  ??_5_BREAK
+                ??_5_DEFAULT:
+;000094                *status = 0;
+                ??_30_COMMON:
+000002E0    C22400                         	ST    00h,[status?CurrentCalculation]
+;000095                break;
+;000096        }
+                  ??_5_BREAK:
+;000098        return tmp_uint16;
+000002E3    A318001C                       	LD    _AX,tmp_uint16?CurrentCalculation[_SP]
+;000099    }
+000002E7    CC00                           	POP   00h
+000002E9    CC2A                           	POP   _HX
+000002EB    CC28                           	POP   _GX
+000002ED    CC26                           	POP   _FX
+000002EF    CC24                           	POP   _EX
+000002F1    F0                             	RET   
+.ENDF
+
+.\TestLinear\dnt_fun.c: 754 byte(s), 2823 line(s), 0 error(s), 1 warning(s)
+
