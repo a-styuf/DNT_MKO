@@ -5,1194 +5,392 @@
 *                                                                             *
 *******************************************************************************
 
-Warning[C24] .\TestLinear\main.c(137,42): Conversion may loose significant digits
-Warning[C24] .\TestLinear\main.c(349,54): Conversion may loose significant digits
-Warning[C24] .\TestLinear\main.c(350,54): Conversion may loose significant digits
-Warning[C24] .\TestLinear\main.c(351,53): Conversion may loose significant digits
-Warning[C24] .\TestLinear\main.c(352,53): Conversion may loose significant digits
-                ?INTERRUPT00:
-                  IRQ_Timer1:
-;FILE: .\TestLinear\main.c
-;000034    void IRQ_Timer1()
-00000000    F4                             	PUSHA 
-00000001    C81C                           	PUSH  _AX
-00000003    C81E                           	PUSH  _BX
-;000037      _di_();
-00000005    FA                             	DI    
-;000038      tmp = IOS1;
-00000006    B0001E                         	LDB   tmp?IRQ_Timer1,IOS1
-;000040      if (tmp&0x20)//обработка таймера 1
-00000009    351E29                         	JBC   tmp?IRQ_Timer1,5h,??_1_ELSE
-;000041      {
-;000042      WSR = 0x0F;
-0000000C    B10F00                         	LDB   WSR,#0Fh
-;000043      TIMER1 = 0xCF9C;
-0000000F    A19CCF00                       	LD    TIMER1,#0CF9Ch
-;000044      WSR = 0x00;
-00000013    1100                           	CLRB  WSR
-;000045      if (TIMER_10MS != 0)
-00000015    A301A0001C                     	LD    _AX,TIMER_10MS
-0000001A    88001C                         	CMP   _AX,0
-0000001D    DF0E                           	JE    ??_2_ELSE
-;000046      {
-;000047        TIMER_10MS -= 1;
-0000001F    051C                           	DEC   _AX
-00000021    C301A0001C                     	ST    _AX,TIMER_10MS
-;000048        timer_flag_1 = 0;
-00000026    C7016D0100                     	STB   00h,timer_flag_1
-;000049      }
-0000002B    2008                           	SJMP  ??_2_END
-                   ??_2_ELSE:
-;000051      {
-;000052        timer_flag_1 = 1;
-0000002D    B1011C                         	LDB   _AL,#01h
-00000030    C7016D011C                     	STB   _AL,timer_flag_1
-;000054      }
-                    ??_2_END:
-;000055      }
-                   ??_1_ELSE:
-;000056      if(tmp&0x10)
-00000035    341E3F                         	JBC   tmp?IRQ_Timer1,4h,??_3_ELSE
-;000057      {
-;000058      WSR = 0x00;
-00000038    1100                           	CLRB  WSR
-;000059      TIMER2 = 0xFB1D;
-0000003A    A11DFB00                       	LD    TIMER2,#0FB1Dh
-;000060      WSR = 0x00;
-;000061      if (TIMER2_1MS != 0)
-0000003E    A3019E001C                     	LD    _AX,TIMER2_1MS
-00000043    88001C                         	CMP   _AX,0
-00000046    DF0E                           	JE    ??_4_ELSE
-;000062      {
-;000063        TIMER2_1MS -= 1;
-00000048    051C                           	DEC   _AX
-0000004A    C3019E001C                     	ST    _AX,TIMER2_1MS
-;000064        timer_flag_2 = 0;
-0000004F    C7016E0100                     	STB   00h,timer_flag_2
-;000065      }
-00000054    2021                           	SJMP  ??_4_END
-                   ??_4_ELSE:
-;000067      {
-;000068        timer_flag_2 = 1;
-00000056    B1011C                         	LDB   _AL,#01h
-00000059    C7016E011C                     	STB   _AL,timer_flag_2
-;000069        dnt_time += 1;
-0000005E    A3010C001C                     	LD    _AX,dnt_time
-00000063    A3010E001E                     	LD    _BX,(dnt_time+2)
-00000068    071C                           	INC   _AX
-0000006A    A4001E                         	ADDC  _BX,0
-0000006D    C3010C001C                     	ST    _AX,dnt_time
-00000072    C3010E001E                     	ST    _BX,(dnt_time+2)
-;000071      }
-                    ??_4_END:
-;000072      }
-                   ??_3_ELSE:
-;000073      _ei_();
-00000077    FB                             	EI    
-;000074    }
-00000078    CC1E                           	POP   _BX
-0000007A    CC1C                           	POP   _AX
-0000007C    F5                             	POPA  
-0000007D    F0                             	RET   
-.ENDF
-                ?INTERRUPT09:
-                  IRQ_MKO_UD:
-;000077    void  IRQ_MKO_UD()
-0000007E    F4                             	PUSHA 
-0000007F    C81C                           	PUSH  _AX
-;000079        _di_();
-00000081    FA                             	DI    
-;000080        SBUF_TX1 = 0xFF;
-00000082    B1FF1C                         	LDB   _AL,#0FFh
-00000085    C70100001C                     	STB   _AL,SBUF_TX1
-;000081        mko_activity_flag = mko_activity_bound;
-0000008A    B3010F001C                     	LDB   _AL,mko_activity_bound
-0000008F    C70128011C                     	STB   _AL,mko_activity_flag
-;000082        _ei_();
-00000094    FB                             	EI    
-;000083    }
-00000095    CC1C                           	POP   _AX
-00000097    F5                             	POPA  
-00000098    F0                             	RET   
-.ENDF
-              Timer10ms_Flag:
-;000085    uint8 Timer10ms_Flag()
-;000087      if (timer_flag_1 != 0)
-00000000    B3016D011C                     	LDB   _AL,timer_flag_1
-00000005    98001C                         	CMPB  _AL,0
-00000008    DF1A                           	JE    ??_5_ELSE
-;000088      {
-;000089        timer_flag_1 = 0;
-0000000A    C7016D0100                     	STB   00h,timer_flag_1
-;000090        return 1;
-0000000F    200F                           	SJMP  COMMON?END_Timer10ms_Flag
-;000091      }
-;000092      return 0;
-;000093    }
-.ENDF
-               Timer1ms_Flag:
-;000095    uint8 Timer1ms_Flag()
-;000097      if (timer_flag_2 != 0)
-00000011    B3016E011C                     	LDB   _AL,timer_flag_2
-00000016    98001C                         	CMPB  _AL,0
-00000019    DF09                           	JE    ??_6_ELSE
-;000098      {
-;000099        timer_flag_2 = 0;
-0000001B    C7016E0100                     	STB   00h,timer_flag_2
-;000100        return 1;
-   COMMON?END_Timer10ms_Flag:
-00000020    B1011C                         	LDB   _AL,#01h
-00000023    F0                             	RET   
-                   ??_5_ELSE:
-;000101      }
-                   ??_6_ELSE:
-;000102      return 0;
-00000024    111C                           	CLRB  _AL
-;000103    }
-00000026    F0                             	RET   
-.ENDF
                         main:
-;000105    void main()
-00000027    C824                           	PUSH  _EX
-;000107        UART_Init();
-00000029    EFD4FF                         	LCALL UART_Init
-;000108        ADC_Init();
-0000002C    EFD1FF                         	LCALL ADC_Init
-;000109        PWM_Init();
-0000002F    EFCEFF                         	LCALL PWM_Init
-;000110        Timer_Init();
-00000032    EFCBFF                         	LCALL Timer_Init
-;000111        MKO_UD_Init();
-00000035    EFC8FF                         	LCALL MKO_UD_Init
-;000112        IOPORT1 = 0x00;
-00000038    1100                           	CLRB  IOPORT1
-;000113        TIMER_10MS = 100;
-0000003A    AD641C                         	LDBZE _AX,#64h
-0000003D    C301A0001C                     	ST    _AX,TIMER_10MS
-;000114        TIMER2_1MS = 100;
-00000042    C3019E001C                     	ST    _AX,TIMER2_1MS
-;000115        SBUF_TX1 = 0x01;
-00000047    B10124                         	LDB   _EL,#01h
-0000004A    C701000024                     	STB   _EL,SBUF_TX1
-;000116        memset(DNT_data, 0xFA, 64);
-0000004F    A112001C                       	LD    _AX,#DNT_data
-00000053    ADFA1E                         	LDBZE _BX,#0FAh
-00000056    AD4020                         	LDBZE _CX,#40h
-00000059    EFA4FF                         	LCALL memset
-;000117        MKO_data_to_transmit(DNT_data, 30);
-0000005C    A112001C                       	LD    _AX,#DNT_data
-00000060    B11E1E                         	LDB   _BL,#1Eh
-00000063    EF9AFF                         	LCALL MKO_data_to_transmit
-;000118        MKO_receive_data_change(DNT_data, 29);
-00000066    A112001C                       	LD    _AX,#DNT_data
-0000006A    B11D1E                         	LDB   _BL,#1Dh
-0000006D    EF90FF                         	LCALL MKO_receive_data_change
-;000120        while(1)
-                     ??_7_DO:
-;000121        {
-;000123            if (Timer10ms_Flag() == 1)
-00000070    2F8E                           	SCALL Timer10ms_Flag
-00000072    99011C                         	CMPB  _AL,#01h
-00000075    DF02                           	JE    ??_8_ELSE_BYPASS_75
-00000077    21FA                           	SJMP  ??_8_ELSE
-         ??_8_ELSE_BYPASS_75:
-;000124            {
-;000127                ADC_50V(&Result_50V, 16);//результат в мВ
-00000079    A188001C                       	LD    _AX,#Result_50V
-0000007D    AD101E                         	LDBZE _BX,#10h
-00000080    EF7DFF                         	LCALL ADC_50V
-;000128                Result_50V_arr[i] = Result_50V;
-00000083    A301A6001C                     	LD    _AX,i
-00000088    09011C                         	SHL   _AX,#01h
-0000008B    A30188001E                     	LD    _BX,Result_50V
-00000090    C31D8A001E                     	ST    _BX,Result_50V_arr[_AX]
-;000129                Result_50V_mean = (Result_50V_arr[0] +Result_50V_arr[1])/2;
-00000095    A3018A001C                     	LD    _AX,Result_50V_arr
-0000009A    67018C001C                     	ADD   _AX,(Result_50V_arr+2)
-0000009F    08011C                         	SHR   _AX,#01h
-000000A2    C3019A001C                     	ST    _AX,Result_50V_mean
-;000131                ADC_Pt1000(&Result_Temp, 32);
-000000A7    A19C001C                       	LD    _AX,#Result_Temp
-000000AB    AD201E                         	LDBZE _BX,#20h
-000000AE    EF4FFF                         	LCALL ADC_Pt1000
-;000133                DNT_max_arr[i] = DNT_max;
-000000B1    A301A6001C                     	LD    _AX,i
-000000B6    09011C                         	SHL   _AX,#01h
-000000B9    A30152001E                     	LD    _BX,DNT_max
-000000BE    C31D54001E                     	ST    _BX,DNT_max_arr[_AX]
-;000134                DNT_min_arr[i] = DNT_min;
-000000C3    A301A6001C                     	LD    _AX,i
-000000C8    09011C                         	SHL   _AX,#01h
-000000CB    A30164001E                     	LD    _BX,DNT_min
-000000D0    C31D66001E                     	ST    _BX,DNT_min_arr[_AX]
-;000135                _di_();
-000000D5    FA                             	DI    
-;000136                if (num_var == 0) num_var = 1;
-000000D6    A301B6001C                     	LD    _AX,num_var
-000000DB    88001C                         	CMP   _AX,0
-000000DE    D708                           	JNE   ??_9_ELSE
-000000E0    AD011C                         	LDBZE _AX,#01h
-000000E3    C301B6001C                     	ST    _AX,num_var
-                   ??_9_ELSE:
-;000137                DNT_result = (adc_var/num_var);
-000000E8    A301B60020                     	LD    _CX,num_var
-000000ED    0122                           	CLR   _DX
-000000EF    A30104001C                     	LD    _AX,adc_var
-000000F4    A30106001E                     	LD    _BX,(adc_var+2)
-000000F9    EF04FF                         	LCALL ??DIV32
-000000FC    C30176001C                     	ST    _AX,DNT_result
-;000138                DNT_max =  0;
-00000101    C301520000                     	ST    00h,DNT_max
-;000139                DNT_min = 17000;
-00000106    A168421C                       	LD    _AX,#4268h
-0000010A    C30164001C                     	ST    _AX,DNT_min
-;000140                adc_var = 0;
-0000010F    C301040000                     	ST    00h,adc_var
-00000114    C301060000                     	ST    00h,(adc_var+2)
-;000141                num_var = 0;
-00000119    C301B60000                     	ST    00h,num_var
-;000142                time_out = 0;
-0000011E    C301C00000                     	ST    00h,time_out
-;000143                _ei_();
-00000123    FB                             	EI    
-;000144                if (i==0)
-00000124    A301A6001C                     	LD    _AX,i
-00000129    88001C                         	CMP   _AX,0
-0000012C    A301A2001C                     	LD    _AX,i-0004h
-00000131    D71B                           	JNE   ??_10_ELSE
-;000145                {
-;000146                    DNT_result_arr[0+dnt_status&0x0F] = DNT_result;
-00000133    610F001C                       	AND   _AX,#000Fh
-00000137    09011C                         	SHL   _AX,#01h
-0000013A    A30176001E                     	LD    _BX,DNT_result
-0000013F    C31D78001E                     	ST    _BX,DNT_result_arr[_AX]
-;000148                    i = 1;
-00000144    AD011C                         	LDBZE _AX,#01h
-00000147    C301A6001C                     	ST    _AX,i
-;000149                }
-0000014C    2077                           	SJMP  ??_10_END
+;FILE: .\TestLinear\main.c
+;000049    void main()
+;000051        UART_Init();
+00000000    EFFDFF                         	LCALL UART_Init
+;000052        ADC_Init();
+00000003    EFFAFF                         	LCALL ADC_Init
+;000053        PWM_Init();
+00000006    EFF7FF                         	LCALL PWM_Init
+;000054        Timer_Init();
+00000009    EFF4FF                         	LCALL Timer_Init
+;000055        MKO_UD_Init();
+0000000C    EFF1FF                         	LCALL MKO_UD_Init
+;000056        IOPORT1 = 0x00;
+0000000F    1100                           	CLRB  IOPORT1
+;000057        TIMER1_50MS = 4;
+00000011    AD041C                         	LDBZE _AX,#04h
+00000014    C30100001C                     	ST    _AX,TIMER1_50MS
+;000058        TIMER2_10MS = 100;
+00000019    AD641C                         	LDBZE _AX,#64h
+0000001C    C30100001C                     	ST    _AX,TIMER2_10MS
+;000059        SBUF_TX1 = 0x01;
+00000021    B1011C                         	LDB   _AL,#01h
+00000024    C70100001C                     	STB   _AL,SBUF_TX1
+;000061        memset(u16_buff, 0xFA, 64);
+00000029    A102001C                       	LD    _AX,#u16_buff
+0000002D    ADFA1E                         	LDBZE _BX,#0FAh
+00000030    AD4020                         	LDBZE _CX,#40h
+00000033    EFCAFF                         	LCALL memset
+;000062        MKO_data_to_transmit(u16_buff, 30);
+00000036    A102001C                       	LD    _AX,#u16_buff
+0000003A    B11E1E                         	LDB   _BL,#1Eh
+0000003D    EFC0FF                         	LCALL MKO_data_to_transmit
+;000063        MKO_receive_data_change(u16_buff, 29);
+00000040    A102001C                       	LD    _AX,#u16_buff
+00000044    B11D1E                         	LDB   _BL,#1Dh
+00000047    EFB6FF                         	LCALL MKO_receive_data_change
+;000065        DNT_Parameters_Init(&dnt, MEAS_LENG_S, DEAD_TIME_MS, MODE);
+0000004A    A100001C                       	LD    _AX,#dnt
+0000004E    AD011E                         	LDBZE _BX,#01h
+00000051    AD6420                         	LDBZE _CX,#64h
+00000054    AD0222                         	LDBZE _DX,#02h
+00000057    EFA6FF                         	LCALL DNT_Parameters_Init
+;000066        DNT_Frame_Definer_Init(&dnt, DEVICE_TYPE, ZAV_NUMBER);
+0000005A    A100001C                       	LD    _AX,#dnt
+0000005E    B1021E                         	LDB   _BL,#02h
+00000061    B1051F                         	LDB   _BH,#05h
+00000064    EF99FF                         	LCALL DNT_Frame_Definer_Init
+;000067        DNT_Frame_Init(&dnt_data_frame, &dnt);
+00000067    A100001C                       	LD    _AX,#dnt_data_frame
+0000006B    A100001E                       	LD    _BX,#dnt
+0000006F    EF8EFF                         	LCALL DNT_Frame_Init
+;000070        while(1)
+                     ??_1_DO:
+;000071        {
+;000073            if (Timer50ms_Flag() == 1)
+00000072    EF8BFF                         	LCALL Timer50ms_Flag
+00000075    99011C                         	CMPB  _AL,#01h
+00000078    D708                           	JNE   ??_2_ELSE
+;000074            {
+;000075                TIMER1_50MS = 1;//задание интервала опроса
+0000007A    AD011C                         	LDBZE _AX,#01h
+0000007D    C30100001C                     	ST    _AX,TIMER1_50MS
+;000076            }
+                   ??_2_ELSE:
+;000077            if (Timer10ms_Flag() == 1)
+00000082    EF7BFF                         	LCALL Timer10ms_Flag
+00000085    99011C                         	CMPB  _AL,#01h
+00000088    D769                           	JNE   ??_3_ELSE
+;000078            {
+;000079                TIMER2_10MS = 1;
+0000008A    AD011C                         	LDBZE _AX,#01h
+0000008D    C30100001C                     	ST    _AX,TIMER2_10MS
+;000080                if (mko_activity_timeout != 0) {
+00000092    B30100001C                     	LDB   _AL,mko_activity_timeout
+00000097    98001C                         	CMPB  _AL,0
+0000009A    DF09                           	JE    ??_4_ELSE
+;000081                    mko_activity_timeout--; //необходимо делать паузы, что бы МКО не вносило помехи в измерения
+0000009C    151C                           	DECB  _AL
+0000009E    C70100001C                     	STB   _AL,mko_activity_timeout
+;000082                }
+000000A3    2025                           	SJMP  ??_4_END
+                   ??_4_ELSE:
+;000083                else{
+;000084                    if (Current_Calc_Step_10ms(&dnt)) {// производим итеративный подсчет тока, по окончанию выкладываемвсе данные на подадрес МПИ
+000000A5    A100001C                       	LD    _AX,#dnt
+000000A9    EF54FF                         	LCALL Current_Calc_Step_10ms
+000000AC    98001C                         	CMPB  _AL,0
+000000AF    DF0B                           	JE    ??_5_ELSE
+;000085                        DNT_Frame_Create(&dnt_data_frame, &dnt);
+000000B1    A100001C                       	LD    _AX,#dnt_data_frame
+000000B5    A100001E                       	LD    _BX,#dnt
+000000B9    EF44FF                         	LCALL DNT_Frame_Create
+;000086                    }
+                   ??_5_ELSE:
+;000087                    Grid_Voltage_Calc_Step_10ms(&dnt);
+000000BC    A100001C                       	LD    _AX,#dnt
+000000C0    EF3DFF                         	LCALL Grid_Voltage_Calc_Step_10ms
+;000088                    Temp_Calc_Step_10ms(&dnt);
+000000C3    A100001C                       	LD    _AX,#dnt
+000000C7    EF36FF                         	LCALL Temp_Calc_Step_10ms
+;000089                }
+                    ??_4_END:
+;000091                if ((mko_read_flag != 0) && (dnt.control.measure_cycle_time_ms == 0)){ //проверяем есть ли команда на запись по МКО и закончился ли цикл измерения, если все есть, перезаписываем параметры ДНТ
+000000CA    B30100001C                     	LDB   _AL,mko_read_flag
+000000CF    98001C                         	CMPB  _AL,0
+000000D2    DF1F                           	JE    ??_6_ELSE
+000000D4    A301B40020                     	LD    _CX,(dnt+0B4h)
+000000D9    A301B60022                     	LD    _DX,(dnt+0B6h)
+000000DE    011C                           	CLR   _AX
+000000E0    011E                           	CLR   _BX
+000000E2    C51C20                         	CMPL  _DCX,_BAX
+000000E5    D70C                           	JNE   ??_6_ELSE
+;000092                    mko_read_flag = 0;
+000000E7    C701000000                     	STB   00h,mko_read_flag
+;000093                    Update_MKO_from_DNT_Parameters(&dnt);
+000000EC    A100001C                       	LD    _AX,#dnt
+000000F0    EF0DFF                         	LCALL Update_MKO_from_DNT_Parameters
+;000094                }
+                   ??_6_ELSE:
+;000095            }
+                   ??_3_ELSE:
+;000098            if((leng = UART1_RX(request)) != 0)
+000000F3    A104011C                       	LD    _AX,#request
+000000F7    EF06FF                         	LCALL UART1_RX
+000000FA    C70102011C                     	STB   _AL,leng
+000000FF    98001C                         	CMPB  _AL,0
+00000102    D702                           	JNE   ??_1_DO_BYPASS_102
+00000104    276C                           	SJMP  ??_1_DO
+          ??_1_DO_BYPASS_102:
+;000099            {
+;000100                if (request[0] == ID)
+00000106    B30104011C                     	LDB   _AL,request
+0000010B    99F01C                         	CMPB  _AL,#0F0h
+0000010E    DF02                           	JE    ??_1_DO_BYPASS_10E
+00000110    2760                           	SJMP  ??_1_DO
+          ??_1_DO_BYPASS_10E:
+;000101                {
+;000102                    if(request[4] == 0x00) // тестовая команда, дающая простой ответ от ДНТ (удобно использовать для проверки связи)
+00000112    B301080122                     	LDB   _DL,(request+4)
+00000117    980022                         	CMPB  _DL,0
+0000011A    D71B                           	JNE   ??_10_ELSE
+;000103                    {
+;000104                        leng = COMAnsForm(req_id, ID, request[2], &seq_num, request[4], 0, com_data, answer);
+0000011C    C94200                         	PUSH  #answer
+0000011F    C9C200                         	PUSH  #com_data
+00000122    B30103011C                     	LDB   _AL,req_id
+00000127    B1F01D                         	LDB   _AH,#0F0h
+0000012A    B30106011E                     	LDB   _BL,(request+2)
+0000012F    A1840120                       	LD    _CX,#seq_num
+00000133    1123                           	CLRB  _DH
+;000105                        UART1_TX(answer, leng);
+;000106                    }
+00000135    2134                           	SJMP  ??_20_COMMON
                   ??_10_ELSE:
-;000151                {
-;000152                    if (dnt_status_old != dnt_status) //данное условие помогает правильно усреднить за две точки калибровочный нуль
-0000014E    A301A4001E                     	LD    _BX,dnt_status_old
-00000153    881C1E                         	CMP   _BX,_AX
-00000156    DF12                           	JE    ??_11_ELSE
-;000153                    {
-;000154                         DNT_result_arr[4+dnt_status&0x0F] = DNT_result;
-00000158    6504001C                       	ADD   _AX,#0004h
-0000015C    610F001C                       	AND   _AX,#000Fh
-00000160    09011C                         	SHL   _AX,#01h
-00000163    A30176001E                     	LD    _BX,DNT_result
-;000155                    }
-00000168    201D                           	SJMP  ??_65_COMMON
+;000107                    else if(request[4] == 0x01)// команда для чтения тока
+00000137    990122                         	CMPB  _DL,#01h
+0000013A    D757                           	JNE   ??_11_ELSE
+;000108                    {
+;000109                        u16_buff[0] = dnt.current_result;
+0000013C    A30106001C                     	LD    _AX,(dnt+6)
+00000141    C30102001C                     	ST    _AX,u16_buff
+;000110                        u16_buff[1] = dnt.signal.value;
+00000146    A30110001C                     	LD    _AX,(dnt+16)
+0000014B    C30104001C                     	ST    _AX,(u16_buff+2)
+;000111                        u16_buff[2] = dnt.zero.value;
+00000150    A30154001C                     	LD    _AX,(dnt+84)
+00000155    C30106001C                     	ST    _AX,(u16_buff+4)
+;000112                        u16_buff[3] = dnt.control.ku;
+0000015A    A301B2001C                     	LD    _AX,(dnt+0B2h)
+0000015F    C30108001C                     	ST    _AX,(u16_buff+6)
+;000113                        uint16_buffer_rev_to_uint8_buffer(u16_buff, com_data, 4);
+00000164    A102001C                       	LD    _AX,#u16_buff
+00000168    A1C2001E                       	LD    _BX,#com_data
+0000016C    B10420                         	LDB   _CL,#04h
+0000016F    EF8EFE                         	LCALL uint16_buffer_rev_to_uint8_buffer
+;000114                        leng = COMAnsForm(req_id, ID, request[2], &seq_num, request[4], 8, com_data, answer);
+00000172    C94200                         	PUSH  #answer
+00000175    C9C200                         	PUSH  #com_data
+00000178    B30103011C                     	LDB   _AL,req_id
+0000017D    B1F01D                         	LDB   _AH,#0F0h
+00000180    B30106011E                     	LDB   _BL,(request+2)
+00000185    A1840120                       	LD    _CX,#seq_num
+00000189    B301080122                     	LDB   _DL,(request+4)
+0000018E    B10823                         	LDB   _DH,#08h
+;000115                        UART1_TX(answer, leng);
+;000116                    }
+00000191    20D8                           	SJMP  ??_21_COMMON
                   ??_11_ELSE:
-;000157                    {
-;000158                        DNT_result_arr[4+dnt_status&0x0F] = (DNT_result+DNT_cal_result)/2;
-0000016A    6504001C                       	ADD   _AX,#0004h
-0000016E    610F001C                       	AND   _AX,#000Fh
-00000172    09011C                         	SHL   _AX,#01h
-00000175    A30176001E                     	LD    _BX,DNT_result
-0000017A    670110001E                     	ADD   _BX,DNT_cal_result
-0000017F    371F02                         	JBC   _BH,7h,??_12_ELSE
-00000182    071E                           	INC   _BX
+;000117                    else if(request[4] == 0x02)// команда для чтения показаний температурного датчика
+00000193    990222                         	CMPB  _DL,#02h
+00000196    D707                           	JNE   ??_12_ELSE
+;000118                    {
+;000119                        u16_buff[0] = dnt.temperature.value;
+00000198    A301A0001C                     	LD    _AX,(dnt+0A0h)
+;000120                        uint16_buffer_rev_to_uint8_buffer(u16_buff, com_data, 1);
+;000121                        leng = COMAnsForm(req_id, ID, request[2], &seq_num, request[4], 2, com_data, answer);
+;000122                        UART1_TX(answer, leng);
+;000123                    }
+0000019D    200A                           	SJMP  ??_22_COMMON
                   ??_12_ELSE:
-00000184    0A011E                         	SHRA  _BX,#01h
-                ??_65_COMMON:
-00000187    C31D78001E                     	ST    _BX,DNT_result_arr[_AX]
-;000159                    }
-;000160                    DNT_cal_result = DNT_result;
-0000018C    A30176001C                     	LD    _AX,DNT_result
-00000191    C30110001C                     	ST    _AX,DNT_cal_result
-;000162                    i = 0;
-00000196    C301A60000                     	ST    00h,i
-;000163                    mko_data_flag     = 1;
-0000019B    B10124                         	LDB   _EL,#01h
-0000019E    C701290124                     	STB   _EL,mko_data_flag
-;000164                    dnt_status_old = dnt_status;
-000001A3    A301A2001C                     	LD    _AX,dnt_status
-000001A8    C301A4001C                     	ST    _AX,dnt_status_old
-;000165                    main_current = CurrentCalculation(DNT_result_arr, DNT_max_arr, DNT_min_arr, &dnt_status);
-000001AD    A178001C                       	LD    _AX,#DNT_result_arr
-000001B1    A154001E                       	LD    _BX,#DNT_max_arr
-000001B5    A1660020                       	LD    _CX,#DNT_min_arr
-000001B9    A1A20022                       	LD    _DX,#dnt_status
-000001BD    EF40FE                         	LCALL CurrentCalculation
-000001C0    C301AE001C                     	ST    _AX,main_current
-;000166                }
-                   ??_10_END:
-;000168                if (dnt_status == 0) dnt_ku = 0x00;
-000001C5    A301A2001C                     	LD    _AX,dnt_status
-000001CA    88001C                         	CMP   _AX,0
-000001CD    DF26                           	JE    ??_66_COMMON
-;000169                else if (dnt_status == 1) dnt_ku = 0x20;
-000001CF    8901001C                       	CMP   _AX,#0001h
-000001D3    D705                           	JNE   ??_14_ELSE
-000001D5    B1201C                         	LDB   _AL,#20h
-000001D8    2014                           	SJMP  ??_78_COMMON
+;000124                    else if(request[4] == 0x03)// команда для чтения сводной информации по генератору -50В
+0000019F    990322                         	CMPB  _DL,#03h
+000001A2    D739                           	JNE   ??_13_ELSE
+;000125                    {
+;000126                        u16_buff[0] = dnt.shut_off_grid.value;
+000001A4    A30194001C                     	LD    _AX,(dnt+94h)
+                ??_22_COMMON:
+000001A9    C30102001C                     	ST    _AX,u16_buff
+;000127                        uint16_buffer_rev_to_uint8_buffer(u16_buff, com_data, 1);
+000001AE    A102001C                       	LD    _AX,#u16_buff
+000001B2    A1C2001E                       	LD    _BX,#com_data
+000001B6    B10120                         	LDB   _CL,#01h
+000001B9    EF44FE                         	LCALL uint16_buffer_rev_to_uint8_buffer
+;000128                        leng = COMAnsForm(req_id, ID, request[2], &seq_num, request[4], 2, com_data, answer);
+000001BC    C94200                         	PUSH  #answer
+000001BF    C9C200                         	PUSH  #com_data
+000001C2    B30103011C                     	LDB   _AL,req_id
+000001C7    B1F01D                         	LDB   _AH,#0F0h
+000001CA    B30106011E                     	LDB   _BL,(request+2)
+000001CF    A1840120                       	LD    _CX,#seq_num
+000001D3    B301080122                     	LDB   _DL,(request+4)
+000001D8    B10223                         	LDB   _DH,#02h
+;000129                        UART1_TX(answer, leng);
+;000130                    }
+000001DB    208E                           	SJMP  ??_23_COMMON
+                  ??_13_ELSE:
+;000131                    else if(request[4] == 0x04)// вычитывание параметров dnt из структуры
+000001DD    990422                         	CMPB  _DL,#04h
+000001E0    D70A                           	JNE   ??_14_ELSE
+;000132                    {
+;000133                        memcpy((uint8_t*)u16_buff, (uint8_t*)&dnt, 64);
+000001E2    A102001C                       	LD    _AX,#u16_buff
+000001E6    A100001E                       	LD    _BX,#dnt
+;000134                        uint16_buffer_rev_to_uint8_buffer(u16_buff, com_data, 32);
+;000135                        leng = COMAnsForm(req_id, ID, request[2], &seq_num, request[4], 64, com_data, answer);
+;000136                        UART1_TX(answer, leng);
+;000137                    }
+000001EA    200D                           	SJMP  ??_24_COMMON
                   ??_14_ELSE:
-;000170                else if (dnt_status == 2) dnt_ku = 0x10;
-000001DA    8902001C                       	CMP   _AX,#0002h
-000001DE    D705                           	JNE   ??_15_ELSE
-000001E0    B1101C                         	LDB   _AL,#10h
-000001E3    2009                           	SJMP  ??_79_COMMON
+;000138                    else if(request[4] == 0x05)// команда для чтения данных с подадреса 30
+000001EC    990522                         	CMPB  _DL,#05h
+000001EF    D73D                           	JNE   ??_15_ELSE
+;000139                    {
+;000140                        memcpy((uint8_t*)u16_buff, (uint8_t*)&dnt_data_frame, 64);
+000001F1    A102001C                       	LD    _AX,#u16_buff
+000001F5    A100001E                       	LD    _BX,#dnt_data_frame
+                ??_24_COMMON:
+000001F9    AD4020                         	LDBZE _CX,#40h
+000001FC    EF01FE                         	LCALL memcpy
+;000141                        uint16_buffer_rev_to_uint8_buffer(u16_buff, com_data, 32);
+000001FF    A102001C                       	LD    _AX,#u16_buff
+00000203    A1C2001E                       	LD    _BX,#com_data
+00000207    B12020                         	LDB   _CL,#20h
+0000020A    EFF3FD                         	LCALL uint16_buffer_rev_to_uint8_buffer
+;000142                        leng = COMAnsForm(req_id, ID, request[2], &seq_num, request[4], 64, com_data, answer);
+0000020D    C94200                         	PUSH  #answer
+00000210    C9C200                         	PUSH  #com_data
+00000213    B30103011C                     	LDB   _AL,req_id
+00000218    B1F01D                         	LDB   _AH,#0F0h
+0000021B    B30106011E                     	LDB   _BL,(request+2)
+00000220    A1840120                       	LD    _CX,#seq_num
+00000224    B301080122                     	LDB   _DL,(request+4)
+00000229    B14023                         	LDB   _DH,#40h
+;000143                        UART1_TX(answer, leng);
+;000144                    }
+0000022C    203D                           	SJMP  ??_25_COMMON
                   ??_15_ELSE:
-;000171                else if (dnt_status == 3) dnt_ku = 0x30;
-000001E5    8903001C                       	CMP   _AX,#0003h
-000001E9    D70A                           	JNE   ??_16_ELSE
-000001EB    B1301C                         	LDB   _AL,#30h
-                ??_78_COMMON:
-                ??_79_COMMON:
-000001EE    C70124011C                     	STB   _AL,dnt_ku
-000001F3    2005                           	SJMP  ??_16_END
+;000145    				else if(request[4] == 0xF1)// управление режимом
+0000022E    99F122                         	CMPB  _DL,#0F1h
+00000231    D752                           	JNE   ??_16_ELSE
+;000146                    {
+;000147                        dnt.control.mode = request[6];
+00000233    AF010A011C                     	LDBZE _AX,(request+6)
+00000238    C301AC001C                     	ST    _AX,(dnt+0ACh)
+;000148                        dnt.control.measure_leng_s = request[7];
+0000023D    AF010B011C                     	LDBZE _AX,(request+7)
+00000242    C301AE001C                     	ST    _AX,(dnt+0AEh)
+;000149                        dnt.control.dead_time_ms = request[8];
+00000247    AF010C011C                     	LDBZE _AX,(request+8)
+0000024C    C301B0001C                     	ST    _AX,(dnt+0B0h)
+;000150                        leng = COMAnsForm(req_id, ID, request[2], &seq_num, request[4], 3, &request[6], answer);
+00000251    C94200                         	PUSH  #answer
+00000254    C90A01                         	PUSH  #(request+6)
+00000257    B30103011C                     	LDB   _AL,req_id
+0000025C    B1F01D                         	LDB   _AH,#0F0h
+0000025F    B30106011E                     	LDB   _BL,(request+2)
+00000264    A1840120                       	LD    _CX,#seq_num
+00000268    B10323                         	LDB   _DH,#03h
+                ??_20_COMMON:
+                ??_21_COMMON:
+                ??_23_COMMON:
+                ??_25_COMMON:
+0000026B    EF92FD                         	LCALL COMAnsForm
+0000026E    65040018                       	ADD   _SP,#0004h
+00000272    C70102011C                     	STB   _AL,leng
+;000151                        UART1_TX(answer, leng);
+00000277    A142001C                       	LD    _AX,#answer
+0000027B    B30102011E                     	LDB   _BL,leng
+00000280    EF7DFD                         	LCALL UART1_TX
+;000152                    }				
+00000283    25ED                           	SJMP  ??_1_DO
                   ??_16_ELSE:
-;000172                else dnt_ku = 0x00;
-                ??_66_COMMON:
-000001F5    C701240100                     	STB   00h,dnt_ku
-                   ??_16_END:
-;000174                if  (i == 0)
-000001FA    A301A6001C                     	LD    _AX,i
-000001FF    88001C                         	CMP   _AX,0
-00000202    D70A                           	JNE   ??_17_ELSE
-;000175                {
-;000176                    IOPORT1 = 0x38&(0x08|dnt_ku);
-00000204    B30124011C                     	LDB   _AL,dnt_ku
-00000209    91081C                         	ORB   _AL,#08h
-;000177                    period = ((mc_time*100)/2);
-;000178                }
-0000020C    200B                           	SJMP  ??_67_COMMON
-                  ??_17_ELSE:
-;000179                else if (i == 1)
-0000020E    8901001C                       	CMP   _AX,#0001h
-00000212    D71C                           	JNE   ??_18_ELSE
-;000180                {
-;000181                    IOPORT1 = 0x38&(0x00|dnt_ku);
-00000214    B30124011C                     	LDB   _AL,dnt_ku
-                ??_67_COMMON:
-00000219    71381C                         	ANDB  _AL,#38h
-0000021C    B01C00                         	LDB   IOPORT1,_AL
-;000182                    period = ((mc_time*100)/2);
-0000021F    A30108001C                     	LD    _AX,mc_time
-00000224    6D64001C                       	MULU  _BAX,#0064h
-00000228    08011C                         	SHR   _AX,#01h
-0000022B    C3010A001C                     	ST    _AX,period
-;000183                }
-                  ??_18_ELSE:
-;000185                if (i == 1)
-00000230    A301A6001C                     	LD    _AX,i
-00000235    8901001C                       	CMP   _AX,#0001h
-00000239    D72E                           	JNE   ??_19_ELSE
-;000186                {
-;000187                    if (pwm_flag == 0)
-0000023B    B3012A011C                     	LDB   _AL,pwm_flag
-00000240    98001C                         	CMPB  _AL,0
-00000243    D71C                           	JNE   ??_20_ELSE
-;000188                    {
-;000189                        if (duty_ena == 1) duty_val=PWM_FB(Result_50V_mean, duty_val); //подстраиваем под -51.2 В
-00000245    B3010E001C                     	LDB   _AL,duty_ena
-0000024A    99011C                         	CMPB  _AL,#01h
-0000024D    D712                           	JNE   ??_21_ELSE
-0000024F    A3019A001C                     	LD    _AX,Result_50V_mean
-00000254    B30125011E                     	LDB   _BL,duty_val
-00000259    EFA4FD                         	LCALL PWM_FB
-0000025C    C70125011C                     	STB   _AL,duty_val
-                  ??_21_ELSE:
-;000190                    }
-                  ??_20_ELSE:
-;000191                    PWM_Duty(duty_val);
-00000261    B30125011C                     	LDB   _AL,duty_val
-00000266    EF97FD                         	LCALL PWM_Duty
-;000192                }
-                  ??_19_ELSE:
-;000193                TIMER_10MS = period;//задание интервала опроса
-00000269    A3010A001C                     	LD    _AX,period
-0000026E    C301A0001C                     	ST    _AX,TIMER_10MS
-;000195            }
-                   ??_8_ELSE:
-;000196            if (Timer1ms_Flag() == 1)
-00000273    2D9C                           	SCALL Timer1ms_Flag
-00000275    99011C                         	CMPB  _AL,#01h
-00000278    DF02                           	JE    ??_22_ELSE_BYPASS_278
-0000027A    20AD                           	SJMP  ??_22_ELSE
-       ??_22_ELSE_BYPASS_278:
-;000197            {
-;000198                TIMER2_1MS = adc_time;
-0000027C    A30102001C                     	LD    _AX,adc_time
-00000281    C3019E001C                     	ST    _AX,TIMER2_1MS
-;000199                _di_();
-00000286    FA                             	DI    
-;000200                if (time_out*adc_time > dead_time)
-00000287    A301C0001C                     	LD    _AX,time_out
-0000028C    6F0102001C                     	MULU  _BAX,adc_time
-00000291    A30106001E                     	LD    _BX,dead_time
-00000296    881C1E                         	CMP   _BX,_AX
-00000299    DB68                           	JC    ??_23_ELSE
-;000201                {
-;000202                    temp_var = ADC_DNT_summ();
-0000029B    EF62FD                         	LCALL ADC_DNT_summ
-0000029E    C301BE001C                     	ST    _AX,temp_var
-;000203                    if (mko_activity_flag == 0)
-000002A3    B30128011C                     	LDB   _AL,mko_activity_flag
-000002A8    98001C                         	CMPB  _AL,0
-000002AB    D74F                           	JNE   ??_24_ELSE
-;000204                        {
-;000205                            adc_var += temp_var;
-000002AD    A301BE0020                     	LD    _CX,temp_var
-000002B2    0620                           	EXT   _DCX
-000002B4    A30104001C                     	LD    _AX,adc_var
-000002B9    A30106001E                     	LD    _BX,(adc_var+2)
-000002BE    64201C                         	ADD   _AX,_CX
-000002C1    A4221E                         	ADDC  _BX,_DX
-000002C4    C30104001C                     	ST    _AX,adc_var
-000002C9    C30106001E                     	ST    _BX,(adc_var+2)
-;000206                            num_var++;
-000002CE    A301B6001C                     	LD    _AX,num_var
-000002D3    071C                           	INC   _AX
-000002D5    C301B6001C                     	ST    _AX,num_var
-;000207                            if (DNT_max < temp_var) DNT_max = temp_var;
-000002DA    A301BE001C                     	LD    _AX,temp_var
-000002DF    A30152001E                     	LD    _BX,DNT_max
-000002E4    881C1E                         	CMP   _BX,_AX
-000002E7    D605                           	JGE   ??_25_ELSE
-000002E9    C30152001C                     	ST    _AX,DNT_max
-                  ??_25_ELSE:
-;000208                            if (DNT_min > temp_var) DNT_min = temp_var;
-000002EE    8B0164001C                     	CMP   _AX,DNT_min
-000002F3    D622                           	JGE   ??_23_END
-000002F5    C30164001C                     	ST    _AX,DNT_min
-;000209                        }
-000002FA    201B                           	SJMP  ??_23_END
-                  ??_24_ELSE:
-;000210                     else SBUF_TX1 = mko_activity_flag;
-000002FC    C70100001C                     	STB   _AL,SBUF_TX1
-;000211                }
-00000301    2014                           	SJMP  ??_23_END
-                  ??_23_ELSE:
-;000213                {
-;000214                    temp_var = ADC_DNT_summ();
-00000303    EFFAFC                         	LCALL ADC_DNT_summ
-00000306    C301BE001C                     	ST    _AX,temp_var
-;000215                    time_out++;
-0000030B    A301C0001C                     	LD    _AX,time_out
-00000310    071C                           	INC   _AX
-00000312    C301C0001C                     	ST    _AX,time_out
-;000216                }
-                   ??_23_END:
-;000217                if (mko_activity_flag != 0) mko_activity_flag--;
-00000317    B30128011C                     	LDB   _AL,mko_activity_flag
-0000031C    98001C                         	CMPB  _AL,0
-0000031F    DF07                           	JE    ??_27_ELSE
-00000321    151C                           	DECB  _AL
-00000323    C70128011C                     	STB   _AL,mko_activity_flag
-                  ??_27_ELSE:
-;000219                _ei_();
-00000328    FB                             	EI    
-;000220            }
-                  ??_22_ELSE:
-;000223            if (mko_data_flag     == 1)
-00000329    B30129011C                     	LDB   _AL,mko_data_flag
-0000032E    99011C                         	CMPB  _AL,#01h
-00000331    DF02                           	JE    ??_28_ELSE_BYPASS_331
-00000333    218B                           	SJMP  ??_28_ELSE
-       ??_28_ELSE_BYPASS_331:
-;000224            {
-;000227                mko_data_flag     = 0; //обнуляем флаг для записи в МКО
-00000335    C701290100                     	STB   00h,mko_data_flag
-;000229                DNT_data[0] = 0x0FF1;
-0000033A    A1F10F1C                       	LD    _AX,#0FF1h
-0000033E    C30112001C                     	ST    _AX,DNT_data
-;000230                DNT_data[1] = 0x4820;
-00000343    A120481E                       	LD    _BX,#4820h
-00000347    C30114001E                     	ST    _BX,(DNT_data+2)
-;000231                DNT_data[2] = main_current;
-0000034C    A301AE001E                     	LD    _BX,main_current
-00000351    C30116001E                     	ST    _BX,(DNT_data+4)
-;000232                DNT_data[3] = Result_Temp;
-00000356    A3019C001E                     	LD    _BX,Result_Temp
-0000035B    C30118001E                     	ST    _BX,(DNT_data+6)
-;000233                DNT_data[4] = Result_50V_mean;
-00000360    A3019A001E                     	LD    _BX,Result_50V_mean
-00000365    C3011A001E                     	ST    _BX,(DNT_data+8)
-;000235                DNT_data[5] = DNT_result_arr[0];
-0000036A    A30178001E                     	LD    _BX,DNT_result_arr
-0000036F    C3011C001E                     	ST    _BX,(DNT_data+10)
-;000236                DNT_data[6] = DNT_result_arr[1];
-00000374    A3017A001E                     	LD    _BX,(DNT_result_arr+2)
-00000379    C3011E001E                     	ST    _BX,(DNT_data+12)
-;000237                DNT_data[7] = DNT_result_arr[2];
-0000037E    A3017C001E                     	LD    _BX,(DNT_result_arr+4)
-00000383    C30120001E                     	ST    _BX,(DNT_data+14)
-;000238                DNT_data[8] = DNT_result_arr[3];
-00000388    A3017E001E                     	LD    _BX,(DNT_result_arr+6)
-0000038D    C30122001E                     	ST    _BX,(DNT_data+16)
-;000239                DNT_data[9] = DNT_result_arr[4];
-00000392    A30180001E                     	LD    _BX,(DNT_result_arr+8)
-00000397    C30124001E                     	ST    _BX,(DNT_data+18)
-;000240                DNT_data[10] = DNT_result_arr[5];
-0000039C    A30182001E                     	LD    _BX,(DNT_result_arr+10)
-000003A1    C30126001E                     	ST    _BX,(DNT_data+20)
-;000241                DNT_data[11] = DNT_result_arr[6];
-000003A6    A30184001E                     	LD    _BX,(DNT_result_arr+12)
-000003AB    C30128001E                     	ST    _BX,(DNT_data+22)
-;000242                DNT_data[12] = DNT_result_arr[7];
-000003B0    A30186001E                     	LD    _BX,(DNT_result_arr+14)
-000003B5    C3012A001E                     	ST    _BX,(DNT_data+24)
-;000243                DNT_data[13] = dnt_status_old;
-000003BA    A301A4001E                     	LD    _BX,dnt_status_old
-000003BF    C3012C001E                     	ST    _BX,(DNT_data+26)
-;000244                DNT_data[14] = 0x0FF1;
-000003C4    C3012E001C                     	ST    _AX,(DNT_data+28)
-;000247                MKO_data_to_transmit(DNT_data, 30);
-000003C9    A112001C                       	LD    _AX,#DNT_data
-000003CD    B11E1E                         	LDB   _BL,#1Eh
-000003D0    EF2DFC                         	LCALL MKO_data_to_transmit
-;000249                MKO_receive_data(DNT_data, 29);
-000003D3    A112001C                       	LD    _AX,#DNT_data
-000003D7    B11D1E                         	LDB   _BL,#1Dh
-000003DA    EF23FC                         	LCALL MKO_receive_data
-;000250                MKO_data_to_transmit(DNT_data, 29); //складываем в регистр чтения для удобства проверки записи данных
-000003DD    A112001C                       	LD    _AX,#DNT_data
-000003E1    B11D1E                         	LDB   _BL,#1Dh
-000003E4    EF19FC                         	LCALL MKO_data_to_transmit
-;000251                if ((DNT_data[0] == 0x0FF1) & (DNT_data[1] == 0x4821)) // проверка на запись в субадрес
-000003E7    A30112001C                     	LD    _AX,DNT_data
-000003EC    89F10F1C                       	CMP   _AX,#0FF1h
-000003F0    DF02                           	JE    ??_29_ELSE_BYPASS_3F0
-000003F2    20CC                           	SJMP  ??_29_ELSE
-       ??_29_ELSE_BYPASS_3F0:
-000003F4    A30114001C                     	LD    _AX,(DNT_data+2)
-000003F9    8921481C                       	CMP   _AX,#4821h
-000003FD    DF02                           	JE    ??_29_ELSE_BYPASS_3FD
-000003FF    20BF                           	SJMP  ??_29_ELSE
-       ??_29_ELSE_BYPASS_3FD:
-;000252                {
-;000254                    mc_time = DNT_data[2];
-00000401    A30116001C                     	LD    _AX,(DNT_data+4)
-00000406    C30108001C                     	ST    _AX,mc_time
-;000255                    if (mc_time < 1) mc_time = 1;
-0000040B    88001C                         	CMP   _AX,0
-0000040E    D705                           	JNE   ??_31_ELSE
-00000410    AD011C                         	LDBZE _AX,#01h
-00000413    2009                           	SJMP  ??_68_COMMON
-                  ??_31_ELSE:
-;000256                    else if (mc_time > 20) mc_time = 20;
-00000415    8915001C                       	CMP   _AX,#0015h
-00000419    D308                           	JNC   ??_32_ELSE
-0000041B    AD141C                         	LDBZE _AX,#14h
-                ??_68_COMMON:
-0000041E    C30108001C                     	ST    _AX,mc_time
-                  ??_32_ELSE:
-;000257                    adc_time = DNT_data[3];
-00000423    A30118001C                     	LD    _AX,(DNT_data+6)
-00000428    C30102001C                     	ST    _AX,adc_time
-;000258                    if (adc_time < 4) adc_time = 4;
-0000042D    8904001C                       	CMP   _AX,#0004h
-00000431    DB05                           	JC    ??_33_ELSE
-00000433    AD041C                         	LDBZE _AX,#04h
-00000436    2009                           	SJMP  ??_69_COMMON
-                  ??_33_ELSE:
-;000259                    else if (adc_time > 20) adc_time = 20;
-00000438    8915001C                       	CMP   _AX,#0015h
-0000043C    D308                           	JNC   ??_34_ELSE
-0000043E    AD141C                         	LDBZE _AX,#14h
-                ??_69_COMMON:
-00000441    C30102001C                     	ST    _AX,adc_time
-                  ??_34_ELSE:
-;000260                    dead_time = DNT_data[4];
-00000446    A3011A001C                     	LD    _AX,(DNT_data+8)
-0000044B    C30106001C                     	ST    _AX,dead_time
-;000261                    if (dead_time < 10) dead_time = 10;
-00000450    890A001C                       	CMP   _AX,#000Ah
-00000454    DB05                           	JC    ??_35_ELSE
-00000456    AD0A1C                         	LDBZE _AX,#0Ah
-00000459    2009                           	SJMP  ??_70_COMMON
-                  ??_35_ELSE:
-;000262                    else if (dead_time > 200) dead_time = 200;
-0000045B    89C9001C                       	CMP   _AX,#00C9h
-0000045F    D308                           	JNC   ??_36_ELSE
-00000461    ADC81C                         	LDBZE _AX,#0C8h
-                ??_70_COMMON:
-00000464    C30106001C                     	ST    _AX,dead_time
-                  ??_36_ELSE:
-;000263                    if (dead_time > (mc_time*1000)/4) dead_time = (1000*mc_time)/4;
-00000469    A30108001C                     	LD    _AX,mc_time
-0000046E    6DE8031C                       	MULU  _BAX,#03E8h
-00000472    08021C                         	SHR   _AX,#02h
-00000475    8B0106001C                     	CMP   _AX,dead_time
-0000047A    DB05                           	JC    ??_37_ELSE
-0000047C    C30106001C                     	ST    _AX,dead_time
-                  ??_37_ELSE:
-;000264                    osc_mode = DNT_data[5];
-00000481    A3011C001C                     	LD    _AX,(DNT_data+10)
-00000486    C301BA001C                     	ST    _AX,osc_mode
-;000265                    osc_ku = DNT_data[6];
-0000048B    A3011E001C                     	LD    _AX,(DNT_data+12)
-00000490    C301B8001C                     	ST    _AX,osc_ku
-;000266                    if (DNT_data[7] != 0)
-00000495    A30120001C                     	LD    _AX,(DNT_data+14)
-0000049A    88001C                         	CMP   _AX,0
-0000049D    DF21                           	JE    ??_38_ELSE
-;000267                    {
-;000268                        Oscilloscope(osc_ku, osc_mode, dead_time);
-0000049F    A301B8001C                     	LD    _AX,osc_ku
-000004A4    A301BA001E                     	LD    _BX,osc_mode
-000004A9    A301060020                     	LD    _CX,dead_time
-000004AE    EF4FFB                         	LCALL Oscilloscope
-;000269                        DNT_data[7] = 0;
-000004B1    C301200000                     	ST    00h,(DNT_data+14)
-;000270                        MKO_receive_data_change(DNT_data, 29);
-000004B6    A112001C                       	LD    _AX,#DNT_data
-000004BA    B11D1E                         	LDB   _BL,#1Dh
-000004BD    EF40FB                         	LCALL MKO_receive_data_change
-;000271                    }
-                  ??_38_ELSE:
-;000272                }
-                  ??_29_ELSE:
-;000274            }
-                  ??_28_ELSE:
-;000276            if((len = UART1_RX(str)) != 0)
-000004C0    A12D011C                       	LD    _AX,#str
-000004C4    EF39FB                         	LCALL UART1_RX
-000004C7    C70126011C                     	STB   _AL,len
-000004CC    98001C                         	CMPB  _AL,0
-000004CF    D703                           	JNE   ??_7_DO_BYPASS_4CF
-000004D1    E79CFB                         	LJMP  ??_7_DO
-          ??_7_DO_BYPASS_4CF:
-;000277            {
-;000278                if (str[0] == ID)
-000004D4    B3012D011C                     	LDB   _AL,str
-000004D9    99F01C                         	CMPB  _AL,#0F0h
-000004DC    DF03                           	JE    ??_7_DO_BYPASS_4DC
-000004DE    E78FFB                         	LJMP  ??_7_DO
-          ??_7_DO_BYPASS_4DC:
-;000279                {
-;000280                    if(str[4] == 0x00) // тестовая команда, дающая простой ответ от ДНТ (удобно использовать для проверки связи)
-000004E1    B301310122                     	LDB   _DL,(str+4)
-000004E6    980022                         	CMPB  _DL,0
-000004E9    D71C                           	JNE   ??_41_ELSE
-;000281                    {
-;000282                        leng = COMAnsForm(req_id, ID, str[2], &seq_num, str[4], 0, com_data, answer);
-000004EB    C9C400                         	PUSH  #answer
-000004EE    C90401                         	PUSH  #com_data
-000004F1    B3012B011C                     	LDB   _AL,req_id
-000004F6    B1F01D                         	LDB   _AH,#0F0h
-000004F9    B3012F011E                     	LDB   _BL,(str+2)
-000004FE    A12C0120                       	LD    _CX,#seq_num
-00000502    1123                           	CLRB  _DH
-;000283                        UART1_TX(answer, leng);
-;000284                    }
-00000504    E70605                         	LJMP  ??_80_COMMON
-                  ??_41_ELSE:
-;000285                    else if(str[4] == 0xF0)// команда для чтения показаний АЦП токового вход: 1 - показания с выключенным РЕЛЕ, 2-5 - показания с различными КУ (1-10-100-1000)
-00000507    99F022                         	CMPB  _DL,#0F0h
-0000050A    DF02                           	JE    ??_42_ELSE_BYPASS_50A
-0000050C    20D5                           	SJMP  ??_42_ELSE
-       ??_42_ELSE_BYPASS_50A:
-;000286                    {
-;000287                        com_data[0] = (DNT_result_arr[0]&0xFF00) >> 8;
-0000050E    A30178001C                     	LD    _AX,DNT_result_arr
-00000513    08081C                         	SHR   _AX,#08h
-00000516    C70104011C                     	STB   _AL,com_data
-;000288                        com_data[1] = (DNT_result_arr[0]&0x00FF) >> 0;
-0000051B    AF0178001C                     	LDBZE _AX,DNT_result_arr
-00000520    C70105011C                     	STB   _AL,(com_data+1)
-;000289                        com_data[2] = (DNT_result_arr[1]&0xFF00) >> 8;
-00000525    A3017A001C                     	LD    _AX,(DNT_result_arr+2)
-0000052A    08081C                         	SHR   _AX,#08h
-0000052D    C70106011C                     	STB   _AL,(com_data+2)
-;000290                        com_data[3] = (DNT_result_arr[1]&0x00FF) >> 0;
-00000532    AF017A001C                     	LDBZE _AX,(DNT_result_arr+2)
-00000537    C70107011C                     	STB   _AL,(com_data+3)
-;000291                        com_data[4] = (DNT_result_arr[2]&0xFF00) >> 8;
-0000053C    A3017C001C                     	LD    _AX,(DNT_result_arr+4)
-00000541    08081C                         	SHR   _AX,#08h
-00000544    C70108011C                     	STB   _AL,(com_data+4)
-;000292                        com_data[5] = (DNT_result_arr[2]&0x00FF) >> 0;
-00000549    AF017C001C                     	LDBZE _AX,(DNT_result_arr+4)
-0000054E    C70109011C                     	STB   _AL,(com_data+5)
-;000293                        com_data[6] = (DNT_result_arr[3]&0xFF00) >> 8;
-00000553    A3017E001C                     	LD    _AX,(DNT_result_arr+6)
-00000558    08081C                         	SHR   _AX,#08h
-0000055B    C7010A011C                     	STB   _AL,(com_data+6)
-;000294                        com_data[7] = (DNT_result_arr[3]&0x00FF) >> 0;
-00000560    AF017E001C                     	LDBZE _AX,(DNT_result_arr+6)
-00000565    C7010B011C                     	STB   _AL,(com_data+7)
-;000295                        com_data[8] = (DNT_result_arr[4]&0xFF00) >> 8;
-0000056A    A30180001C                     	LD    _AX,(DNT_result_arr+8)
-0000056F    08081C                         	SHR   _AX,#08h
-00000572    C7010C011C                     	STB   _AL,(com_data+8)
-;000296                        com_data[9] = (DNT_result_arr[4]&0x00FF) >> 0;
-00000577    AF0180001C                     	LDBZE _AX,(DNT_result_arr+8)
-0000057C    C7010D011C                     	STB   _AL,(com_data+9)
-;000297                        com_data[10] = (DNT_result_arr[5]&0xFF00) >> 8;
-00000581    A30182001C                     	LD    _AX,(DNT_result_arr+10)
-00000586    08081C                         	SHR   _AX,#08h
-00000589    C7010E011C                     	STB   _AL,(com_data+10)
-;000298                        com_data[11] = (DNT_result_arr[5]&0x00FF) >> 0;
-0000058E    AF0182001C                     	LDBZE _AX,(DNT_result_arr+10)
-00000593    C7010F011C                     	STB   _AL,(com_data+11)
-;000299                        com_data[12] = (DNT_result_arr[6]&0xFF00) >> 8;
-00000598    A30184001C                     	LD    _AX,(DNT_result_arr+12)
-0000059D    08081C                         	SHR   _AX,#08h
-000005A0    C70110011C                     	STB   _AL,(com_data+12)
-;000300                        com_data[13] = (DNT_result_arr[6]&0x00FF) >> 0;
-000005A5    AF0184001C                     	LDBZE _AX,(DNT_result_arr+12)
-000005AA    C70111011C                     	STB   _AL,(com_data+13)
-;000301                        com_data[14] = (DNT_result_arr[7]&0xFF00) >> 8;
-000005AF    A30186001C                     	LD    _AX,(DNT_result_arr+14)
-000005B4    08081C                         	SHR   _AX,#08h
-000005B7    C70112011C                     	STB   _AL,(com_data+14)
-;000302                        com_data[15] = (DNT_result_arr[7]&0x00FF) >> 0;
-000005BC    AF0186001C                     	LDBZE _AX,(DNT_result_arr+14)
-000005C1    C70113011C                     	STB   _AL,(com_data+15)
-;000303                        leng = COMAnsForm(req_id, ID, str[2], &seq_num, str[4], 16, com_data, answer);
-000005C6    C9C400                         	PUSH  #answer
-000005C9    C90401                         	PUSH  #com_data
-000005CC    B3012B011C                     	LDB   _AL,req_id
-000005D1    B1F01D                         	LDB   _AH,#0F0h
-000005D4    B3012F011E                     	LDB   _BL,(str+2)
-000005D9    A12C0120                       	LD    _CX,#seq_num
-000005DD    B11023                         	LDB   _DH,#10h
-;000304                        UART1_TX(answer, leng);
-;000305                    }
-000005E0    E72A04                         	LJMP  ??_81_COMMON
-                  ??_42_ELSE:
-;000306                    else if(str[4] == 0xF1)// команда для чтения показаний температурного датчика: 4-е байта: 0 - температура в °C, 1 - дробная часть температуры, 2,3 - сигнал с Pt1000 в 10мВ.
-000005E3    99F122                         	CMPB  _DL,#0F1h
-000005E6    D723                           	JNE   ??_43_ELSE
-;000307                    {
-;000308                        com_data[0] = Result_Temp>>8; //todo пока нет калибровок, вывожу только напряжение с датчика в 10-х мВ
-000005E8    A3019C001C                     	LD    _AX,Result_Temp
-000005ED    0A081C                         	SHRA  _AX,#08h
-000005F0    C70104011C                     	STB   _AL,com_data
-;000309                        com_data[1] = Result_Temp>>0;
-000005F5    B3019C001C                     	LDB   _AL,Result_Temp
-000005FA    C70105011C                     	STB   _AL,(com_data+1)
-;000310                        com_data[2] = 0x00;
-000005FF    C701060100                     	STB   00h,(com_data+2)
-;000311                        com_data[3] = 0x00;
-00000604    C701070100                     	STB   00h,(com_data+3)
-;000312                        leng = COMAnsForm(req_id, ID, str[2], &seq_num, str[4], 0x04, com_data, answer);
-;000313                        UART1_TX(answer, leng);
-;000314                    }
-00000609    202D                           	SJMP  ??_82_COMMON
-                  ??_43_ELSE:
-;000315                    else if(str[4] == 0xF2)// команда для чтения сводной информации по генератору -50В
-0000060B    99F222                         	CMPB  _DL,#0F2h
-0000060E    D744                           	JNE   ??_44_ELSE
-;000316                    {
-;000317                        com_data[0] = (duty_ena&0xFF);
-00000610    B3010E001C                     	LDB   _AL,duty_ena
-00000615    C70104011C                     	STB   _AL,com_data
-;000318                        com_data[1] = (duty_val&0xFF);
-0000061A    B30125011C                     	LDB   _AL,duty_val
-0000061F    C70105011C                     	STB   _AL,(com_data+1)
-;000319                        com_data[2] = (Result_50V_mean&0xFF00) >> 8;
-00000624    B3019B001C                     	LDB   _AL,(Result_50V_mean+1)
-00000629    C70106011C                     	STB   _AL,(com_data+2)
-;000320                        com_data[3] = (Result_50V_mean&0x00FF) >> 0;
-0000062E    B3019A001C                     	LDB   _AL,Result_50V_mean
-00000633    C70107011C                     	STB   _AL,(com_data+3)
-;000321                        leng = COMAnsForm(req_id, ID, str[2], &seq_num, str[4], 0x04, com_data, answer);
-                ??_82_COMMON:
-00000638    C9C400                         	PUSH  #answer
-0000063B    C90401                         	PUSH  #com_data
-0000063E    B3012B011C                     	LDB   _AL,req_id
-00000643    B1F01D                         	LDB   _AH,#0F0h
-00000646    B3012F011E                     	LDB   _BL,(str+2)
-0000064B    A12C0120                       	LD    _CX,#seq_num
-0000064F    B10423                         	LDB   _DH,#04h
-;000322                        UART1_TX(answer, leng);
-;000323                    }
-00000652    23B9                           	SJMP  ??_83_COMMON
-                  ??_44_ELSE:
-;000324                    else if(str[4] == 0xF3)// вычитывание осцилограммы
-00000654    99F322                         	CMPB  _DL,#0F3h
-00000657    DF02                           	JE    ??_45_ELSE_BYPASS_657
-00000659    20BD                           	SJMP  ??_45_ELSE
-       ??_45_ELSE_BYPASS_657:
-;000325                    {
-;000327                        seq_num++;
-0000065B    B3012C011C                     	LDB   _AL,seq_num
-00000660    171C                           	INCB  _AL
-00000662    C7012C011C                     	STB   _AL,seq_num
-;000328                        Oscilloscope(osc_ku, osc_mode, dead_time);
-00000667    A301B8001C                     	LD    _AX,osc_ku
-0000066C    A301BA001E                     	LD    _BX,osc_mode
-00000671    A301060020                     	LD    _CX,dead_time
-00000676    EF87F9                         	LCALL Oscilloscope
-;000329                        answer[0] = 0x00;
-00000679    C701C40000                     	STB   00h,answer
-;000330                        answer[1] = 0xF0;
-0000067E    B1F01C                         	LDB   _AL,#0F0h
-00000681    C701C5001C                     	STB   _AL,(answer+1)
-;000331                        answer[2] = 0x00;
-00000686    C701C60000                     	STB   00h,(answer+2)
-;000332                        answer[3] = seq_num&0xFF;
-0000068B    B3012C011C                     	LDB   _AL,seq_num
-00000690    C701C7001C                     	STB   _AL,(answer+3)
-;000333                        answer[4] = 0xF3;
-00000695    B1F31C                         	LDB   _AL,#0F3h
-00000698    C701C8001C                     	STB   _AL,(answer+4)
-;000334                        answer[5] = 0xFF;
-0000069D    B1FF1C                         	LDB   _AL,#0FFh
-000006A0    C701C9001C                     	STB   _AL,(answer+5)
-;000335                        UART1_TX(answer, 0x06);
-000006A5    A1C4001C                       	LD    _AX,#answer
-000006A9    B1061E                         	LDB   _BL,#06h
-000006AC    EF51F9                         	LCALL UART1_TX
-;000336                        TIMER2_1MS = 100;
-000006AF    AD641C                         	LDBZE _AX,#64h
-000006B2    C3019E001C                     	ST    _AX,TIMER2_1MS
-;000337                        for(k=0; k < 512; k++)
-000006B7    C301AA0000                     	ST    00h,k
-000006BC    204D                           	SJMP  ??_46_CHECK
-                  ??_46_LOOP:
-;000338                        {
-;000339                            answer[0] = ((*(MKO_tr_data_1 + 32 + k))>>8)&0xFF;
-000006BE    09011C                         	SHL   _AX,#01h
-000006C1    670100001C                     	ADD   _AX,MKO_tr_data_1
-000006C6    B31C411C                       	LDB   _AL,41h[_AX]
-000006CA    C701C4001C                     	STB   _AL,answer
-;000340                            answer[1] = ((*(MKO_tr_data_1 + 32 + k))>>0)&0xFF;
-000006CF    A301AA001C                     	LD    _AX,k
-000006D4    09011C                         	SHL   _AX,#01h
-000006D7    670100001C                     	ADD   _AX,MKO_tr_data_1
-000006DC    B31C401C                       	LDB   _AL,40h[_AX]
-000006E0    C701C5001C                     	STB   _AL,(answer+1)
-;000341                            while (Timer1ms_Flag() != 1);
-                    ??_47_DO:
-000006E5    EF29F9                         	LCALL Timer1ms_Flag
-000006E8    99011C                         	CMPB  _AL,#01h
-000006EB    D7F8                           	JNE   ??_47_DO
-;000342                            UART1_TX(answer, 0x02);
-000006ED    A1C4001C                       	LD    _AX,#answer
-000006F1    B1021E                         	LDB   _BL,#02h
-000006F4    EF09F9                         	LCALL UART1_TX
-;000343                            TIMER2_1MS = 1;
-000006F7    AD011C                         	LDBZE _AX,#01h
-000006FA    C3019E001C                     	ST    _AX,TIMER2_1MS
-;000344                        }
-000006FF    A301AA001C                     	LD    _AX,k
-00000704    071C                           	INC   _AX
-00000706    C301AA001C                     	ST    _AX,k
-                 ??_46_CHECK:
-0000070B    A301AA001C                     	LD    _AX,k
-00000710    8900021C                       	CMP   _AX,#0200h
-00000714    D3A8                           	JNC   ??_46_LOOP
-;000345                    }
-00000716    230D                           	SJMP  ??_45_END
-                  ??_45_ELSE:
-;000346                    else if(str[4] == 0xF4)// вычитывание переменноя для хранения суммы измерений и числа измерений
-00000718    99F422                         	CMPB  _DL,#0F4h
-0000071B    D77D                           	JNE   ??_48_ELSE
-;000347                    {
-;000349                        com_data[0] = ((adc_var)>>24)&0xFF;
-0000071D    A30104001C                     	LD    _AX,adc_var
-00000722    A30106001E                     	LD    _BX,(adc_var+2)
-00000727    B11820                         	LDB   _CL,#18h
-0000072A    980020                         	CMPB  _CL,00h
-0000072D    DF03                           	JE    ??_49_SKIP
-0000072F    0E201C                         	SHRAL _BAX,_CL
-                  ??_49_SKIP:
-00000732    C70104011C                     	STB   _AL,com_data
-;000350                        com_data[1] = ((adc_var)>>16)&0xFF;
-00000737    A30104001C                     	LD    _AX,adc_var
-0000073C    A30106001E                     	LD    _BX,(adc_var+2)
-00000741    B11020                         	LDB   _CL,#10h
-00000744    980020                         	CMPB  _CL,00h
-00000747    DF03                           	JE    ??_50_SKIP
-00000749    0E201C                         	SHRAL _BAX,_CL
-                  ??_50_SKIP:
-0000074C    C70105011C                     	STB   _AL,(com_data+1)
-;000351                        com_data[2] = ((adc_var)>>8)&0xFF;
-00000751    A30104001C                     	LD    _AX,adc_var
-00000756    A30106001E                     	LD    _BX,(adc_var+2)
-0000075B    0E081C                         	SHRAL _BAX,#08h
-0000075E    C70106011C                     	STB   _AL,(com_data+2)
-;000352                        com_data[3] = ((adc_var)>>0)&0xFF;
-00000763    B30104001C                     	LDB   _AL,adc_var
-00000768    C70107011C                     	STB   _AL,(com_data+3)
-;000353                        com_data[4] = (num_var&0xFF00)>>8;
-0000076D    B301B7001C                     	LDB   _AL,(num_var+1)
-00000772    C70108011C                     	STB   _AL,(com_data+4)
-;000354                        com_data[5] = (num_var&0x00FF)>>0;
-00000777    B301B6001C                     	LDB   _AL,num_var
-0000077C    C70109011C                     	STB   _AL,(com_data+5)
-;000355                        leng = COMAnsForm(req_id, ID, str[2], &seq_num, str[4], 0x06, com_data, answer);
-00000781    C9C400                         	PUSH  #answer
-00000784    C90401                         	PUSH  #com_data
-00000787    B3012B011C                     	LDB   _AL,req_id
-0000078C    B1F01D                         	LDB   _AH,#0F0h
-0000078F    B3012F011E                     	LDB   _BL,(str+2)
-00000794    A12C0120                       	LD    _CX,#seq_num
-;000356                        UART1_TX(answer, leng);
-;000357                    }
-00000798    21C0                           	SJMP  ??_84_COMMON
-                  ??_48_ELSE:
-;000358                    else if(str[4] == 0xF5)//чятение статуса МКО
-0000079A    99F522                         	CMPB  _DL,#0F5h
-0000079D    D73A                           	JNE   ??_51_ELSE
-;000359                    {
-;000360                        var = MKO_State();
-0000079F    EF5EF8                         	LCALL MKO_State
-000007A2    C301C2001C                     	ST    _AX,var
-;000361                        com_data[0] = (var>>8)&0xFF;
-000007A7    B301C3001C                     	LDB   _AL,(var+1)
-000007AC    C70104011C                     	STB   _AL,com_data
-;000362                        com_data[1] = (var>>0)&0xFF;
-000007B1    B301C2001C                     	LDB   _AL,var
-000007B6    C70105011C                     	STB   _AL,(com_data+1)
-;000363                        leng = COMAnsForm(req_id, ID, str[2], &seq_num, str[4], 0x02, com_data, answer);
-000007BB    C9C400                         	PUSH  #answer
-000007BE    C90401                         	PUSH  #com_data
-000007C1    B3012B011C                     	LDB   _AL,req_id
-000007C6    B1F01D                         	LDB   _AH,#0F0h
-000007C9    B3012F011E                     	LDB   _BL,(str+2)
-000007CE    A12C0120                       	LD    _CX,#seq_num
-000007D2    B301310122                     	LDB   _DL,(str+4)
-;000364                        UART1_TX(answer, leng);
-;000365                    }
-000007D7    2231                           	SJMP  ??_72_COMMON
-                  ??_51_ELSE:
-;000366                    else if(str[4] == 0xF6)//чятение подадреса МКО
-000007D9    99F622                         	CMPB  _DL,#0F6h
-000007DC    D76B                           	JNE   ??_52_ELSE
-;000367                    {
-;000368                        MKO_receive_data(DNT_data, 29);
-000007DE    A112001C                       	LD    _AX,#DNT_data
-000007E2    B11D1E                         	LDB   _BL,#1Dh
-000007E5    EF18F8                         	LCALL MKO_receive_data
-;000369                        for (k=0; k<16; k++)
-000007E8    C301AA0000                     	ST    00h,k
-000007ED    202E                           	SJMP  ??_53_CHECK
-                  ??_53_LOOP:
-;000370                        {
-;000371                            com_data[2*k] = (DNT_data[k]&0xFF00)>>8;
-000007EF    09011C                         	SHL   _AX,#01h
-000007F2    A31D12001E                     	LD    _BX,DNT_data[_AX]
-000007F7    08081E                         	SHR   _BX,#08h
-000007FA    C71D04011E                     	STB   _BL,com_data[_AX]
-;000372                            com_data[2*k+1] = (DNT_data[k]&0xFF)>>0;
-000007FF    A301AA001C                     	LD    _AX,k
-00000804    09011C                         	SHL   _AX,#01h
-00000807    AF1D12001E                     	LDBZE _BX,DNT_data[_AX]
-0000080C    C71D05011E                     	STB   _BL,(com_data+1)[_AX]
-;000373                        }
-00000811    A301AA001C                     	LD    _AX,k
-00000816    071C                           	INC   _AX
-00000818    C301AA001C                     	ST    _AX,k
-                 ??_53_CHECK:
-0000081D    A301AA001C                     	LD    _AX,k
-00000822    8910001C                       	CMP   _AX,#0010h
-00000826    D3C7                           	JNC   ??_53_LOOP
-;000374                        leng = COMAnsForm(req_id, ID, str[2], &seq_num, str[4], 0x32, com_data, answer);
-00000828    C9C400                         	PUSH  #answer
-0000082B    C90401                         	PUSH  #com_data
-0000082E    B3012B011C                     	LDB   _AL,req_id
-00000833    B1F01D                         	LDB   _AH,#0F0h
-00000836    B3012F011E                     	LDB   _BL,(str+2)
-0000083B    A12C0120                       	LD    _CX,#seq_num
-0000083F    B301310122                     	LDB   _DL,(str+4)
-00000844    B13223                         	LDB   _DH,#32h
-;000375                        UART1_TX(answer, leng);
-;000376                    }
-00000847    21C4                           	SJMP  ??_73_COMMON
-                  ??_52_ELSE:
-;000377                    else if(str[4] == 0xFB)// изменение постоянной времени измерения
-00000849    99FB22                         	CMPB  _DL,#0FBh
-0000084C    DF02                           	JE    ??_54_ELSE_BYPASS_84C
-0000084E    210F                           	SJMP  ??_54_ELSE
-       ??_54_ELSE_BYPASS_84C:
-;000378                    {
-;000379                        mc_time = (((str[6]&0xFF)<<8) + ((str[7]&0xFF)<<0))*100/8;
-00000850    B30133011C                     	LDB   _AL,(str+6)
-00000855    09081C                         	SHL   _AX,#08h
-00000858    AF0134011E                     	LDBZE _BX,(str+7)
-0000085D    641E1C                         	ADD   _AX,_BX
-00000860    6D64001C                       	MULU  _BAX,#0064h
-00000864    371D04                         	JBC   _AH,7h,??_55_ELSE
-00000867    6507001C                       	ADD   _AX,#0007h
-                  ??_55_ELSE:
-0000086B    0A031C                         	SHRA  _AX,#03h
-0000086E    C30108001C                     	ST    _AX,mc_time
-;000380                        if (mc_time <= 0) mc_time = 1;
-00000873    A01C1E                         	LD    _BX,_AX
-00000876    88001E                         	CMP   _BX,0
-00000879    D705                           	JNE   ??_56_ELSE
-0000087B    AD011C                         	LDBZE _AX,#01h
-0000087E    2009                           	SJMP  ??_74_COMMON
-                  ??_56_ELSE:
-;000381                        else if (mc_time >= 20) mc_time = 20;
-00000880    8914001E                       	CMP   _BX,#0014h
-00000884    D308                           	JNC   ??_57_ELSE
-00000886    AD141C                         	LDBZE _AX,#14h
-                ??_74_COMMON:
-00000889    C30108001C                     	ST    _AX,mc_time
-                  ??_57_ELSE:
-;000382                        adc_time = ((str[8]&0xFF)<<8) + ((str[9]&0xFF)<<0);
-0000088E    B30135011C                     	LDB   _AL,(str+8)
-00000893    09081C                         	SHL   _AX,#08h
-00000896    AF0136011E                     	LDBZE _BX,(str+9)
-0000089B    641E1C                         	ADD   _AX,_BX
-0000089E    C30102001C                     	ST    _AX,adc_time
-;000383                        if (adc_time < 4) adc_time = 4;
-000008A3    8904001C                       	CMP   _AX,#0004h
-000008A7    DB05                           	JC    ??_58_ELSE
-000008A9    AD041C                         	LDBZE _AX,#04h
-000008AC    2009                           	SJMP  ??_75_COMMON
-                  ??_58_ELSE:
-;000384                        else if (adc_time > 20) adc_time = 20;
-000008AE    8915001C                       	CMP   _AX,#0015h
-000008B2    D308                           	JNC   ??_59_ELSE
-000008B4    AD141C                         	LDBZE _AX,#14h
-                ??_75_COMMON:
-000008B7    C30102001C                     	ST    _AX,adc_time
-                  ??_59_ELSE:
-;000385                        dead_time = ((str[10]&0xFF)<<8) + ((str[11]&0xFF)<<0);;
-000008BC    B30137011C                     	LDB   _AL,(str+10)
-000008C1    09081C                         	SHL   _AX,#08h
-000008C4    AF0138011E                     	LDBZE _BX,(str+11)
-000008C9    641E1C                         	ADD   _AX,_BX
-000008CC    C30106001C                     	ST    _AX,dead_time
-;000386                        if (dead_time < 10) dead_time = 10;
-000008D1    890A001C                       	CMP   _AX,#000Ah
-000008D5    DB05                           	JC    ??_60_ELSE
-000008D7    AD0A1C                         	LDBZE _AX,#0Ah
-000008DA    2009                           	SJMP  ??_85_COMMON
-                  ??_60_ELSE:
-;000387                        else if (dead_time > 200) dead_time = 200;
-000008DC    89C9001C                       	CMP   _AX,#00C9h
-000008E0    D30A                           	JNC   ??_61_ELSE
-000008E2    ADC81C                         	LDBZE _AX,#0C8h
-                ??_85_COMMON:
-000008E5    C30106001C                     	ST    _AX,dead_time
-000008EA    2016                           	SJMP  ??_61_END
-                  ??_61_ELSE:
-;000388                        else if (dead_time > (mc_time*1000)/4) dead_time = (1000*mc_time)/4;
-000008EC    A301080020                     	LD    _CX,mc_time
-000008F1    6DE80320                       	MULU  _DCX,#03E8h
-000008F5    080220                         	SHR   _CX,#02h
-000008F8    881C20                         	CMP   _CX,_AX
-000008FB    DB05                           	JC    ??_62_ELSE
-000008FD    C301060020                     	ST    _CX,dead_time
-                  ??_62_ELSE:
-                   ??_61_END:
-;000389                        com_data[0] = (mc_time&0xFF00)>>8;
-00000902    B30109001C                     	LDB   _AL,(mc_time+1)
-00000907    C70104011C                     	STB   _AL,com_data
-;000390                        com_data[1] = mc_time&0xFF;
-0000090C    AF0108001C                     	LDBZE _AX,mc_time
-00000911    C70105011C                     	STB   _AL,(com_data+1)
-;000391                        com_data[2] = (adc_time&0xFF00)>>8;
-00000916    B30103001C                     	LDB   _AL,(adc_time+1)
-0000091B    C70106011C                     	STB   _AL,(com_data+2)
-;000392                        com_data[3] = adc_time&0xFF;
-00000920    AF0102001C                     	LDBZE _AX,adc_time
-00000925    C70107011C                     	STB   _AL,(com_data+3)
-;000393                        com_data[4] = (dead_time&0xFF00)>>8;
-0000092A    B30107001C                     	LDB   _AL,(dead_time+1)
-0000092F    C70108011C                     	STB   _AL,(com_data+4)
-;000394                        com_data[5] = dead_time&0xFF;
-00000934    AF0106001C                     	LDBZE _AX,dead_time
-00000939    C70109011C                     	STB   _AL,(com_data+5)
-;000395                        leng = COMAnsForm(req_id, ID, str[2], &seq_num, str[4], 0x06, com_data, answer);
-0000093E    C9C400                         	PUSH  #answer
-00000941    C90401                         	PUSH  #com_data
-00000944    B3012B011C                     	LDB   _AL,req_id
-00000949    B1F01D                         	LDB   _AH,#0F0h
-0000094C    B3012F011E                     	LDB   _BL,(str+2)
-00000951    A12C0120                       	LD    _CX,#seq_num
-00000955    B301310122                     	LDB   _DL,(str+4)
-                ??_84_COMMON:
-0000095A    B10623                         	LDB   _DH,#06h
-;000396                        UART1_TX(answer, leng);
-;000397                    }
-0000095D    20AE                           	SJMP  ??_76_COMMON
-                  ??_54_ELSE:
-;000398                    else if (str[4] == 0xF7)//чтение максимумов и минимумов
-0000095F    99F722                         	CMPB  _DL,#0F7h
-00000962    D778                           	JNE   ??_63_ELSE
-;000399                    {
-;000400                        com_data[0] = ((DNT_max_arr[0])>>8)&0xFF;
-00000964    A30154001C                     	LD    _AX,DNT_max_arr
-00000969    0A081C                         	SHRA  _AX,#08h
-0000096C    C70104011C                     	STB   _AL,com_data
-;000401                        com_data[1] = ((DNT_max_arr[0])>>0)&0xFF;
-00000971    AF0154001C                     	LDBZE _AX,DNT_max_arr
-00000976    C70105011C                     	STB   _AL,(com_data+1)
-;000402                        com_data[2] = ((DNT_max_arr[1])>>8)&0xFF;
-0000097B    A30156001C                     	LD    _AX,(DNT_max_arr+2)
-00000980    0A081C                         	SHRA  _AX,#08h
-00000983    C70106011C                     	STB   _AL,(com_data+2)
-;000403                        com_data[3] = ((DNT_max_arr[1])>>0)&0xFF;
-00000988    AF0156001C                     	LDBZE _AX,(DNT_max_arr+2)
-0000098D    C70107011C                     	STB   _AL,(com_data+3)
-;000404                        com_data[4] = ((DNT_min_arr[0])>>8)&0xFF;
-00000992    A30166001C                     	LD    _AX,DNT_min_arr
-00000997    0A081C                         	SHRA  _AX,#08h
-0000099A    C70108011C                     	STB   _AL,(com_data+4)
-;000405                        com_data[5] = ((DNT_min_arr[0])>>0)&0xFF;
-0000099F    AF0166001C                     	LDBZE _AX,DNT_min_arr
-000009A4    C70109011C                     	STB   _AL,(com_data+5)
-;000406                        com_data[6] = ((DNT_min_arr[1])>>8)&0xFF;
-000009A9    A30168001C                     	LD    _AX,(DNT_min_arr+2)
-000009AE    0A081C                         	SHRA  _AX,#08h
-000009B1    C7010A011C                     	STB   _AL,(com_data+6)
-;000407                        com_data[7] = ((DNT_min_arr[1])>>0)&0xFF;
-000009B6    AF0168001C                     	LDBZE _AX,(DNT_min_arr+2)
-000009BB    C7010B011C                     	STB   _AL,(com_data+7)
-;000409                        leng = COMAnsForm(req_id, ID, str[2], &seq_num, str[4], 0x08, com_data, answer);
-000009C0    C9C400                         	PUSH  #answer
-000009C3    C90401                         	PUSH  #com_data
-000009C6    B3012B011C                     	LDB   _AL,req_id
-000009CB    B1F01D                         	LDB   _AH,#0F0h
-000009CE    B3012F011E                     	LDB   _BL,(str+2)
-000009D3    A12C0120                       	LD    _CX,#seq_num
-000009D7    B10823                         	LDB   _DH,#08h
-;000410                        UART1_TX(answer, leng);
-;000411                    }
-000009DA    2031                           	SJMP  ??_77_COMMON
-                  ??_63_ELSE:
-;000412                    else if (str[4] == 0xF8)//чтение максимумов и минимумов
-000009DC    99F822                         	CMPB  _DL,#0F8h
-000009DF    D744                           	JNE   ??_64_ELSE
-;000413                    {
-;000414                        mko_activity_bound = (((str[6]&0xFF)<<8) + ((str[7]&0xFF)<<0));
-000009E1    B30133011C                     	LDB   _AL,(str+6)
-000009E6    19081C                         	SHLB  _AL,#08h
-000009E9    770134011C                     	ADDB  _AL,(str+7)
-000009EE    C7010F001C                     	STB   _AL,mko_activity_bound
-;000416                        leng = COMAnsForm(req_id, ID, str[2], &seq_num, str[4], 0x02, com_data, answer);
-000009F3    C9C400                         	PUSH  #answer
-000009F6    C90401                         	PUSH  #com_data
-000009F9    B3012B011C                     	LDB   _AL,req_id
-000009FE    B1F01D                         	LDB   _AH,#0F0h
-00000A01    B3012F011E                     	LDB   _BL,(str+2)
-00000A06    A12C0120                       	LD    _CX,#seq_num
-                ??_72_COMMON:
-00000A0A    B10223                         	LDB   _DH,#02h
-                ??_73_COMMON:
-                ??_76_COMMON:
-                ??_77_COMMON:
-                ??_80_COMMON:
-                ??_81_COMMON:
-                ??_83_COMMON:
-00000A0D    EFF0F5                         	LCALL COMAnsForm
-00000A10    65040018                       	ADD   _SP,#0004h
-00000A14    C70127011C                     	STB   _AL,leng
-;000417                        UART1_TX(answer, leng);
-00000A19    A1C4001C                       	LD    _AX,#answer
-00000A1D    B30127011E                     	LDB   _BL,leng
-00000A22    EFDBF5                         	LCALL UART1_TX
-;000418                    }
-                  ??_64_ELSE:
-                   ??_45_END:
-;000419                }
-;000420            }
-;000421        }
-00000A25    E748F6                         	LJMP  ??_7_DO
-;000422    }
+;000153                    else if(request[4] == 0xFF)// запуск и вычитываник осциллограммы
+00000285    99FF22                         	CMPB  _DL,#0FFh
+00000288    DF02                           	JE    ??_1_DO_BYPASS_288
+0000028A    25E6                           	SJMP  ??_1_DO
+          ??_1_DO_BYPASS_288:
+;000154                    {
+;000156                        seq_num++;
+0000028C    B30184011C                     	LDB   _AL,seq_num
+00000291    171C                           	INCB  _AL
+00000293    C70184011C                     	STB   _AL,seq_num
+;000157                        Oscilloscope(request[6], request[7], dnt.control.dead_time_ms/10);
+00000298    A301B00020                     	LD    _CX,(dnt+0B0h)
+0000029D    0122                           	CLR   _DX
+0000029F    8D0A0020                       	DIVU  _DCX,#000Ah
+000002A3    AF010B011E                     	LDBZE _BX,(request+7)
+000002A8    AF010A011C                     	LDBZE _AX,(request+6)
+000002AD    EF50FD                         	LCALL Oscilloscope
+;000158                        answer[0] = 0x00;
+000002B0    C701420000                     	STB   00h,answer
+;000159                        answer[1] = 0xF0;
+000002B5    B1F01C                         	LDB   _AL,#0F0h
+000002B8    C70143001C                     	STB   _AL,(answer+1)
+;000160                        answer[2] = 0x00;
+000002BD    C701440000                     	STB   00h,(answer+2)
+;000161                        answer[3] = seq_num&0xFF;
+000002C2    B30184011C                     	LDB   _AL,seq_num
+000002C7    C70145001C                     	STB   _AL,(answer+3)
+;000162                        answer[4] = 0xF3;
+000002CC    B1F31C                         	LDB   _AL,#0F3h
+000002CF    C70146001C                     	STB   _AL,(answer+4)
+;000163                        answer[5] = 0xFF;
+000002D4    B1FF1C                         	LDB   _AL,#0FFh
+000002D7    C70147001C                     	STB   _AL,(answer+5)
+;000164                        UART1_TX(answer, 0x06);
+000002DC    A142001C                       	LD    _AX,#answer
+000002E0    B1061E                         	LDB   _BL,#06h
+000002E3    EF1AFD                         	LCALL UART1_TX
+;000165                        TIMER2_10MS = 10;
+000002E6    AD0A1C                         	LDBZE _AX,#0Ah
+000002E9    C30100001C                     	ST    _AX,TIMER2_10MS
+;000166                        for(i=0; i<512; i++)
+000002EE    C301000000                     	ST    00h,i
+000002F3    204D                           	SJMP  ??_18_CHECK
+                  ??_18_LOOP:
+;000167                        {
+;000168                            answer[0] = ((*(MKO_tr_data + 32 + i))>>8)&0xFF;
+000002F5    09011C                         	SHL   _AX,#01h
+000002F8    670100001C                     	ADD   _AX,MKO_tr_data
+000002FD    B31C411C                       	LDB   _AL,41h[_AX]
+00000301    C70142001C                     	STB   _AL,answer
+;000169                            answer[1] = ((*(MKO_tr_data + 32 + i))>>0)&0xFF;
+00000306    A30100001C                     	LD    _AX,i
+0000030B    09011C                         	SHL   _AX,#01h
+0000030E    670100001C                     	ADD   _AX,MKO_tr_data
+00000313    B31C401C                       	LDB   _AL,40h[_AX]
+00000317    C70143001C                     	STB   _AL,(answer+1)
+;000170                            while (Timer10ms_Flag() != 1);
+                    ??_19_DO:
+0000031C    EFE1FC                         	LCALL Timer10ms_Flag
+0000031F    99011C                         	CMPB  _AL,#01h
+00000322    D7F8                           	JNE   ??_19_DO
+;000171                            UART1_TX(answer, 0x02);
+00000324    A142001C                       	LD    _AX,#answer
+00000328    B1021E                         	LDB   _BL,#02h
+0000032B    EFD2FC                         	LCALL UART1_TX
+;000172                            TIMER2_10MS = 1;
+0000032E    AD011C                         	LDBZE _AX,#01h
+00000331    C30100001C                     	ST    _AX,TIMER2_10MS
+;000173                        }
+00000336    A30100001C                     	LD    _AX,i
+0000033B    071C                           	INC   _AX
+0000033D    C30100001C                     	ST    _AX,i
+                 ??_18_CHECK:
+00000342    A30100001C                     	LD    _AX,i
+00000347    8900021C                       	CMP   _AX,#0200h
+0000034B    D3A8                           	JNC   ??_18_LOOP
+;000174                    }
+;000175                }
+;000176            }
+;000177        }
+0000034D    2523                           	SJMP  ??_1_DO
+;000178    }
 .ENDF
 
-.\TestLinear\main.c: 2753 byte(s), 3209 line(s), 0 error(s), 5 warning(s)
+.\TestLinear\main.c: 847 byte(s), 3219 line(s), 0 error(s), 0 warning(s)
 

@@ -5,7 +5,7 @@
 *                                                                             *
 *******************************************************************************
 
-Warning[C180] C:\Program Files (x86)\CodeMaster-96\1_30_01\CMC-96\Inc\K1874VE7T.h(2523,0): Empty translation unit
+Warning[C180] .\TestLinear\pwm_header.h(6,0): Empty translation unit
 
-.\TestLinear\types.h: 0 byte(s), 2628 line(s), 0 error(s), 1 warning(s)
+.\TestLinear\pwm_header.h: 0 byte(s), 2637 line(s), 0 error(s), 1 warning(s)
 

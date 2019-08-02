@@ -8,7 +8,7 @@
                  * * *  O P T I O N S   A T   S T A R T  * * *
 
     -O C:\Program Files (x86)\CodeMaster-96\1_30_01\CMC-96\Lib
-    -E D:\YandexDisk\Work\Microcontrolers\1874бе7р\DNT_MKO\DNT_MKO_v05\TestLinear\Release\Exe\TestLinear
+    -E D:\YandexDisk\Work\Microcontrolers\1874бе7р\DNT_MKO\TestLinear\Release\Exe\TestLinear
     -M 10
     -M 20
     -M 21
@@ -18,7 +18,7 @@
     -m
     -t
     -A (code)CODE(02000H-07FFFH)
-    -A (data)DATA(0100H-07FFH,0800H-017FFH)
+    -A (data)DATA(0800H-017FFH,0100H-07FFH)
     -Z CSTACK(256)
     -Z HEAP(0)
 
@@ -37,6 +37,14 @@
   Module:                DNT_FUN                                 
 
   Module:                MKO_UD                                  
+
+  Module:                TIMERS                                  
+
+  Module:                TIMERS_HEADER                           
+
+  Module:                PWM                                     
+
+  Module:                PWM_HEADER                              
 
   Module:                ??RESERVED_FAKE_END_MODULE               
 
@@ -112,16 +120,6 @@
 
   Module:                ??FPL_FRM_UI_MOD         low-priority   
 
-  Module:                ?FPCONV16U               low-priority   
-
-  Module:                ?FPCONV32U               low-priority   
-
-  Module:                ??FPL_FRM_UL_MOD         low-priority   
-
-  Module:                ?FPDIV                   low-priority   
-
-  Module:                ??FPL_DIV_MOD            low-priority   
-
   Module:                ?FPMUL                   low-priority   
 
   Module:                ??FPL_MUL_MOD            low-priority   
@@ -142,6 +140,8 @@
 
   Module:                ??FPL_FRM_L_MOD          low-priority   
 
+  Module:                ??FPL_FRM_UL_MOD         low-priority   
+
   Module:                FREXP                    low-priority   
 
   Module:                ?FPHUGE_VAL              low-priority   
@@ -153,7 +153,7 @@
               * * *  F U L L   S E T   O F   O P T I O N S  * * *
 
     -O C:\Program Files (x86)\CodeMaster-96\1_30_01\CMC-96\Lib
-    -E D:\YandexDisk\Work\Microcontrolers\1874бе7р\DNT_MKO\DNT_MKO_v05\TestLinear\Release\Exe\TestLinear
+    -E D:\YandexDisk\Work\Microcontrolers\1874бе7р\DNT_MKO\TestLinear\Release\Exe\TestLinear
     -M 10
     -M 20
     -M 21
@@ -163,7 +163,7 @@
     -m
     -t
     -A (code)CODE(02000H-07FFFH)
-    -A (data)DATA(0100H-07FFH,0800H-017FFH)
+    -A (data)DATA(0800H-017FFH,0100H-07FFH)
     -Z CSTACK(256)
     -Z HEAP(0)
     -K data(01F60h-01FFFh)
@@ -319,20 +319,22 @@
   ============================================================
   MAIN                      00000004        01        00000000
   UART                      00000004        01        00000004
-  ??STARTUP                 00000004        01        00000008
+  DNT_FUN                   00000004        01        00000008
+  MKO_UD                    00000004        01        0000000C
+  TIMERS                    00000004        01        00000010
+  ??STARTUP                 00000004        01        00000014
   ============================================================
-  Total:                    0000000C        01
+  Total:                    00000018        01
 
 
   Segment: ??INIT_DATA_SEGMENT_ADDRESSES           code    REL
   ------------------------------------------------------------
   Module                      Size        Align        Offset 
   ============================================================
-  MAIN                      00000006        01        00000000
-  MKO_UD                    00000006        01        00000006
-  ??STARTUP                 00000006        01        0000000C
+  MKO_UD                    00000006        01        00000000
+  ??STARTUP                 00000006        01        00000006
   ============================================================
-  Total:                    00000012        01
+  Total:                    0000000C        01
 
 
   Segment: ??STD_LOC_SEG                           code    ABS
@@ -366,21 +368,17 @@
   ?FPCONV16                 0000000C        00        0000033D
   ??FPL_FRM_I_MOD           00000011        00        00000349
   ??FPL_FRM_UI_MOD          00000017        00        0000035A
-  ?FPCONV16U                0000000C        00        00000371
-  ?FPCONV32U                0000000C        00        0000037D
-  ??FPL_FRM_UL_MOD          00000026        00        00000389
-  ?FPDIV                    00000010        00        000003AF
-  ??FPL_DIV_MOD             00000087        00        000003BF
-  ?FPMUL                    00000010        00        00000446
-  ??FPL_MUL_MOD             00000084        00        00000456
-  ?FPTRUNC                  0000000C        00        000004DA
-  ??FPL_TO_L_MOD            00000061        00        000004E6
-  ?FPCMP                    00000013        00        00000547
-  ??FPL_CMP_MOD             00000058        00        0000055A
-  ?FPCONV32                 0000000C        00        000005B2
-  ??FPL_FRM_L_MOD           00000033        00        000005BE
+  ?FPMUL                    00000010        00        00000371
+  ??FPL_MUL_MOD             00000084        00        00000381
+  ?FPTRUNC                  0000000C        00        00000405
+  ??FPL_TO_L_MOD            00000061        00        00000411
+  ?FPCMP                    00000013        00        00000472
+  ??FPL_CMP_MOD             00000058        00        00000485
+  ?FPCONV32                 0000000C        00        000004DD
+  ??FPL_FRM_L_MOD           00000033        00        000004E9
+  ??FPL_FRM_UL_MOD          00000026        00        0000051C
   ============================================================
-  Total:                    000005F1        00
+  Total:                    00000542        00
 
 
   Segment: CONST__??CLIB                           code    REL
@@ -439,9 +437,9 @@
   ------------------------------------------------------------
   Module                      Size        Align        Offset 
   ============================================================
-  ADC                       00000401        00        00000000
+  ADC                       000001EF        00        00000000
   ============================================================
-  Total:                    00000401        00
+  Total:                    000001EF        00
 
 
   Segment: FUN_CODE__CRC16                         code    REL
@@ -457,9 +455,9 @@
   ------------------------------------------------------------
   Module                      Size        Align        Offset 
   ============================================================
-  DNT_FUN                   000002F2        00        00000000
+  DNT_FUN                   00000BF4        00        00000000
   ============================================================
-  Total:                    000002F2        00
+  Total:                    00000BF4        00
 
 
   Segment: FUN_CODE__FLOOR                         code    REL
@@ -484,9 +482,9 @@
   ------------------------------------------------------------
   Module                      Size        Align        Offset 
   ============================================================
-  MAIN                      00000A28        00        00000000
+  MAIN                      0000034F        00        00000000
   ============================================================
-  Total:                    00000A28        00
+  Total:                    0000034F        00
 
 
   Segment: FUN_CODE__MEMCPY                        code    REL
@@ -516,6 +514,24 @@
   Total:                    00000111        00
 
 
+  Segment: FUN_CODE__PWM                           code    REL
+  ------------------------------------------------------------
+  Module                      Size        Align        Offset 
+  ============================================================
+  PWM                       00000019        00        00000000
+  ============================================================
+  Total:                    00000019        00
+
+
+  Segment: FUN_CODE__TIMERS                        code    REL
+  ------------------------------------------------------------
+  Module                      Size        Align        Offset 
+  ============================================================
+  TIMERS                    00000047        00        00000000
+  ============================================================
+  Total:                    00000047        00
+
+
   Segment: FUN_CODE__UART                          code    REL
   ------------------------------------------------------------
   Module                      Size        Align        Offset 
@@ -525,49 +541,40 @@
   Total:                    000001BA        00
 
 
-  Segment: IDATA_INI__MAIN                         code    REL
-  ------------------------------------------------------------
-  Module                      Size        Align        Offset 
-  ============================================================
-  MAIN                      00000010        00        00000000
-  ============================================================
-  Total:                    00000010        00
-
-
   Segment: IDATA_INI__MKO_UD                       code    REL
   ------------------------------------------------------------
   Module                      Size        Align        Offset 
   ============================================================
-  MKO_UD                    00000004        00        00000000
+  MKO_UD                    00000005        00        00000000
   ============================================================
-  Total:                    00000004        00
-
-
-  Segment: IDATA__MAIN                             data    REL
-  ------------------------------------------------------------
-  Module                      Size        Align        Offset 
-  ============================================================
-  MAIN                      00000010        01        00000000
-  ============================================================
-  Total:                    00000010        01
+  Total:                    00000005        00
 
 
   Segment: IDATA__MKO_UD                           data    REL
   ------------------------------------------------------------
   Module                      Size        Align        Offset 
   ============================================================
-  MKO_UD                    00000004        01        00000000
+  MKO_UD                    00000005        01        00000000
   ============================================================
-  Total:                    00000004        01
+  Total:                    00000005        01
 
 
-  Segment: ISR_CODE__MAIN                          code    REL
+  Segment: ISR_CODE__MKO_UD                        code    REL
   ------------------------------------------------------------
   Module                      Size        Align        Offset 
   ============================================================
-  MAIN                      00000099        00        00000000
+  MKO_UD                    00000029        00        00000000
   ============================================================
-  Total:                    00000099        00
+  Total:                    00000029        00
+
+
+  Segment: ISR_CODE__TIMERS                        code    REL
+  ------------------------------------------------------------
+  Module                      Size        Align        Offset 
+  ============================================================
+  TIMERS                    000000A1        00        00000000
+  ============================================================
+  Total:                    000000A1        00
 
 
   Segment: ISR_CODE__UART                          code    REL
@@ -589,13 +596,40 @@
   Total:                min:00000000 max:0000002B     0000002C
 
 
+  Segment: UDATA__DNT_FUN                          data    REL
+  ------------------------------------------------------------
+  Module                      Size        Align        Offset 
+  ============================================================
+  DNT_FUN                   00000158        02        00000000
+  ============================================================
+  Total:                    00000158        02
+
+
   Segment: UDATA__MAIN                             data    REL
   ------------------------------------------------------------
   Module                      Size        Align        Offset 
   ============================================================
-  MAIN                      0000016F        02        00000000
+  MAIN                      00000185        01        00000000
   ============================================================
-  Total:                    0000016F        02
+  Total:                    00000185        01
+
+
+  Segment: UDATA__MKO_UD                           data    REL
+  ------------------------------------------------------------
+  Module                      Size        Align        Offset 
+  ============================================================
+  MKO_UD                    00000001        00        00000000
+  ============================================================
+  Total:                    00000001        00
+
+
+  Segment: UDATA__TIMERS                           data    REL
+  ------------------------------------------------------------
+  Module                      Size        Align        Offset 
+  ============================================================
+  TIMERS                    00000008        01        00000000
+  ============================================================
+  Total:                    00000008        01
 
 
   Segment: UDATA__UART                             data    REL
@@ -628,12 +662,12 @@
 
   Segment:                       CODE__??CLIB
   Allocation:                    code
-  Size:                          000005F1
+  Size:                          00000542
   Align:                         00
   Address area:                  CODE
   Border:                        >00000000
   Placed at:                     00002083
-  Ends at:                       00002673
+  Ends at:                       000025C4
 
 
   Segment:                       CONST__??CLIB
@@ -642,8 +676,8 @@
   Align:                         01
   Address area:                  CODE
   Border:                        >00000000
-  Placed at:                     00002674
-  Ends at:                       00002683
+  Placed at:                     000025C6
+  Ends at:                       000025D5
 
 
   Segment:                       CSEG__??ISR
@@ -652,8 +686,8 @@
   Align:                         00
   Address area:                  CODE
   Border:                        >00000000
-  Placed at:                     00002684
-  Ends at:                       000026B3
+  Placed at:                     000025D6
+  Ends at:                       00002605
 
 
   Segment:                       FUN_CODE__ABS
@@ -662,8 +696,8 @@
   Align:                         00
   Address area:                  CODE
   Border:                        >00000000
-  Placed at:                     000026B4
-  Ends at:                       000026B9
+  Placed at:                     00002606
+  Ends at:                       0000260B
 
 
   Segment:                       FUN_CODE__FLOOR
@@ -672,8 +706,8 @@
   Align:                         00
   Address area:                  CODE
   Border:                        >00000000
-  Placed at:                     000026BA
-  Ends at:                       00002711
+  Placed at:                     0000260C
+  Ends at:                       00002663
 
 
   Segment:                       FUN_CODE__FREXP
@@ -682,8 +716,8 @@
   Align:                         00
   Address area:                  CODE
   Border:                        >00000000
-  Placed at:                     00002712
-  Ends at:                       00002795
+  Placed at:                     00002664
+  Ends at:                       000026E7
 
 
   Segment:                       FUN_CODE__MEMCPY
@@ -692,8 +726,8 @@
   Align:                         00
   Address area:                  CODE
   Border:                        >00000000
-  Placed at:                     00002796
-  Ends at:                       000027AC
+  Placed at:                     000026E8
+  Ends at:                       000026FE
 
 
   Segment:                       FUN_CODE__MEMSET
@@ -702,28 +736,28 @@
   Align:                         00
   Address area:                  CODE
   Border:                        >00000000
-  Placed at:                     000027AD
-  Ends at:                       000027C3
+  Placed at:                     000026FF
+  Ends at:                       00002715
 
 
   Segment:                       ??DATA_SEGMENT_ADDRESSES
+  Allocation:                    code
+  Size:                          00000018
+  Align:                         01
+  Address area:                  CODE
+  Border:                        >00000000
+  Placed at:                     00002716
+  Ends at:                       0000272D
+
+
+  Segment:                       ??INIT_DATA_SEGMENT_ADDRESSES
   Allocation:                    code
   Size:                          0000000C
   Align:                         01
   Address area:                  CODE
   Border:                        >00000000
-  Placed at:                     000027C4
-  Ends at:                       000027CF
-
-
-  Segment:                       ??INIT_DATA_SEGMENT_ADDRESSES
-  Allocation:                    code
-  Size:                          00000012
-  Align:                         01
-  Address area:                  CODE
-  Border:                        >00000000
-  Placed at:                     000027D0
-  Ends at:                       000027E1
+  Placed at:                     0000272E
+  Ends at:                       00002739
 
 
   Segment:                       CDATA__CRC16
@@ -732,18 +766,18 @@
   Align:                         01
   Address area:                  CODE
   Border:                        >00000000
-  Placed at:                     000027E2
-  Ends at:                       000029E1
+  Placed at:                     0000273A
+  Ends at:                       00002939
 
 
   Segment:                       FUN_CODE__ADC
   Allocation:                    code
-  Size:                          000002A4
+  Size:                          000001EF
   Align:                         00
   Address area:                  CODE
   Border:                        >00000000
-  Placed at:                     000029E2
-  Ends at:                       00002C85
+  Placed at:                     0000293A
+  Ends at:                       00002B28
 
 
   Segment:                       FUN_CODE__CRC16
@@ -752,38 +786,58 @@
   Align:                         00
   Address area:                  CODE
   Border:                        >00000000
-  Placed at:                     00002C86
-  Ends at:                       00002CD0
+  Placed at:                     00002B29
+  Ends at:                       00002B73
 
 
   Segment:                       FUN_CODE__DNT_FUN
   Allocation:                    code
-  Size:                          000002F2
+  Size:                          00000AC7
   Align:                         00
   Address area:                  CODE
   Border:                        >00000000
-  Placed at:                     00002CD1
-  Ends at:                       00002FC2
+  Placed at:                     00002B74
+  Ends at:                       0000363A
 
 
   Segment:                       FUN_CODE__MAIN
   Allocation:                    code
-  Size:                          00000A28
+  Size:                          0000034F
   Align:                         00
   Address area:                  CODE
   Border:                        >00000000
-  Placed at:                     00002FC3
-  Ends at:                       000039EA
+  Placed at:                     0000363B
+  Ends at:                       00003989
 
 
   Segment:                       FUN_CODE__MKO_UD
   Allocation:                    code
-  Size:                          00000111
+  Size:                          000000B5
   Align:                         00
   Address area:                  CODE
   Border:                        >00000000
-  Placed at:                     000039EB
-  Ends at:                       00003AFB
+  Placed at:                     0000398A
+  Ends at:                       00003A3E
+
+
+  Segment:                       FUN_CODE__PWM
+  Allocation:                    code
+  Size:                          00000019
+  Align:                         00
+  Address area:                  CODE
+  Border:                        >00000000
+  Placed at:                     00003A3F
+  Ends at:                       00003A57
+
+
+  Segment:                       FUN_CODE__TIMERS
+  Allocation:                    code
+  Size:                          00000047
+  Align:                         00
+  Address area:                  CODE
+  Border:                        >00000000
+  Placed at:                     00003A58
+  Ends at:                       00003A9E
 
 
   Segment:                       FUN_CODE__UART
@@ -792,38 +846,38 @@
   Align:                         00
   Address area:                  CODE
   Border:                        >00000000
-  Placed at:                     00003AFC
-  Ends at:                       00003BDA
-
-
-  Segment:                       IDATA_INI__MAIN
-  Allocation:                    code
-  Size:                          00000010
-  Align:                         00
-  Address area:                  CODE
-  Border:                        >00000000
-  Placed at:                     00003BDB
-  Ends at:                       00003BEA
+  Placed at:                     00003A9F
+  Ends at:                       00003B7D
 
 
   Segment:                       IDATA_INI__MKO_UD
   Allocation:                    code
-  Size:                          00000004
+  Size:                          00000005
   Align:                         00
   Address area:                  CODE
   Border:                        >00000000
-  Placed at:                     00003BEB
-  Ends at:                       00003BEE
+  Placed at:                     00003B7E
+  Ends at:                       00003B82
 
 
-  Segment:                       ISR_CODE__MAIN
+  Segment:                       ISR_CODE__MKO_UD
   Allocation:                    code
-  Size:                          00000099
+  Size:                          00000029
   Align:                         00
   Address area:                  CODE
   Border:                        >00000000
-  Placed at:                     00003BEF
-  Ends at:                       00003C87
+  Placed at:                     00003B83
+  Ends at:                       00003BAB
+
+
+  Segment:                       ISR_CODE__TIMERS
+  Allocation:                    code
+  Size:                          000000A1
+  Align:                         00
+  Address area:                  CODE
+  Border:                        >00000000
+  Placed at:                     00003BAC
+  Ends at:                       00003C4C
 
 
   Segment:                       ISR_CODE__UART
@@ -832,8 +886,8 @@
   Align:                         00
   Address area:                  CODE
   Border:                        >00000000
-  Placed at:                     00003C88
-  Ends at:                       00003D32
+  Placed at:                     00003C4D
+  Ends at:                       00003CF7
 
 
   Segment:                       CSTACK
@@ -846,34 +900,54 @@
   Ends at:                       000001FF
 
 
-  Segment:                       IDATA__MAIN
+  Segment:                       IDATA__MKO_UD
   Allocation:                    data
-  Size:                          00000010
+  Size:                          00000005
   Align:                         01
   Address area:                  DATA
   Border:                        >00000000
   Placed at:                     00000200
-  Ends at:                       0000020F
+  Ends at:                       00000204
 
 
-  Segment:                       IDATA__MKO_UD
+  Segment:                       UDATA__DNT_FUN
   Allocation:                    data
-  Size:                          00000004
-  Align:                         01
+  Size:                          00000158
+  Align:                         02
   Address area:                  DATA
   Border:                        >00000000
-  Placed at:                     00000210
-  Ends at:                       00000213
+  Placed at:                     00000208
+  Ends at:                       0000035F
 
 
   Segment:                       UDATA__MAIN
   Allocation:                    data
-  Size:                          0000016F
-  Align:                         02
+  Size:                          00000185
+  Align:                         01
   Address area:                  DATA
   Border:                        >00000000
-  Placed at:                     00000214
-  Ends at:                       00000382
+  Placed at:                     00000360
+  Ends at:                       000004E4
+
+
+  Segment:                       UDATA__MKO_UD
+  Allocation:                    data
+  Size:                          00000001
+  Align:                         00
+  Address area:                  DATA
+  Border:                        >00000000
+  Placed at:                     00000205
+  Ends at:                       00000205
+
+
+  Segment:                       UDATA__TIMERS
+  Allocation:                    data
+  Size:                          00000008
+  Align:                         01
+  Address area:                  DATA
+  Border:                        >00000000
+  Placed at:                     000004E6
+  Ends at:                       000004ED
 
 
   Segment:                       UDATA__UART
@@ -882,8 +956,8 @@
   Align:                         01
   Address area:                  DATA
   Border:                        >00000000
-  Placed at:                     00000384
-  Ends at:                       00000492
+  Placed at:                     000004EE
+  Ends at:                       000005FC
 
                 * * *  A D D R E S S   A R E A S   M A P  * * *
 
@@ -892,28 +966,31 @@
   Segment                       Align  Starts at   Ends at   Size(hex)   (dec)
   ----------------------------------------------------------------------------
   *** RESERVED ***               -     00002000    00002082  00000083    131
-  CODE__??CLIB                   0     00002083    00002673  000005F1    1521
-  CONST__??CLIB                  1     00002674    00002683  00000010    16
-  CSEG__??ISR                    0     00002684    000026B3  00000030    48
-  FUN_CODE__ABS                  0     000026B4    000026B9  00000006    6
-  FUN_CODE__FLOOR                0     000026BA    00002711  00000058    88
-  FUN_CODE__FREXP                0     00002712    00002795  00000084    132
-  FUN_CODE__MEMCPY               0     00002796    000027AC  00000017    23
-  FUN_CODE__MEMSET               0     000027AD    000027C3  00000017    23
-  ??DATA_SEGMENT_ADDRESSES       1     000027C4    000027CF  0000000C    12
-  ??INIT_DATA_SEGMENT_ADDRESSES  1     000027D0    000027E1  00000012    18
-  CDATA__CRC16                   1     000027E2    000029E1  00000200    512
-  FUN_CODE__ADC                  0     000029E2    00002C85  000002A4    676
-  FUN_CODE__CRC16                0     00002C86    00002CD0  0000004B    75
-  FUN_CODE__DNT_FUN              0     00002CD1    00002FC2  000002F2    754
-  FUN_CODE__MAIN                 0     00002FC3    000039EA  00000A28    2600
-  FUN_CODE__MKO_UD               0     000039EB    00003AFB  00000111    273
-  FUN_CODE__UART                 0     00003AFC    00003BDA  000000DF    223
-  IDATA_INI__MAIN                0     00003BDB    00003BEA  00000010    16
-  IDATA_INI__MKO_UD              0     00003BEB    00003BEE  00000004    4
-  ISR_CODE__MAIN                 0     00003BEF    00003C87  00000099    153
-  ISR_CODE__UART                 0     00003C88    00003D32  000000AB    171
-  *** GAP ***                    -     00003D33    00007FFF  000042CD    17101
+  CODE__??CLIB                   0     00002083    000025C4  00000542    1346
+  *** GAP ***                    -     000025C5    000025C5  00000001    1
+  CONST__??CLIB                  1     000025C6    000025D5  00000010    16
+  CSEG__??ISR                    0     000025D6    00002605  00000030    48
+  FUN_CODE__ABS                  0     00002606    0000260B  00000006    6
+  FUN_CODE__FLOOR                0     0000260C    00002663  00000058    88
+  FUN_CODE__FREXP                0     00002664    000026E7  00000084    132
+  FUN_CODE__MEMCPY               0     000026E8    000026FE  00000017    23
+  FUN_CODE__MEMSET               0     000026FF    00002715  00000017    23
+  ??DATA_SEGMENT_ADDRESSES       1     00002716    0000272D  00000018    24
+  ??INIT_DATA_SEGMENT_ADDRESSES  1     0000272E    00002739  0000000C    12
+  CDATA__CRC16                   1     0000273A    00002939  00000200    512
+  FUN_CODE__ADC                  0     0000293A    00002B28  000001EF    495
+  FUN_CODE__CRC16                0     00002B29    00002B73  0000004B    75
+  FUN_CODE__DNT_FUN              0     00002B74    0000363A  00000AC7    2759
+  FUN_CODE__MAIN                 0     0000363B    00003989  0000034F    847
+  FUN_CODE__MKO_UD               0     0000398A    00003A3E  000000B5    181
+  FUN_CODE__PWM                  0     00003A3F    00003A57  00000019    25
+  FUN_CODE__TIMERS               0     00003A58    00003A9E  00000047    71
+  FUN_CODE__UART                 0     00003A9F    00003B7D  000000DF    223
+  IDATA_INI__MKO_UD              0     00003B7E    00003B82  00000005    5
+  ISR_CODE__MKO_UD               0     00003B83    00003BAB  00000029    41
+  ISR_CODE__TIMERS               0     00003BAC    00003C4C  000000A1    161
+  ISR_CODE__UART                 0     00003C4D    00003CF7  000000AB    171
+  *** GAP ***                    -     00003CF8    00007FFF  00004308    17160
 
 
   Address area: DATA
@@ -921,12 +998,15 @@
   Segment                       Align  Starts at   Ends at   Size(hex)   (dec)
   ----------------------------------------------------------------------------
   CSTACK                         0     00000100    000001FF  00000100    256
-  IDATA__MAIN                    1     00000200    0000020F  00000010    16
-  IDATA__MKO_UD                  1     00000210    00000213  00000004    4
-  UDATA__MAIN                    2     00000214    00000382  0000016F    367
-  *** GAP ***                    -     00000383    00000383  00000001    1
-  UDATA__UART                    1     00000384    00000492  0000010F    271
-  *** GAP ***                    -     00000493    000017FF  0000136D    4973
+  IDATA__MKO_UD                  1     00000200    00000204  00000005    5
+  UDATA__MKO_UD                  0     00000205    00000205  00000001    1
+  *** GAP ***                    -     00000206    00000207  00000002    2
+  UDATA__DNT_FUN                 2     00000208    0000035F  00000158    344
+  UDATA__MAIN                    1     00000360    000004E4  00000185    389
+  *** GAP ***                    -     000004E5    000004E5  00000001    1
+  UDATA__TIMERS                  1     000004E6    000004ED  00000008    8
+  UDATA__UART                    1     000004EE    000005FC  0000010F    271
+  *** GAP ***                    -     000005FD    000017FF  00001203    4611
 
 
   Address area: REG
@@ -943,35 +1023,32 @@
   Name                           Segment          Value       Type info
 
   ?CCB_DATA                      n/a             0000001F     n/a
-  ?INTERRUPT00                   ISR_CODE__MAIN  00003BEF     n/a
-  ?INTERRUPT01                   CSEG__??ISR     00002684     n/a
-  ?INTERRUPT02                   CSEG__??ISR     00002687     n/a
-  ?INTERRUPT03                   CSEG__??ISR     0000268A     n/a
-  ?INTERRUPT04                   CSEG__??ISR     0000268D     n/a
-  ?INTERRUPT05                   CSEG__??ISR     00002690     n/a
-  ?INTERRUPT06                   CSEG__??ISR     00002693     n/a
-  ?INTERRUPT07                   CSEG__??ISR     00002696     n/a
-  ?INTERRUPT08                   ISR_CODE__UART  00003C88     n/a
-  ?INTERRUPT09                   ISR_CODE__MAIN  00003C6D     n/a
-  ?INTERRUPT10                   CSEG__??ISR     00002699     n/a
-  ?INTERRUPT11                   CSEG__??ISR     0000269C     n/a
-  ?INTERRUPT12                   CSEG__??ISR     0000269F     n/a
-  ?INTERRUPT13                   CSEG__??ISR     000026A2     n/a
-  ?INTERRUPT14                   CSEG__??ISR     000026A5     n/a
-  ?INTERRUPT15                   CSEG__??ISR     000026A8     n/a
-  ?INTERRUPT16                   CSEG__??ISR     000026AB     n/a
-  ?INTERRUPT17                   CSEG__??ISR     000026AE     n/a
-  ?INTERRUPT18                   CSEG__??ISR     000026B1     n/a
+  ?INTERRUPT00                   ISR_CODE__TIMER 00003BAC     n/a
+  ?INTERRUPT01                   CSEG__??ISR     000025D6     n/a
+  ?INTERRUPT02                   CSEG__??ISR     000025D9     n/a
+  ?INTERRUPT03                   CSEG__??ISR     000025DC     n/a
+  ?INTERRUPT04                   CSEG__??ISR     000025DF     n/a
+  ?INTERRUPT05                   CSEG__??ISR     000025E2     n/a
+  ?INTERRUPT06                   CSEG__??ISR     000025E5     n/a
+  ?INTERRUPT07                   CSEG__??ISR     000025E8     n/a
+  ?INTERRUPT08                   ISR_CODE__UART  00003C4D     n/a
+  ?INTERRUPT09                   ISR_CODE__MKO_U 00003B83     n/a
+  ?INTERRUPT10                   CSEG__??ISR     000025EB     n/a
+  ?INTERRUPT11                   CSEG__??ISR     000025EE     n/a
+  ?INTERRUPT12                   CSEG__??ISR     000025F1     n/a
+  ?INTERRUPT13                   CSEG__??ISR     000025F4     n/a
+  ?INTERRUPT14                   CSEG__??ISR     000025F7     n/a
+  ?INTERRUPT15                   CSEG__??ISR     000025FA     n/a
+  ?INTERRUPT16                   CSEG__??ISR     000025FD     n/a
+  ?INTERRUPT17                   CSEG__??ISR     00002600     n/a
+  ?INTERRUPT18                   CSEG__??ISR     00002603     n/a
   ?START                         CODE__??CLIB    00002103     <function>
   ?TMPREGS                       TMPREG_SEG      0000001C     n/a
-  ADC_50V                        FUN_CODE__ADC   00002A15     <function>
   ADC_CON                        ??ABS_DATA      00001FC0     unsigned char
-  ADC_DNT_summ                   FUN_CODE__ADC   000029F3     <function>
   ADC_EN                         ??ABS_DATA      00001FC2     unsigned char
   ADC_IOPORT0                    ??ABS_REG       0000000E *** unsigned char
   ADC_IOPORT5                    ??ABS_DATA      00001FF9 *** unsigned char
-  ADC_Init                       FUN_CODE__ADC   000029E2     <function>
-  ADC_Pt1000                     FUN_CODE__ADC   00002A8A     <function>
+  ADC_Init                       FUN_CODE__ADC   0000293A     <function>
   ADC_RESULT                     ??ABS_DATA      00001FC4     unsigned int
   ADC_SET                        ??ABS_DATA      00001FC1     unsigned char
   ADC_TRSCHAN                    ??ABS_DATA      00001FC6 *** unsigned int
@@ -989,17 +1066,13 @@
   CLKC                           ??ABS_DATA      00001FF0     unsigned int
   CLKCH                          ??ABS_DATA      00001FF1 *** unsigned char
   CLKCL                          ??ABS_DATA      00001FF0 *** unsigned char
-  COMAnsForm                     FUN_CODE__DNT_F 00002D25     <function>
-  CurrentCalculation             FUN_CODE__DNT_F 00002DA1     <function>
-  DNT_cal_result                 UDATA__MAIN     00000224 *** int
-  DNT_data                       UDATA__MAIN     00000226 *** <array>
-  DNT_max                        UDATA__MAIN     00000266 *** int
-  DNT_max_arr                    UDATA__MAIN     00000268 *** <array>
-  DNT_min                        UDATA__MAIN     00000278 *** int
-  DNT_min_arr                    UDATA__MAIN     0000027A *** <array>
-  DNT_result                     UDATA__MAIN     0000028A *** int
-  DNT_result_arr                 UDATA__MAIN     0000028C *** <array>
-  DNT_zero                       UDATA__MAIN     00000214 *** long
+  COMAnsForm                     FUN_CODE__DNT_F 000035BF     <function>
+  Current_Calc_Step_10ms         FUN_CODE__DNT_F 00002CFE     <function>
+  DNT_Frame_Create               FUN_CODE__DNT_F 00002BD0     <function>
+  DNT_Frame_Definer_Init         FUN_CODE__DNT_F 00002CEE     <function>
+  DNT_Frame_Init                 FUN_CODE__DNT_F 00002B74     <function>
+  DNT_Parameters_Init            FUN_CODE__DNT_F 00002CD4     <function>
+  Grid_Voltage_Calc_Step_10ms    FUN_CODE__DNT_F 00002FAF     <function>
   HSI_MODE                       ??ABS_REG       00000003 *** unsigned char
   HSI_STATUS                     ??ABS_REG       00000006 *** unsigned char
   HSI_TIME                       ??ABS_REG       00000004 *** unsigned int
@@ -1027,18 +1100,15 @@
   IOS0                           ??ABS_REG       00000015 *** unsigned char
   IOS1                           ??ABS_REG       00000016     unsigned char
   IOS2                           ??ABS_REG       00000017 *** unsigned char
-  IRQ_MKO_UD                     ISR_CODE__MAIN  00003C6D *** <function>
-  IRQ_Timer1                     ISR_CODE__MAIN  00003BEF *** <function>
-  IRQ_uart_rx_tx                 ISR_CODE__UART  00003C88 *** <function>
-  MKO_State                      FUN_CODE__MKO_U 00003AF6     <function>
-  MKO_UD_Init                    FUN_CODE__MKO_U 000039EB     <function>
-  MKO_data_to_transmit           FUN_CODE__MKO_U 00003A04     <function>
-  MKO_receive_data               FUN_CODE__MKO_U 00003A4D     <function>
-  MKO_receive_data_change        FUN_CODE__MKO_U 00003AA3     <function>
-  MKO_rv_data                    IDATA__MKO_UD   00000210 *** <pointer>
-  MKO_tr_data                    IDATA__MKO_UD   00000212 *** <pointer>
-  MKO_tr_data_1                  IDATA__MAIN     00000200 *** <pointer>
-  Oscilloscope                   FUN_CODE__ADC   00002B9A     <function>
+  IRQ_MKO_UD                     ISR_CODE__MKO_U 00003B83 *** <function>
+  IRQ_Timer1                     ISR_CODE__TIMER 00003BAC *** <function>
+  IRQ_uart_rx_tx                 ISR_CODE__UART  00003C4D *** <function>
+  MKO_UD_Init                    FUN_CODE__MKO_U 0000398A     <function>
+  MKO_data_to_transmit           FUN_CODE__MKO_U 000039A3     <function>
+  MKO_receive_data_change        FUN_CODE__MKO_U 000039EC     <function>
+  MKO_rv_data                    IDATA__MKO_UD   00000200 *** <pointer>
+  MKO_tr_data                    IDATA__MKO_UD   00000202     <pointer>
+  Oscilloscope                   FUN_CODE__ADC   00002A35     <function>
   PTSSEL                         ??ABS_REG       00000004     unsigned int
   PTSSEL_HI                      ??ABS_REG       00000005 *** unsigned char
   PTSSEL_LO                      ??ABS_REG       00000004 *** unsigned char
@@ -1048,13 +1118,8 @@
   PWM0_CONTROL                   ??ABS_REG       00000017 *** unsigned char
   PWM1_CONTROL                   ??ABS_REG       00000016     unsigned char
   PWM2_CONTROL                   ??ABS_REG       00000017 *** unsigned char
-  PWM_Duty                       FUN_CODE__DNT_F 00002CD9     <function>
-  PWM_FB                         FUN_CODE__DNT_F 00002CEA     <function>
-  PWM_Init                       FUN_CODE__DNT_F 00002CD1     <function>
-  Result_50V                     UDATA__MAIN     0000029C *** unsigned int
-  Result_50V_arr                 UDATA__MAIN     0000029E *** <array>
-  Result_50V_mean                UDATA__MAIN     000002AE *** unsigned int
-  Result_Temp                    UDATA__MAIN     000002B0 *** int
+  PWM_Duty                       FUN_CODE__PWM   00003A47     <function>
+  PWM_Init                       FUN_CODE__PWM   00003A3F     <function>
   SBUF_RX0                       ??ABS_REG       00000007     unsigned char
   SBUF_RX1                       ??ABS_DATA      00001FAB     unsigned char
   SBUF_TX0                       ??ABS_REG       00000007     unsigned char
@@ -1068,85 +1133,74 @@
   T2CAPTURE_HI                   ??ABS_REG       0000000D *** unsigned char
   T2CAPTURE_LO                   ??ABS_REG       0000000C *** unsigned char
   TIMER1                         ??ABS_REG       0000000A     unsigned int
+  TIMER1_50MS                    UDATA__TIMERS   000004E6     unsigned int
   TIMER1_HI                      ??ABS_REG       0000000B *** unsigned char
   TIMER1_LO                      ??ABS_REG       0000000A *** unsigned char
   TIMER2                         ??ABS_REG       0000000C     unsigned int
-  TIMER2_1MS                     UDATA__MAIN     000002B2 *** unsigned int
+  TIMER2_10MS                    UDATA__TIMERS   000004E8     unsigned int
   TIMER2_HI                      ??ABS_REG       0000000D *** unsigned char
   TIMER2_LO                      ??ABS_REG       0000000C *** unsigned char
-  TIMER_10MS                     UDATA__MAIN     000002B4 *** unsigned int
-  Timer10ms_Flag                 FUN_CODE__MAIN  00002FC3 *** <function>
-  Timer1ms_Flag                  FUN_CODE__MAIN  00002FD4 *** <function>
-  Timer_Init                     FUN_CODE__DNT_F 00002D05     <function>
-  UART0_RX_array                 UDATA__UART     0000038C *** <array>
-  UART0_TX_array                 UDATA__UART     000003CC *** <array>
-  UART1_RX                       FUN_CODE__UART  00003B72     <function>
-  UART1_RX_array                 UDATA__UART     0000040C *** <array>
-  UART1_TX                       FUN_CODE__UART  00003B96     <function>
-  UART1_TX_array                 UDATA__UART     0000044C *** <array>
-  UART_Init                      FUN_CODE__UART  00003AFC     <function>
-  UartPTS                        UDATA__UART     00000384 *** <struct>
+  Temp_Calc_Step_10ms            FUN_CODE__DNT_F 00002F29     <function>
+  Timer10ms_Flag                 FUN_CODE__TIMER 00003A78     <function>
+  Timer50ms_Flag                 FUN_CODE__TIMER 00003A89     <function>
+  Timer_Init                     FUN_CODE__TIMER 00003A58     <function>
+  UART0_RX_array                 UDATA__UART     000004F6 *** <array>
+  UART0_TX_array                 UDATA__UART     00000536 *** <array>
+  UART1_RX                       FUN_CODE__UART  00003B15     <function>
+  UART1_RX_array                 UDATA__UART     00000576 *** <array>
+  UART1_TX                       FUN_CODE__UART  00003B39     <function>
+  UART1_TX_array                 UDATA__UART     000005B6 *** <array>
+  UART_Init                      FUN_CODE__UART  00003A9F     <function>
+  UartPTS                        UDATA__UART     000004EE *** <struct>
+  Update_MKO_from_DNT_Parameters FUN_CODE__DNT_F 00002C67     <function>
   WATCHDOG                       ??ABS_REG       0000000A *** unsigned char
   WSR                            ??ABS_REG       00000014     unsigned char
-  abs                            FUN_CODE__ABS   000026B4     <function>
-  adc_time                       IDATA__MAIN     00000202 *** unsigned int
-  adc_var                        UDATA__MAIN     00000218 *** long
-  adc_var_2                      UDATA__MAIN     0000021C *** long
-  answer                         UDATA__MAIN     000002D8 *** <array>
-  average_num                    IDATA__MAIN     00000204 *** unsigned int
-  com_data                       UDATA__MAIN     00000318 *** <array>
-  crc16_ccitt                    FUN_CODE__CRC16 00002C86     <function>
-  crc16tab                       CDATA__CRC16    000027E2 *** <array>
-  dead_time                      IDATA__MAIN     00000206 *** unsigned int
-  dnt_ku                         UDATA__MAIN     00000338 *** unsigned char
-  dnt_status                     UDATA__MAIN     000002B6 *** unsigned int
-  dnt_status_old                 UDATA__MAIN     000002B8 *** unsigned int
-  dnt_time                       UDATA__MAIN     00000220 *** unsigned long
-  duty_ena                       IDATA__MAIN     0000020E *** unsigned char
-  duty_val                       UDATA__MAIN     00000339 *** unsigned char
+  _adc_data_get                  FUN_CODE__DNT_F 000032D2 *** <function>
+  _current_result_calc           FUN_CODE__DNT_F 0000332C *** <function>
+  _cycle_measure_struct_init     FUN_CODE__DNT_F 00003098 *** <function>
+  _get_frame_definer             FUN_CODE__DNT_F 0000354F *** <function>
+  _ku_change_checker             FUN_CODE__DNT_F 0000340F *** <function>
+  _single_meas_adc_data_get      FUN_CODE__DNT_F 00003386 *** <function>
+  _single_measure_struct_init    FUN_CODE__DNT_F 00003139 *** <function>
+  abs                            FUN_CODE__ABS   00002606     <function>
+  adc_value_get                  FUN_CODE__ADC   0000294B     <function>
+  answer                         UDATA__MAIN     000003A2 *** <array>
+  com_data                       UDATA__MAIN     00000422 *** <array>
+  crc16_ccitt                    FUN_CODE__CRC16 00002B29     <function>
+  crc16tab                       CDATA__CRC16    0000273A *** <array>
+  dnt                            UDATA__DNT_FUN  00000208     <struct>
+  dnt_data_frame                 UDATA__DNT_FUN  00000320     <struct>
   exit                           CODE__??CLIB    000021E5 *** <function>
-  flag_rx                        UDATA__UART     0000048C *** unsigned char
-  flag_rx0                       UDATA__UART     0000048D *** unsigned char
-  flag_rx1                       UDATA__UART     0000048E *** unsigned char
-  floor                          FUN_CODE__FLOOR 000026BA     <function>
-  frexp                          FUN_CODE__FREXP 00002712     <function>
-  i                              UDATA__MAIN     000002BA *** unsigned int
-  j                              UDATA__MAIN     000002BC *** unsigned int
-  k                              UDATA__MAIN     000002BE *** unsigned int
+  flag_rx                        UDATA__UART     000005F6 *** unsigned char
+  flag_rx0                       UDATA__UART     000005F7 *** unsigned char
+  flag_rx1                       UDATA__UART     000005F8 *** unsigned char
+  floor                          FUN_CODE__FLOOR 0000260C     <function>
+  frexp                          FUN_CODE__FREXP 00002664     <function>
+  grid_voltage_adc_to_voltage    FUN_CODE__ADC   00002955     <function>
+  grid_voltage_adc_value_get     FUN_CODE__ADC   00002950     <function>
+  i                              UDATA__MAIN     00000360 *** unsigned int
+  ku_gpio_set                    FUN_CODE__DNT_F 00003072 *** <function>
   ldiv                           CODE__??CLIB    00002083 *** <function>
-  len                            UDATA__MAIN     0000033A *** unsigned char
-  len_rx0                        UDATA__UART     0000048F *** unsigned char
-  len_rx1                        UDATA__UART     00000490 *** unsigned char
-  leng                           UDATA__MAIN     0000033B *** unsigned char
-  m                              UDATA__MAIN     000002C0 *** unsigned int
-  main                           FUN_CODE__MAIN  00002FEA     <function>
-  main_current                   UDATA__MAIN     000002C2 *** int
-  max                            UDATA__MAIN     000002C4 *** int
-  mc_time                        IDATA__MAIN     00000208 *** unsigned int
-  memcpy                         FUN_CODE__MEMCP 00002796     <function>
-  memset                         FUN_CODE__MEMSE 000027AD     <function>
-  min                            UDATA__MAIN     000002C6 *** int
-  mko_activity_bound             IDATA__MAIN     0000020F *** unsigned char
-  mko_activity_flag              UDATA__MAIN     0000033C *** unsigned char
-  mko_data_flag                  UDATA__MAIN     0000033D *** unsigned char
-  n                              UDATA__MAIN     000002C8 *** unsigned int
-  num_var                        UDATA__MAIN     000002CA *** unsigned int
-  osc_ku                         UDATA__MAIN     000002CC *** unsigned int
-  osc_mode                       UDATA__MAIN     000002CE *** unsigned int
-  period                         IDATA__MAIN     0000020A *** unsigned int
-  pwm_flag                       UDATA__MAIN     0000033E *** unsigned char
-  req_id                         UDATA__MAIN     0000033F *** unsigned char
-  seq_num                        UDATA__MAIN     00000340 *** unsigned char
-  start                          UDATA__MAIN     000002D0 *** unsigned int
-  status_uart0                   UDATA__UART     00000491 *** unsigned char
-  status_uart1                   UDATA__UART     00000492 *** unsigned char
-  stop                           IDATA__MAIN     0000020C *** unsigned int
-  str                            UDATA__MAIN     00000341 *** <array>
-  temp_var                       UDATA__MAIN     000002D2 *** int
-  time_out                       UDATA__MAIN     000002D4 *** int
-  timer_flag_1                   UDATA__MAIN     00000381 *** unsigned char
-  timer_flag_2                   UDATA__MAIN     00000382 *** unsigned char
-  var                            UDATA__MAIN     000002D6 *** unsigned int
+  len_rx0                        UDATA__UART     000005F9 *** unsigned char
+  len_rx1                        UDATA__UART     000005FA *** unsigned char
+  leng                           UDATA__MAIN     00000462 *** unsigned char
+  main                           FUN_CODE__MAIN  0000363B     <function>
+  memcpy                         FUN_CODE__MEMCP 000026E8     <function>
+  memset                         FUN_CODE__MEMSE 000026FF     <function>
+  mko_activity_timeout           IDATA__MKO_UD   00000204     unsigned char
+  mko_read_flag                  UDATA__MKO_UD   00000205     unsigned char
+  req_id                         UDATA__MAIN     00000463 *** unsigned char
+  request                        UDATA__MAIN     00000464 *** <array>
+  seq_num                        UDATA__MAIN     000004E4 *** unsigned char
+  status_uart0                   UDATA__UART     000005FB *** unsigned char
+  status_uart1                   UDATA__UART     000005FC *** unsigned char
+  temperature_adc_to_degree      FUN_CODE__ADC   00002994     <function>
+  temperature_adc_value_get      FUN_CODE__ADC   00002972     <function>
+  time_50ms                      UDATA__TIMERS   000004EA *** unsigned int
+  timer_flag_1                   UDATA__TIMERS   000004EC *** unsigned char
+  timer_flag_2                   UDATA__TIMERS   000004ED *** unsigned char
+  u16_buff                       UDATA__MAIN     00000362 *** <array>
+  uint16_buffer_rev_to_uint8_buf FUN_CODE__DNT_F 00003581     <function>
 
   ***  These symbols do not resolve any external reference
 
@@ -1154,10 +1208,10 @@
                      * * *  O U T P U T   F I L E S  * * *
 
   Phyton/MicroCOSM format:
-    D:\YandexDisk\Work\Microcontrolers\1874бе7р\DNT_MKO\DNT_MKO_v05\TestLinear\Release\Exe\TestLinear.mce
+    D:\YandexDisk\Work\Microcontrolers\1874бе7р\DNT_MKO\TestLinear\Release\Exe\TestLinear.mce
 
   Intel Extended HEX format:
-    D:\YandexDisk\Work\Microcontrolers\1874бе7р\DNT_MKO\DNT_MKO_v05\TestLinear\Release\Exe\TestLinear.HEX  for Address Area CODE
+    D:\YandexDisk\Work\Microcontrolers\1874бе7р\DNT_MKO\TestLinear\Release\Exe\TestLinear.HEX  for Address Area CODE
 
   Generated code is suitable for:  K1874BE96T
 

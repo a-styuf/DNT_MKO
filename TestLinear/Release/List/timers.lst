@@ -1,0 +1,174 @@
+*******************************************************************************
+*                                                                             *
+*              K1874BE96T C CROSS COMPILER Version 2.00.150328                *
+*                          Copyright (C) 2012 NIIET                           *
+*                                                                             *
+*******************************************************************************
+
+                ?INTERRUPT00:
+                  IRQ_Timer1:
+;FILE: .\TestLinear\timers.c
+;000011    void IRQ_Timer1()
+00000000    F4                             	PUSHA 
+00000001    C81C                           	PUSH  _AX
+00000003    C81E                           	PUSH  _BX
+00000005    C820                           	PUSH  _CX
+;000014        _di_();
+00000007    FA                             	DI    
+;000015        tmp = IOS1;
+00000008    B00020                         	LDB   tmp?IRQ_Timer1,IOS1
+;000017        if (tmp&0x20)//обработка таймера 1
+0000000B    35205E                         	JBC   tmp?IRQ_Timer1,5h,??_1_ELSE
+;000018        {
+;000019            WSR = 0x0F;
+0000000E    B10F00                         	LDB   WSR,#0Fh
+;000020            TIMER1 = 0x0BDC; // 3036 50мс для частоты МК 20МГц
+00000011    A1DC0B00                       	LD    TIMER1,#0BDCh
+;000021            WSR = 0x00;
+00000015    1100                           	CLRB  WSR
+;000023    		if (time_50ms < 19){
+00000017    A30104001C                     	LD    _AX,time_50ms
+0000001C    8913001C                       	CMP   _AX,#0013h
+00000020    DB09                           	JC    ??_2_ELSE
+;000024    			time_50ms += 1;
+00000022    071C                           	INC   _AX
+00000024    C30104001C                     	ST    _AX,time_50ms
+;000025    		}
+00000029    201E                           	SJMP  ??_2_END
+                   ??_2_ELSE:
+;000026    		else{
+;000027    			dnt.time += 1;
+0000002B    A30100001C                     	LD    _AX,dnt
+00000030    A30102001E                     	LD    _BX,(dnt+2)
+00000035    071C                           	INC   _AX
+00000037    A4001E                         	ADDC  _BX,0
+0000003A    C30100001C                     	ST    _AX,dnt
+0000003F    C30102001E                     	ST    _BX,(dnt+2)
+;000028    			time_50ms = 0;
+00000044    C301040000                     	ST    00h,time_50ms
+;000029    		}
+                    ??_2_END:
+;000030            if (TIMER1_50MS != 0){
+00000049    A30100001C                     	LD    _AX,TIMER1_50MS
+0000004E    88001C                         	CMP   _AX,0
+00000051    DF0C                           	JE    ??_3_ELSE
+;000031                TIMER1_50MS -= 1;
+00000053    051C                           	DEC   _AX
+00000055    C30100001C                     	ST    _AX,TIMER1_50MS
+;000032                timer_flag_1 = 0;
+0000005A    C701060000                     	STB   00h,timer_flag_1
+;000033            }
+                   ??_3_ELSE:
+;000034            if(TIMER1_50MS == 0){
+0000005F    88001C                         	CMP   _AX,0
+00000062    D708                           	JNE   ??_4_ELSE
+;000035                timer_flag_1 = 1;
+00000064    B1011C                         	LDB   _AL,#01h
+00000067    C70106001C                     	STB   _AL,timer_flag_1
+;000036            }
+                   ??_4_ELSE:
+;000037        }
+                   ??_1_ELSE:
+;000038        if(tmp&0x10){
+0000006C    342029                         	JBC   tmp?IRQ_Timer1,4h,??_5_ELSE
+;000039            WSR = 0x00;
+0000006F    1100                           	CLRB  WSR
+;000040            TIMER2 = 0xCF2C; //53036 10 мс для частоты МК 20МГц
+00000071    A12CCF00                       	LD    TIMER2,#0CF2Ch
+;000041            WSR = 0x00;
+;000042            if (TIMER2_10MS != 0){
+00000075    A30102001C                     	LD    _AX,TIMER2_10MS
+0000007A    88001C                         	CMP   _AX,0
+0000007D    DF0C                           	JE    ??_6_ELSE
+;000043                TIMER2_10MS -= 1;
+0000007F    051C                           	DEC   _AX
+00000081    C30102001C                     	ST    _AX,TIMER2_10MS
+;000044                timer_flag_2 = 0;
+00000086    C701070000                     	STB   00h,timer_flag_2
+;000045            }
+                   ??_6_ELSE:
+;000046            if (TIMER2_10MS == 0){
+0000008B    88001C                         	CMP   _AX,0
+0000008E    D708                           	JNE   ??_7_ELSE
+;000047                timer_flag_2 = 1;
+00000090    B1011C                         	LDB   _AL,#01h
+00000093    C70107001C                     	STB   _AL,timer_flag_2
+;000048            }
+                   ??_7_ELSE:
+;000049        }
+                   ??_5_ELSE:
+;000050        _ei_();
+00000098    FB                             	EI    
+;000051    }
+00000099    CC20                           	POP   _CX
+0000009B    CC1E                           	POP   _BX
+0000009D    CC1C                           	POP   _AX
+0000009F    F5                             	POPA  
+000000A0    F0                             	RET   
+.ENDF
+                  Timer_Init:
+;000053    void Timer_Init()
+;000056      WSR = 0x0F;
+00000000    B10F00                         	LDB   WSR,#0Fh
+;000057      tmp = IOC1;
+00000003    B0001C                         	LDB   tmp?Timer_Init,IOC1
+;000058      WSR = 0x00;
+00000006    1100                           	CLRB  WSR
+;000059      IOC1 = tmp | 0x0C; //разрешаем прерывания таймера 1 и 2
+00000008    910C1C                         	ORB   tmp?Timer_Init,#0Ch
+0000000B    B01C00                         	LDB   IOC1,tmp?Timer_Init
+;000060      WSR = 0x01;
+0000000E    B10100                         	LDB   WSR,#01h
+;000061      IOC3 |= 0x01;
+00000011    910100                         	ORB   IOC3,#01h
+;000062      WSR = 0x00;
+00000014    1100                           	CLRB  WSR
+;000063      INT_MASK |= 0x01;
+00000016    910100                         	ORB   INT_MASK,#01h
+;000065      WSR = 0x00;
+;000066      INT_PEND1 &= ~0x10;
+00000019    71EF00                         	ANDB  INT_PEND1,#0EFh
+;000067      INT_PEND &= ~0x01;
+0000001C    71FE00                         	ANDB  INT_PEND,#0FEh
+;000068    }
+0000001F    F0                             	RET   
+.ENDF
+              Timer10ms_Flag:
+;000070    uint8 Timer10ms_Flag()
+;000072      if (timer_flag_2 != 0)
+00000020    B30107001C                     	LDB   _AL,timer_flag_2
+00000025    98001C                         	CMPB  _AL,0
+00000028    DF1A                           	JE    ??_8_ELSE
+;000073      {
+;000074        timer_flag_2 = 0;
+0000002A    C701070000                     	STB   00h,timer_flag_2
+;000075        return 1;
+0000002F    200F                           	SJMP  COMMON?END_Timer10ms_Flag
+;000076      }
+;000077      return 0;
+;000078    }
+.ENDF
+              Timer50ms_Flag:
+;000080    uint8 Timer50ms_Flag()
+;000082      if (timer_flag_1 != 0)
+00000031    B30106001C                     	LDB   _AL,timer_flag_1
+00000036    98001C                         	CMPB  _AL,0
+00000039    DF09                           	JE    ??_9_ELSE
+;000083      {
+;000084        timer_flag_1 = 0;
+0000003B    C701060000                     	STB   00h,timer_flag_1
+;000085        return 1;
+   COMMON?END_Timer10ms_Flag:
+00000040    B1011C                         	LDB   _AL,#01h
+00000043    F0                             	RET   
+                   ??_8_ELSE:
+;000086      }
+                   ??_9_ELSE:
+;000087      return 0;
+00000044    111C                           	CLRB  _AL
+;000088    }
+00000046    F0                             	RET   
+.ENDF
+
+.\TestLinear\timers.c: 232 byte(s), 2877 line(s), 0 error(s), 0 warning(s)
+

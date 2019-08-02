@@ -49,5 +49,5 @@
 0000004A    F0                             	RET   
 .ENDF
 
-.\TestLinear\crc16.c: 75 byte(s), 2683 line(s), 0 error(s), 0 warning(s)
+.\TestLinear\crc16.c: 75 byte(s), 2689 line(s), 0 error(s), 0 warning(s)
 

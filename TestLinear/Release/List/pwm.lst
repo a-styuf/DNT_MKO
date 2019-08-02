@@ -1,0 +1,38 @@
+*******************************************************************************
+*                                                                             *
+*              K1874BE96T C CROSS COMPILER Version 2.00.150328                *
+*                          Copyright (C) 2012 NIIET                           *
+*                                                                             *
+*******************************************************************************
+
+                    PWM_Init:
+;FILE: .\TestLinear\pwm.c
+;000003    void PWM_Init()
+;000005      WSR = 0x01;
+00000000    B10100                         	LDB   WSR,#01h
+;000006      PWM1_CONTROL = 0;
+00000003    1100                           	CLRB  PWM1_CONTROL
+;000007      WSR = 0x00;
+00000005    1100                           	CLRB  WSR
+;000008    }
+00000007    F0                             	RET   
+.ENDF
+                    PWM_Duty:
+;000010    void PWM_Duty(uint8 Duty)
+;000012      if (Duty > 128) Duty = 128;
+00000008    99811C                         	CMPB  Duty?PWM_Duty,#81h
+0000000B    D303                           	JNC   ??_1_ELSE
+0000000D    B1801C                         	LDB   Duty?PWM_Duty,#80h
+                   ??_1_ELSE:
+;000014      WSR = 0x01;
+00000010    B10100                         	LDB   WSR,#01h
+;000015      PWM1_CONTROL = Duty;
+00000013    B01C00                         	LDB   PWM1_CONTROL,Duty?PWM_Duty
+;000016      WSR = 0x00;
+00000016    1100                           	CLRB  WSR
+;000017    }
+00000018    F0                             	RET   
+.ENDF
+
+.\TestLinear\pwm.c: 25 byte(s), 2655 line(s), 0 error(s), 0 warning(s)
+
