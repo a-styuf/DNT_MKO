@@ -31,8 +31,7 @@
 extern typeDNTOperationData dnt;
 extern typeDNTFrame dnt_data_frame;
 extern uint8_t mko_activity_timeout, mko_read_flag;
-extern uint16 TIMER1_50MS;
-extern uint16 TIMER2_10MS;
+extern uint16 TIMER_10MS;
 extern uint16 *MKO_tr_data;
 
 uint16_t i;
@@ -54,8 +53,7 @@ void main()
     Timer_Init();
     MKO_UD_Init();
     IOPORT1 = 0x00;
-    TIMER1_50MS = 4;
-    TIMER2_10MS = 100;
+    TIMER_10MS = 100;
     SBUF_TX1 = 0x01;
     //
     memset(u16_buff, 0xFA, 64);
@@ -69,14 +67,9 @@ void main()
     //////////////////////////
     while(1)
     {
-        ////обработка срабатывания таймера раз в 1 сек
-        if (Timer50ms_Flag() == 1)
-        {
-            TIMER1_50MS = 1;//задание интервала опроса
-        }
         if (Timer10ms_Flag() == 1)
         {
-            TIMER2_10MS = 1;
+            TIMER_10MS = 1;
             if (mko_activity_timeout != 0) {
                 mko_activity_timeout--; //необходимо делать паузы, что бы МКО не вносило помехи в измерения
             }
@@ -90,7 +83,7 @@ void main()
             //
             if ((mko_read_flag != 0) && (dnt.control.measure_cycle_time_ms == 0)){ //проверяем есть ли команда на запись по МКО и закончился ли цикл измерения, если все есть, перезаписываем параметры ДНТ
                 mko_read_flag = 0;
-                Update_MKO_from_DNT_Parameters(&dnt);
+                Update_DNT_Prameters_from_MKO(&dnt);
             }
         }
         //// Работа с внешними интерфейсами ////
@@ -135,21 +128,22 @@ void main()
                     leng = COMAnsForm(req_id, ID, request[2], &seq_num, request[4], 64, com_data, answer);
                     UART1_TX(answer, leng);
                 }
-                else if(request[4] == 0x05)// команда для чтения данных с подадреса 30
+                else if(request[4] == 0x05)// команда для чтения данных с задаваемого ПА МКО
                 {
-                    memcpy((uint8_t*)u16_buff, (uint8_t*)&dnt_data_frame, 64);
+                    MKO_get_data_from_transmit_subaddr(u16_buff, request[6]&0x1F);
                     uint16_buffer_rev_to_uint8_buffer(u16_buff, com_data, 32);
                     leng = COMAnsForm(req_id, ID, request[2], &seq_num, request[4], 64, com_data, answer);
                     UART1_TX(answer, leng);
                 }
-				else if(request[4] == 0xF1)// управление режимом
+                else if(request[4] == 0xF1)// управление режимом
                 {
                     dnt.control.mode = request[6];
                     dnt.control.measure_leng_s = request[7];
                     dnt.control.dead_time_ms = request[8];
+                    Update_MKO_from_DNT_Parameters(&dnt);
                     leng = COMAnsForm(req_id, ID, request[2], &seq_num, request[4], 3, &request[6], answer);
                     UART1_TX(answer, leng);
-                }				
+                }
                 else if(request[4] == 0xFF)// запуск и вычитываник осциллограммы
                 {
                     //заголовок
@@ -162,14 +156,14 @@ void main()
                     answer[4] = 0xF3;
                     answer[5] = 0xFF;
                     UART1_TX(answer, 0x06);
-                    TIMER2_10MS = 10;
+                    TIMER_10MS = 10;
                     for(i=0; i<512; i++)
                     {
                         answer[0] = ((*(MKO_tr_data + 32 + i))>>8)&0xFF;
                         answer[1] = ((*(MKO_tr_data + 32 + i))>>0)&0xFF;
                         while (Timer10ms_Flag() != 1);
                         UART1_TX(answer, 0x02);
-                        TIMER2_10MS = 1;
+                        TIMER_10MS = 1;
                     }
                 }
             }

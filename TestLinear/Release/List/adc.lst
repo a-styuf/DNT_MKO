@@ -124,61 +124,61 @@ COMMON?END_grid_voltage_adc_value_get:
 000000FA    F0                             	RET   
 .ENDF
                 Oscilloscope:
-;000053    void Oscilloscope(uint16 ku, uint16 mode, uint16 delay_10ms) //блокирующая функция для вычитки АЦП
+;000053    void Oscilloscope(uint16 ku, uint16 mode, uint16 delay_1ms) //блокирующая функция для вычитки АЦП
 000000FB    C824                           	PUSH  _EX
+000000FD    C826                           	PUSH  _FX
 ;000057        uint16 *MKO_tr_data = (uint16*)0x1000;
-;000058        SBUF_TX1 = 0x11;
-000000FD    B11122                         	LDB   _DL,#11h
-00000100    C701000022                     	STB   _DL,SBUF_TX1
 ;000059        if (mode == 0)  {
-00000105    88001E                         	CMP   mode?Oscilloscope,0
-00000108    D726                           	JNE   ??_4_ELSE
+000000FF    88001E                         	CMP   mode?Oscilloscope,0
+00000102    D72B                           	JNE   ??_4_ELSE
 ;000060            if (ku == 0) IOPORT1 = 0x38&0x08;
-0000010A    88001C                         	CMP   ku?Oscilloscope,0
-0000010D    DF26                           	JE    ??_19_COMMON
+00000104    88001C                         	CMP   ku?Oscilloscope,0
+00000107    D705                           	JNE   ??_5_ELSE
+00000109    B10800                         	LDB   IOPORT1,#08h
+0000010C    2049                           	SJMP  ??_4_END
+                   ??_5_ELSE:
 ;000061            else if (ku == 1) IOPORT1 = 0x38&0x28;
-0000010F    8901001C                       	CMP   ku?Oscilloscope,#0001h
-00000113    D705                           	JNE   ??_6_ELSE
-00000115    B12800                         	LDB   IOPORT1,#28h
-00000118    203F                           	SJMP  ??_4_END
+0000010E    8901001C                       	CMP   ku?Oscilloscope,#0001h
+00000112    D705                           	JNE   ??_6_ELSE
+00000114    B12800                         	LDB   IOPORT1,#28h
+00000117    203E                           	SJMP  ??_4_END
                    ??_6_ELSE:
 ;000062            else if (ku == 2) IOPORT1 = 0x38&0x18;
-0000011A    8902001C                       	CMP   ku?Oscilloscope,#0002h
-0000011E    D705                           	JNE   ??_7_ELSE
-00000120    B11800                         	LDB   IOPORT1,#18h
-00000123    2034                           	SJMP  ??_4_END
+00000119    8902001C                       	CMP   ku?Oscilloscope,#0002h
+0000011D    D705                           	JNE   ??_7_ELSE
+0000011F    B11800                         	LDB   IOPORT1,#18h
+00000122    2033                           	SJMP  ??_4_END
                    ??_7_ELSE:
 ;000063            else if (ku == 3) IOPORT1 = 0x38&0x38;
-00000125    8903001C                       	CMP   ku?Oscilloscope,#0003h
-00000129    D72E                           	JNE   ??_4_END
-0000012B    B13800                         	LDB   IOPORT1,#38h
+00000124    8903001C                       	CMP   ku?Oscilloscope,#0003h
+00000128    D72D                           	JNE   ??_4_END
+0000012A    B13800                         	LDB   IOPORT1,#38h
 ;000064        }
-0000012E    2029                           	SJMP  ??_4_END
+0000012D    2028                           	SJMP  ??_4_END
                    ??_4_ELSE:
-;000065        else    {
-;000066            if (ku == 0) IOPORT1 = 0x38&0x08;
-00000130    88001C                         	CMP   ku?Oscilloscope,0
-00000133    D705                           	JNE   ??_9_ELSE
-                ??_19_COMMON:
-00000135    B10800                         	LDB   IOPORT1,#08h
-00000138    201F                           	SJMP  ??_9_END
+;000065        else  {
+;000066            if (ku == 0) IOPORT1 = 0x38&0x00;
+0000012F    88001C                         	CMP   ku?Oscilloscope,0
+00000132    D704                           	JNE   ??_9_ELSE
+00000134    1100                           	CLRB  IOPORT1
+00000136    201F                           	SJMP  ??_9_END
                    ??_9_ELSE:
 ;000067            else if (ku == 1) IOPORT1 = 0x38&0x20;
-0000013A    8901001C                       	CMP   ku?Oscilloscope,#0001h
-0000013E    D705                           	JNE   ??_10_ELSE
-00000140    B12000                         	LDB   IOPORT1,#20h
-00000143    2014                           	SJMP  ??_10_END
+00000138    8901001C                       	CMP   ku?Oscilloscope,#0001h
+0000013C    D705                           	JNE   ??_10_ELSE
+0000013E    B12000                         	LDB   IOPORT1,#20h
+00000141    2014                           	SJMP  ??_10_END
                   ??_10_ELSE:
 ;000068            else if (ku == 2) IOPORT1 = 0x38&0x10;
-00000145    8902001C                       	CMP   ku?Oscilloscope,#0002h
-00000149    D705                           	JNE   ??_11_ELSE
-0000014B    B11000                         	LDB   IOPORT1,#10h
-0000014E    2009                           	SJMP  ??_11_END
+00000143    8902001C                       	CMP   ku?Oscilloscope,#0002h
+00000147    D705                           	JNE   ??_11_ELSE
+00000149    B11000                         	LDB   IOPORT1,#10h
+0000014C    2009                           	SJMP  ??_11_END
                   ??_11_ELSE:
 ;000069            else if (ku == 3) IOPORT1 = 0x38&0x30;
-00000150    8903001C                       	CMP   ku?Oscilloscope,#0003h
-00000154    D703                           	JNE   ??_12_ELSE
-00000156    B13000                         	LDB   IOPORT1,#30h
+0000014E    8903001C                       	CMP   ku?Oscilloscope,#0003h
+00000152    D703                           	JNE   ??_12_ELSE
+00000154    B13000                         	LDB   IOPORT1,#30h
                   ??_12_ELSE:
                    ??_11_END:
                    ??_10_END:
@@ -186,87 +186,83 @@ COMMON?END_grid_voltage_adc_value_get:
 ;000070        }
                     ??_4_END:
 ;000071        _di_();
-00000159    FA                             	DI    
-;000072        SBUF_TX1 = 0x12;
-0000015A    B1121E                         	LDB   _BL,#12h
-0000015D    C70100001E                     	STB   _BL,SBUF_TX1
+00000157    FA                             	DI    
 ;000073        IOPORT1 |= 0x40;
-00000162    914000                         	ORB   IOPORT1,#40h
-;000074        for (i=0; i< delay_10ms; i++)    {
-00000165    0122                           	CLR   i?Oscilloscope
-00000167    200E                           	SJMP  ??_13_CHECK
+00000158    914000                         	ORB   IOPORT1,#40h
+;000074        for (i=0; i < delay_1ms/10; i++)    {
+0000015B    0122                           	CLR   i?Oscilloscope
+0000015D    2011                           	SJMP  ??_13_CHECK
                   ??_13_LOOP:
-;000075            WSR = 0x00;
-00000169    1100                           	CLRB  WSR
-;000076            TIMER2 = 0xFB1D;
-0000016B    A11DFB00                       	LD    TIMER2,#0FB1Dh
+;000075            WSR = 0x0F;
+0000015F    B10F00                         	LDB   WSR,#0Fh
+;000076            TIMER1 = 0xCF2C;
+00000162    A12CCF00                       	LD    TIMER1,#0CF2Ch
 ;000077            WSR = 0x00;
+00000166    1100                           	CLRB  WSR
 ;000078            tmp = IOS1;
-;000079            while((tmp&0x10) == 0)  {
+;000079            while((tmp&0x20) == 0)  {
                     ??_14_DO:
 ;000080                tmp = IOS1;
-0000016F    B0001C                         	LDB   tmp?Oscilloscope,IOS1
+00000168    B0001C                         	LDB   tmp?Oscilloscope,IOS1
 ;000081            }
-00000172    341CFA                         	JBC   tmp?Oscilloscope,4h,??_14_DO
+0000016B    351CFA                         	JBC   tmp?Oscilloscope,5h,??_14_DO
 ;000082        }
-00000175    0722                           	INC   i?Oscilloscope
+0000016E    0722                           	INC   i?Oscilloscope
                  ??_13_CHECK:
-00000177    882022                         	CMP   i?Oscilloscope,delay_10ms?Oscilloscope
-0000017A    D3ED                           	JNC   ??_13_LOOP
-;000083        SBUF_TX1 = 0x13;
-0000017C    B1131C                         	LDB   _AL,#13h
-0000017F    C70100001C                     	STB   _AL,SBUF_TX1
+00000170    A02024                         	LD    _EX,delay_1ms?Oscilloscope
+00000173    0126                           	CLR   _FX
+00000175    8D0A0024                       	DIVU  _FEX,#000Ah
+00000179    882422                         	CMP   i?Oscilloscope,_EX
+0000017C    D3E1                           	JNC   ??_13_LOOP
 ;000084        for (i = 1; i<=512; i++)
-00000184    AD0122                         	LDBZE i?Oscilloscope,#01h
+0000017E    AD0122                         	LDBZE i?Oscilloscope,#01h
                   ??_15_LOOP:
 ;000085        {
 ;000086            ADC_CON = 0x01 | (12 << 3); //канал для измерения тока DNT
-00000187    B1611C                         	LDB   _AL,#61h
-0000018A    C70100001C                     	STB   _AL,ADC_CON
+00000181    B1611C                         	LDB   _AL,#61h
+00000184    C70100001C                     	STB   _AL,ADC_CON
 ;000087            while((ADC_RESULT) & 0x8000);
                     ??_16_DO:
-0000018F    B30101001C                     	LDB   _AL,(ADC_RESULT+1)
-00000194    3F1CF8                         	JBS   _AL,7h,??_16_DO
+00000189    B30101001C                     	LDB   _AL,(ADC_RESULT+1)
+0000018E    3F1CF8                         	JBS   _AL,7h,??_16_DO
 ;000088            if (i%32 == 0){
-00000197    411F00221C                     	AND   _AX,i?Oscilloscope,#001Fh
-0000019C    88001C                         	CMP   _AX,0
-0000019F    A02224                         	LD    _EX,i?Oscilloscope
-000001A2    D71B                           	JNE   ??_17_ELSE
+00000191    411F00221C                     	AND   _AX,i?Oscilloscope,#001Fh
+00000196    88001C                         	CMP   _AX,0
+00000199    A02224                         	LD    _EX,i?Oscilloscope
+0000019C    D71B                           	JNE   ??_17_ELSE
 ;000089                MKO_tr_data[i] = ((ADC_RESULT&0x3FFF)-0x2000) & 0x3FFF;
-000001A4    090124                         	SHL   _EX,#01h
-000001A7    A30100001C                     	LD    _AX,ADC_RESULT
-000001AC    61FF3F1C                       	AND   _AX,#3FFFh
-000001B0    6500E01C                       	ADD   _AX,#0E000h
-000001B4    61FF3F1C                       	AND   _AX,#3FFFh
-000001B8    C32500101C                     	ST    _AX,1000h[_EX]
+0000019E    090124                         	SHL   _EX,#01h
+000001A1    A30100001C                     	LD    _AX,ADC_RESULT
+000001A6    61FF3F1C                       	AND   _AX,#3FFFh
+000001AA    6500E01C                       	ADD   _AX,#0E000h
+000001AE    61FF3F1C                       	AND   _AX,#3FFFh
+000001B2    C32500101C                     	ST    _AX,1000h[_EX]
 ;000090            }
-000001BD    2019                           	SJMP  ??_17_END
+000001B7    2019                           	SJMP  ??_17_END
                   ??_17_ELSE:
 ;000091            else {
 ;000092                MKO_tr_data[i+32] = ((ADC_RESULT&0x3FFF)-0x2000) & 0x3FFF;
-000001BF    090124                         	SHL   _EX,#01h
-000001C2    A30100001C                     	LD    _AX,ADC_RESULT
-000001C7    61FF3F1C                       	AND   _AX,#3FFFh
-000001CB    6500E01C                       	ADD   _AX,#0E000h
-000001CF    61FF3F1C                       	AND   _AX,#3FFFh
-000001D3    C32540101C                     	ST    _AX,1040h[_EX]
+000001B9    090124                         	SHL   _EX,#01h
+000001BC    A30100001C                     	LD    _AX,ADC_RESULT
+000001C1    61FF3F1C                       	AND   _AX,#3FFFh
+000001C5    6500E01C                       	ADD   _AX,#0E000h
+000001C9    61FF3F1C                       	AND   _AX,#3FFFh
+000001CD    C32540101C                     	ST    _AX,1040h[_EX]
 ;000093            }
                    ??_17_END:
 ;000094        }
-000001D8    0722                           	INC   i?Oscilloscope
-000001DA    89010222                       	CMP   i?Oscilloscope,#0201h
-000001DE    D3A7                           	JNC   ??_15_LOOP
+000001D2    0722                           	INC   i?Oscilloscope
+000001D4    89010222                       	CMP   i?Oscilloscope,#0201h
+000001D8    D3A7                           	JNC   ??_15_LOOP
 ;000095        _ei_();
-000001E0    FB                             	EI    
+000001DA    FB                             	EI    
 ;000096        IOPORT1 &= 0x3F;
-000001E1    713F00                         	ANDB  IOPORT1,#3Fh
-;000097        SBUF_TX1 = 0x12;
-000001E4    B1121E                         	LDB   _BL,#12h
-000001E7    C70100001E                     	STB   _BL,SBUF_TX1
+000001DB    713F00                         	ANDB  IOPORT1,#3Fh
 ;000098    }
-000001EC    CC24                           	POP   _EX
-000001EE    F0                             	RET   
+000001DE    CC26                           	POP   _FX
+000001E0    CC24                           	POP   _EX
+000001E2    F0                             	RET   
 .ENDF
 
-.\TestLinear\adc.c: 495 byte(s), 2837 line(s), 0 error(s), 0 warning(s)
+.\TestLinear\adc.c: 483 byte(s), 2837 line(s), 0 error(s), 0 warning(s)
 

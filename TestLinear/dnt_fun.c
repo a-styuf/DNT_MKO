@@ -62,24 +62,28 @@ void DNT_Frame_Create(typeDNTFrame *dnt_data_frame_ptr, typeDNTOperationData* dn
 void Update_DNT_Prameters_from_MKO(typeDNTOperationData* dnt_ptr)
 {
   uint16_t dnt_data[32] = {0};
-  //
+   //форматируем весь кадр значением 0xFE
+    memset((uint8_t*)dnt_data, 0xFE, sizeof(typeDNTFrame));
+	//
   MKO_receive_data(dnt_data, 29);
-
   //
-  if ((dnt_data[0] == 0x0FF1) & (dnt_data[1] == _get_frame_definer(dnt_ptr, 1))) // проверка на запись в субадрес
+  if ((dnt_data[0] == 0x0FF1) && (dnt_data[1] == (_get_frame_definer(dnt_ptr, 1)&0xFC07))) // проверка на запись в субадрес, но исключаем заводской номер (как заготовка под широковещ. команду)
   {
     dnt_ptr->control.measure_leng_s = (uint16_t)_check_bounds(dnt_data[2], 1, 20);
-
     dnt_ptr->control.dead_time_ms = (uint16_t)_check_bounds(dnt_data[3], 20, (dnt_ptr->control.measure_leng_s*1000/4));
-    dnt_ptr->control.osc_mode = dnt_data[5] & 0x01;
-    dnt_ptr->control.osc_ku = dnt_data[6] & 0x3;
+    dnt_ptr->control.osc_mode = dnt_data[4] & 0x01;
+    dnt_ptr->control.osc_ku = dnt_data[5] & 0x3;
     //
+	
     dnt_ptr->control.mode = dnt_data[6] & 0xFF;
-    if (dnt_data[7]&0x01 != 0)
+	Update_MKO_from_DNT_Parameters(dnt_ptr);
+    if (dnt_data[6]&0x01 != 0)
     {
-      Oscilloscope(dnt_ptr->control.osc_ku, dnt_ptr->control.osc_mode, dnt_ptr->control.dead_time_ms);
-      dnt_data[7] = 0;
-      Update_MKO_from_DNT_Parameters(dnt_ptr);
+		// SBUF_TX1 = ((dnt_ptr->control.osc_mode & 0x0F) << 4) + (dnt_ptr->control.osc_mode & 0x0F);
+        Oscilloscope(dnt_ptr->control.osc_ku, dnt_ptr->control.osc_mode, dnt_ptr->control.dead_time_ms);
+        dnt_data[6] = 0;
+		dnt_ptr->control.mode = dnt_data[6] & 0xFF;
+		Update_MKO_from_DNT_Parameters(dnt_ptr);
     }
   }
 }
@@ -90,10 +94,11 @@ void Update_MKO_from_DNT_Parameters(typeDNTOperationData* dnt_ptr)
   dnt_data[0] = 0x0FF1;
   dnt_data[1] = _get_frame_definer(dnt_ptr, 1);
   dnt_data[2] = dnt_ptr->control.measure_leng_s;
-  dnt_data[4] = dnt_ptr->control.dead_time_ms;
-  dnt_data[5] = dnt_ptr->control.osc_mode;
-  dnt_data[6] = dnt_ptr->control.osc_ku;
-  dnt_data[7] = dnt_ptr->control.mode;
+  dnt_data[3] = dnt_ptr->control.dead_time_ms;
+  dnt_data[4] = dnt_ptr->control.osc_mode;
+  dnt_data[5] = dnt_ptr->control.osc_ku;
+  dnt_data[6] = dnt_ptr->control.mode;
+  dnt_data[31] = crc16_ccitt((uint8_t*)dnt_data, 62);
   MKO_data_to_transmit(dnt_data, 29); //складываем в регистр чтения для удобства проверки записи данных
 }
 
@@ -150,7 +155,7 @@ uint8_t Current_Calc_Step_10ms(typeDNTOperationData* dnt_ptr) //некая  фу
             else if (dnt_ptr->control.measure_cycle_time_ms >= dnt_ptr->control.signal_cycle_ref_point){
                 _current_result_calc(dnt_ptr);
                 dnt_ptr->control.measure_cycle_time_ms = 0;
-				IOPORT1 = 0x38&(0x00|ku_gpio_set(dnt_ptr->control.ku)); //сбрасываем ток с обмотки реле
+                IOPORT1 = 0x38&(0x00|ku_gpio_set(dnt_ptr->control.ku)); //сбрасываем ток с обмотки реле
                 //Update_MKO_from_DNT_Parameters(dnt_ptr);
                 return 1; //передаем сигнал о готовности измерения
             }
@@ -159,7 +164,6 @@ uint8_t Current_Calc_Step_10ms(typeDNTOperationData* dnt_ptr) //некая  фу
     else if (dnt_ptr->control.mode & 0x02){ //запустили одиночное измерение
         if (dnt_ptr->control.measure_cycle_time_ms == 0){ //инициализация переменных для подсчета тока
             _single_measure_struct_init(dnt_ptr);
-			SBUF_TX1 = 0x02;
         }
         else{
             dnt_ptr->control.measure_cycle_time_ms += 10; //не гарантировано точные часы подсчета времени цикла
@@ -175,11 +179,11 @@ uint8_t Current_Calc_Step_10ms(typeDNTOperationData* dnt_ptr) //некая  фу
                 }
                 if (dnt_ptr->control.measure_cycle_time_ms < dnt_ptr->control.single_ref_points[2*i]) {
                     IOPORT1 = 0x38&(type|ku_gpio_set(i&0x03)); //определяем состояние gpio и КУ для измерения  нуля
-					break;
+                    break;
                 }
                 else if(dnt_ptr->control.measure_cycle_time_ms < dnt_ptr->control.single_ref_points[2*i+1]) {
                     _single_meas_adc_data_get(signal_ptr, i&0x3);
-					break;
+                    break;
                 }
             }
             if (dnt_ptr->control.measure_cycle_time_ms >= dnt_ptr->control.single_ref_points[15]) {
@@ -187,8 +191,7 @@ uint8_t Current_Calc_Step_10ms(typeDNTOperationData* dnt_ptr) //некая  фу
                 dnt_ptr->control.measure_cycle_time_ms = 0;
                 dnt_ptr->control.mode &= ~(0x02); //сбрасываем флаг единичного запуска
                 Update_MKO_from_DNT_Parameters(dnt_ptr); //прописываем флаг на ПА
-				IOPORT1 = 0x38&(0x00|ku_gpio_set(dnt_ptr->control.ku)); //сбрасываем ток с обмотки реле
-				SBUF_TX1 = 0x03;
+                IOPORT1 = 0x38&(0x00|ku_gpio_set(dnt_ptr->control.ku)); //сбрасываем ток с обмотки реле
                 return 1; //передаем сигнал о готовности измерения
             }
         }
@@ -261,8 +264,8 @@ void _single_measure_struct_init(typeDNTOperationData* dnt_ptr)
     uint8_t i;
     uint16_t short_dead_time, long_short_time, single_cycle_time_s;
     single_cycle_time_s = max(2, dnt_ptr->control.measure_cycle_time_ms); //выбираем время цикла, не меньше 2 сек
-    short_dead_time = max(single_cycle_time_s*1000/32, dnt_ptr->control.dead_time_ms); //выбираем мертвое время для КУ1, 10, но не меньше половини от измирительного цикла
-    long_short_time = max(single_cycle_time_s*1000/16, dnt_ptr->control.dead_time_ms); //выбираем мертвое время для КУ1, 10, но не меньше половини от измирительного цикла
+    short_dead_time = min(single_cycle_time_s*1000/32, dnt_ptr->control.dead_time_ms); //выбираем мертвое время для КУ1, 10, но не меньше половини от измирительного цикла
+    long_short_time = min(single_cycle_time_s*1000/16, dnt_ptr->control.dead_time_ms); //выбираем мертвое время для КУ1, 10, но не меньше половини от измирительного цикла
     //
     dnt_ptr->control.measure_cycle_time_ms = 1;
     //
@@ -330,11 +333,11 @@ void _single_meas_adc_data_get(typeDNTCurrent *signal_ptr, uint8_t ku)
 
 void _single_meas_current_result_calc(typeDNTOperationData* dnt_ptr)
 {
-    uint8_t i;
-    for (i=3; i<=0; i--){
-        if ((dnt_ptr->signal.value_max_arr[i]  <=  16000) || (dnt_ptr->zero.value_max_arr[i]  <= 16000)) //проверяем, подходит ли нам данный КУ
+    int8_t i;
+    for (i=3; i>=0; i--){
+        if ((dnt_ptr->signal.value_max_arr[i]  <=  16000) & (dnt_ptr->zero.value_max_arr[i]  <= 16000)) //проверяем, подходит ли нам данный КУ
         {
-            if ((dnt_ptr->signal.value_summ_number == 0) || (dnt_ptr->zero.value_summ_number == 0)) {
+            if ((dnt_ptr->signal.value_summ_number_arr[i] == 0) || (dnt_ptr->zero.value_summ_number_arr[i] == 0)) {
                 dnt_ptr->current_result = 0x0000;
                 dnt_ptr->signal.value = 0x0000;
                 dnt_ptr->zero.value = 0x0000;

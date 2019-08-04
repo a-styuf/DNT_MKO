@@ -15,19 +15,14 @@ volatile struct structPTS {
 } UartPTS;
 
 uint8 status_uart0 = 0, status_uart1 = 0;
-char UART0_RX_array[64];
 char UART1_RX_array[64];
-char UART0_TX_array[64];
 char UART1_TX_array[64];
-uint8 len_rx0=0;
 uint8 len_rx1=0;
-
 uint8 flag_rx1 = 0;
-uint8 flag_rx0 = 0;
 
 uint8 flag_rx = 0;
 
-//инициализация UART1(Отладочного) и UART0(MUART)//////////////// 0x40 - 19200; 0x1F - 38400; 0x0A - 115200
+//инициализация UART1(Отладочного - NU) и UART0(MUART)//////////////// 0x40 - 19200; 0x1F - 38400; 0x0A - 115200
 void UART_Init()
 {
   volatile uint8 tmp;
@@ -61,16 +56,15 @@ void UART_Init()
 
 void IRQ_uart_rx_tx()
 {
-  _di_(); // запрет обработки прерываний
-  status_uart0 = SP_STAT0;
-  status_uart1 = SP_STAT1;
-  if (status_uart1 & 0x40) //oбрабатываем прерывание по приему
-    {
+	_di_(); // запрет обработки прерываний
+	status_uart1 = SP_STAT1;
+	if (status_uart1 & 0x40) //oбрабатываем прерывание по приему
+	{
 		if (INT_PEND1 & 0x10) 
 		{
 			len_rx1 = 0;
 			UART1_RX_array[len_rx1] = SBUF_RX1; 
-			//SBUF_TX1 = 0xAA;
+			// SBUF_TX1 = SBUF_RX1;
 		}
 		else if (len_rx1 > 63)
 		{
@@ -78,42 +72,20 @@ void IRQ_uart_rx_tx()
 		}
 		else 
 		{
-			//SBUF_TX1 = len_rx1;
 			len_rx1 ++;
 			UART1_RX_array[len_rx1] = SBUF_RX1;
+			// SBUF_TX1 = SBUF_RX1;
 		}
 		len_rx1 &= 0x3F;
 		INT_PEND1 &= ~0x10;  //сброс флага переполнения таймера 2
-		TIMER2 = 0xCF2B;  //межпакетный интервал 2ms
-     }
-	else   if (status_uart0 & 0x40) //oбрабатываем прерывание по приему
-    {
-		if (INT_PEND1 & 0x10) 
-		{
-			len_rx0 = 0;
-			UART0_RX_array[len_rx0] = SBUF_RX0;
-			//SBUF_TX1 = 0xAA;
+		TIMER2 = 0xF63C;  //межпакетный интервал 2ms
 		}
-		else if (len_rx0 > 63)
-		{
-			len_rx0 = 0;
-		}
-		else 
-		{
-			//SBUF_TX1 = len_rx1;
-			len_rx0 ++;
-			UART0_RX_array[len_rx0] = SBUF_RX0;
-		}
-		len_rx0 &= 0x3F;
-		INT_PEND1 &= ~0x10;  //сброс флага переполнения таймера 2
-		TIMER2 = 0xCF2B;  //межпакетный интервал 2ms
-     }
-	 else
-	 {
-		 //SP_CON0 = 0x19;  //вновь разрешение приема
-		 //SP_CON1 = 0x19;  //вновь разрешение приема
-	 }
-   _ei_(); //разрешение обработки прерываний
+	else
+	{
+		//SP_CON0 = 0x19;  //вновь разрешение приема
+		//SP_CON1 = 0x19;  //вновь разрешение приема
+	}
+	_ei_(); //разрешение обработки прерываний
 }
 
 uint8 UART1_RX(char *buff)
@@ -121,7 +93,7 @@ uint8 UART1_RX(char *buff)
   uint8 len_tmp = 0;
   if((len_rx1 != 0) && ((INT_PEND1 & 0x10) != 0))
   {
-	len_tmp =  len_rx1; 
+	len_tmp =  len_rx1 + 1; 
 	//SBUF_TX1 = len_rx1; 
     memcpy(buff, UART1_RX_array, len_rx1);
 	len_rx1 = 0;
@@ -141,46 +113,6 @@ uint8 UART1_TX(char *buff, uint8 len)
   }
   SP_CON1 = 0x19;  //разрешение приема приема
   return i;
-}
-
-uint8 UART0_RX(char *buff)
-{
-  uint8 len_tmp = 0;
-  if((len_rx0 != 0) && ((INT_PEND1 & 0x10) != 0))
-  {
-	len_tmp =  len_rx0; 
-	//SBUF_TX1 = len_rx1; 
-    memcpy(buff, UART0_RX_array, len_rx0);
-	len_rx0 = 0;
-  }
-  return len_tmp;
-}
-
-uint8 UART0_TX(char *buff, uint8 len)
-{
-  uint8 i;
-  SP_CON0 = 0x11;  //запрет приема
-  for (i = 0; i < len; i++)
-  {
-    status_uart0 = SP_STAT0;
-    while(!(status_uart0 & 0x08));//дожидаемся освобождения буфера
-    SBUF_TX0 = buff[i];
-  }
-  SP_CON0 = 0x19;  //запрет приема
-  return i;
-}
-
-void UART0_SendPacket(uint8 *buff, uint8 leng) {
-  SP_CON0 = 0x11;  //запрет приема
-  UartPTS.dst = (uint8*)&SBUF_TX0;
-  WSR = 1;
-  while(PTSSEL & 0x100);  //ожидание конца передачи
-  memcpy(UART0_TX_array, buff, leng);
-  UartPTS.src = (uint8*)&UART0_TX_array[1];
-  UartPTS.count = leng-1;
-  PTSSEL = 0x100;  //start Tx
-  WSR = 0;
-  SBUF_TX0 = UART0_TX_array[0];
 }
 
 void UART1_SendPacket(uint8 *buff, uint8 leng) {

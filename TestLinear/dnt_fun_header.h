@@ -13,10 +13,11 @@ typedef struct //кадр с данными ДНТ ПА30 !!! нельзя де�
     uint16_t time_lo; //+8
     //
     uint16_t current; //+10
-    uint16_t temperature; //+12
-    uint16_t shut_off_grid_voltage; //+14 
-	uint16_t signal; //+16
-	uint16_t zero; //+18
+	uint16_t signal; //+12
+	uint16_t zero; //+14
+	//
+	uint16_t temperature; //+16
+    uint16_t shut_off_grid_voltage; //+18 
     uint16_t dnt_state; //+20
     //резерв
 	uint16_t reserved[20]; //+22

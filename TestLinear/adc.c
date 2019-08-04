@@ -50,37 +50,37 @@ uint16_t temperature_adc_to_degree(int16_t adc_data)
     return (uint16)(floor(mean));
 }
 
-void Oscilloscope(uint16 ku, uint16 mode, uint16 delay_10ms) //блокирующая функция для вычитки АЦП
+void Oscilloscope(uint16 ku, uint16 mode, uint16 delay_1ms) //блокирующая функция для вычитки АЦП
 {
     uint16 i;
     uint8 tmp ;
     uint16 *MKO_tr_data = (uint16*)0x1000;
-    SBUF_TX1 = 0x11;
+    // SBUF_TX1 = 0x11;
     if (mode == 0)  {
         if (ku == 0) IOPORT1 = 0x38&0x08;
         else if (ku == 1) IOPORT1 = 0x38&0x28;
         else if (ku == 2) IOPORT1 = 0x38&0x18;
         else if (ku == 3) IOPORT1 = 0x38&0x38;
     }
-    else    {
-        if (ku == 0) IOPORT1 = 0x38&0x08;
+    else  {
+        if (ku == 0) IOPORT1 = 0x38&0x00;
         else if (ku == 1) IOPORT1 = 0x38&0x20;
         else if (ku == 2) IOPORT1 = 0x38&0x10;
         else if (ku == 3) IOPORT1 = 0x38&0x30;
     }
     _di_();
-    SBUF_TX1 = 0x12;
+    // SBUF_TX1 = 0x12;
     IOPORT1 |= 0x40;
-    for (i=0; i< delay_10ms; i++)    {
-        WSR = 0x00;
-        TIMER2 = 0xFB1D;
+    for (i=0; i < delay_1ms/10; i++)    {
+        WSR = 0x0F;
+        TIMER1 = 0xCF2C;
         WSR = 0x00;
         tmp = IOS1;
-        while((tmp&0x10) == 0)  {
+        while((tmp&0x20) == 0)  {
             tmp = IOS1;
         }
     }
-    SBUF_TX1 = 0x13;
+    //SBUF_TX1 = 0x13;
     for (i = 1; i<=512; i++)
     {
         ADC_CON = 0x01 | (12 << 3); //канал для измерения тока DNT
@@ -94,6 +94,6 @@ void Oscilloscope(uint16 ku, uint16 mode, uint16 delay_10ms) //блокирую�
     }
     _ei_();
     IOPORT1 &= 0x3F;
-    SBUF_TX1 = 0x12;
+    //SBUF_TX1 = 0x14;
 }
 

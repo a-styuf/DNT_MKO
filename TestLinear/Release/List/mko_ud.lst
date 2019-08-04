@@ -150,39 +150,73 @@ COMMON?END_MKO_data_to_transmit:
 00000108    CC24                           	POP   _EX
 0000010A    F0                             	RET   
 .ENDF
+MKO_get_data_from_transmit_subaddr:
+;000055    void MKO_get_data_from_transmit_subaddr(uint16 *data, uint8 subaddr)
+0000010B    C824                           	PUSH  _EX
+0000010D    B01E25                         	LDB   _EH,_BL
+;000058    	for (i=0; i<31; i++)	{
+00000110    1124                           	CLRB  i?MKO_get_data_from_transmit_subaddr
+                  ??_10_LOOP:
+;000059    		data[i] =  MKO_tr_data[i+1+(subaddr*32)];
+00000112    AC251E                         	LDBZE _BX,subaddr?MKO_get_data_from_transmit_subaddr
+00000115    09051E                         	SHL   _BX,#05h
+00000118    AC2420                         	LDBZE _CX,i?MKO_get_data_from_transmit_subaddr
+0000011B    A02022                         	LD    _DX,_CX
+0000011E    090122                         	SHL   _DX,#01h
+00000121    641C22                         	ADD   _DX,data?MKO_get_data_from_transmit_subaddr
+00000124    44201E20                       	ADD   _CX,_BX,_CX
+00000128    090120                         	SHL   _CX,#01h
+0000012B    6701020020                     	ADD   _CX,MKO_tr_data
+00000130    A3200220                       	LD    _CX,02h[_CX]
+00000134    C22220                         	ST    _CX,[_DX]
+;000060    	}
+00000137    1724                           	INCB  i?MKO_get_data_from_transmit_subaddr
+00000139    991F24                         	CMPB  i?MKO_get_data_from_transmit_subaddr,#1Fh
+0000013C    D3D4                           	JNC   ??_10_LOOP
+;000061    	data[31] = MKO_tr_data[0+(subaddr*32)] ;
+0000013E    09011E                         	SHL   _BX,#01h
+00000141    670102001E                     	ADD   _BX,MKO_tr_data
+00000146    A21E1E                         	LD    _BX,[_BX]
+00000149    C31C3E1E                       	ST    _BX,3Eh[data?MKO_get_data_from_transmit_subaddr]
+;000062    }
+0000014D    CC24                           	POP   _EX
+0000014F    F0                             	RET   
+.ENDF
                    MKO_State:
-;000055    uint16 MKO_State()
-;000057      return BSISTAT_TERM;
-0000010B    A30100001C                     	LD    _AX,BSISTAT_TERM
-;000058    }
-00000110    F0                             	RET   
+;000065    uint16 MKO_State()
+;000067      return BSISTAT_TERM;
+00000150    A30100001C                     	LD    _AX,BSISTAT_TERM
+;000068    }
+00000155    F0                             	RET   
 .ENDF
                 ?INTERRUPT09:
                   IRQ_MKO_UD:
-;000061    void  IRQ_MKO_UD()
+;000071    void  IRQ_MKO_UD()
 00000000    F4                             	PUSHA 
 00000001    C81C                           	PUSH  _AX
-;000063        _di_();
-00000003    FA                             	DI    
-;000064    	if (MKO_State()&0x2000) mko_activity_timeout = MKO_TIMEOUT_MS;
-00000004    B30101001C                     	LDB   _AL,(BSISTAT_TERM+1)
-00000009    351C08                         	JBC   _AL,5h,??_10_ELSE
-0000000C    B10A1C                         	LDB   _AL,#0Ah
-0000000F    C70104001C                     	STB   _AL,mko_activity_timeout
-                  ??_10_ELSE:
-;000065        if (MKO_State()&0x0400) mko_read_flag = 1;
-00000014    B30101001C                     	LDB   _AL,(BSISTAT_TERM+1)
-00000019    321C08                         	JBC   _AL,2h,??_11_ELSE
-0000001C    B1011C                         	LDB   _AL,#01h
-0000001F    C70100001C                     	STB   _AL,mko_read_flag
+00000003    C81E                           	PUSH  _BX
+;000073        _di_();
+00000005    FA                             	DI    
+;000074    	state = MKO_State();
+00000006    A30100001C                     	LD    state?IRQ_MKO_UD,BSISTAT_TERM
+;000075    	if (state&0x2000) mko_activity_timeout = MKO_TIMEOUT_MS;
+0000000B    351D08                         	JBC   (state?IRQ_MKO_UD+1),5h,??_11_ELSE
+0000000E    B10A1E                         	LDB   _BL,#0Ah
+00000011    C70104001E                     	STB   _BL,mko_activity_timeout
                   ??_11_ELSE:
-;000066        _ei_();
-00000024    FB                             	EI    
-;000067    }
-00000025    CC1C                           	POP   _AX
-00000027    F5                             	POPA  
-00000028    F0                             	RET   
+;000076        if ((state&0x0400) == 0) mko_read_flag = 1;  //проверка бита направления передачи из командного слова
+00000016    3A1D08                         	JBS   (state?IRQ_MKO_UD+1),2h,??_12_ELSE
+00000019    B1011C                         	LDB   _AL,#01h
+0000001C    C70100001C                     	STB   _AL,mko_read_flag
+                  ??_12_ELSE:
+;000077        _ei_();
+00000021    FB                             	EI    
+;000078    }
+00000022    CC1E                           	POP   _BX
+00000024    CC1C                           	POP   _AX
+00000026    F5                             	POPA  
+00000027    F0                             	RET   
 .ENDF
 
-.\TestLinear\mko_ud.c: 314 byte(s), 2707 line(s), 0 error(s), 0 warning(s)
+.\TestLinear\mko_ud.c: 382 byte(s), 2719 line(s), 0 error(s), 0 warning(s)
 
