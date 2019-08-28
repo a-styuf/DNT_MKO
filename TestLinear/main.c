@@ -22,11 +22,10 @@
 #define MODE 0x02 //единичное измерение
 /*---параметры рибора----*/
 #define DEVICE_TYPE 2 // 2 - ДНТ (Формат кадров определял Игорь Щепихин)
-#define ZAV_NUMBER 5 // 3 - реестр, 4 - СУХД, 5 - МБКАП зн02
+#define ZAV_NUMBER 11 // 3 - реестр, 4 - СУХД, 9-12 - МБКАП, з.н.02-05
 
-#define mcu_freq 20E6  //задаем частоту кварцевого генератора
-#define dT_default 0x0100 //задаем шаг для калибровки по температуре в (1/256)°С - 1°С
-#define zero_calibration_timeout_s_default 30 //задаем шаг для обязательной перекалибровки в секундах
+#define DELTA_T_DEG 0x0100 //задаем шаг для калибровки по температуре в (1/256)°С - 1°С
+#define ZERO_CALIBRATION_TIMEOUT_S 30 //задаем шаг для обязательной перекалибровки в секундах
 
 extern typeDNTOperationData dnt;
 extern typeDNTFrame dnt_data_frame;
@@ -84,6 +83,11 @@ void main()
             if ((mko_read_flag != 0) && (dnt.control.measure_cycle_time_ms == 0)){ //проверяем есть ли команда на запись по МКО и закончился ли цикл измерения, если все есть, перезаписываем параметры ДНТ
                 mko_read_flag = 0;
                 Update_DNT_Prameters_from_MKO(&dnt);
+                //
+                MKO_get_data_from_transmit_subaddr(u16_buff, 0x1D);
+                uint16_buffer_rev_to_uint8_buffer(u16_buff, com_data, 32);
+                leng = COMAnsForm(req_id, ID, 0x00, &seq_num, 0x1D, 64, com_data, answer);
+                UART1_TX(answer, leng);
             }
         }
         //// Работа с внешними интерфейсами ////

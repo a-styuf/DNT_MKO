@@ -69,11 +69,12 @@ uint16 MKO_State()
 
 #pragma interrupt 9 IRQ_MKO_UD //обработка прерываний ћ ќ
 void  IRQ_MKO_UD()
-{ uint16_t state;
+{ volatile uint16_t state;
     _di_();
 	state = MKO_State();
-	if (state&0x2000) mko_activity_timeout = MKO_TIMEOUT_MS;
-    if ((state&0x0400) == 0) mko_read_flag = 1;  //проверка бита направлени€ передачи из командного слова
-    _ei_();
+	if (state & (1<<13)) mko_activity_timeout = MKO_TIMEOUT_MS;
+  if ((state & (1<<10)) == 0) {
+    mko_read_flag = 1;  //проверка бита направлени€ передачи из командного слова
+  }
+  _ei_();
 }
-

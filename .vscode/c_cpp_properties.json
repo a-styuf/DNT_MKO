@@ -1,0 +1,25 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/TestLinear",
+                "C:/Program Files (x86)/CodeMaster-96/1_30_01/CMC-96/Inc"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "windowsSdkVersion": "10.0.18362.0",
+            "compilerPath": "C:/Program Files (x86)/CodeMaster-96/1_30_01/CMC-96/Bin/mcc96.exe",
+            "cStandard": "c99",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "clang-x64",
+            "forcedInclude": [
+                "C:/Program Files (x86)/CodeMaster-96/1_30_01/CMC-96/Inc/K1874VE7T.h"
+            ]
+        }
+    ],
+    "version": 4
+}

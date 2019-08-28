@@ -55,7 +55,6 @@ void Oscilloscope(uint16 ku, uint16 mode, uint16 delay_1ms) //блокирующ
     uint16 i;
     uint8 tmp ;
     uint16 *MKO_tr_data = (uint16*)0x1000;
-    // SBUF_TX1 = 0x11;
     if (mode == 0)  {
         if (ku == 0) IOPORT1 = 0x38&0x08;
         else if (ku == 1) IOPORT1 = 0x38&0x28;

@@ -194,29 +194,34 @@ MKO_get_data_from_transmit_subaddr:
 ;000071    void  IRQ_MKO_UD()
 00000000    F4                             	PUSHA 
 00000001    C81C                           	PUSH  _AX
-00000003    C81E                           	PUSH  _BX
+00000003    C800                           	PUSH  00h
 ;000073        _di_();
 00000005    FA                             	DI    
 ;000074    	state = MKO_State();
-00000006    A30100001C                     	LD    state?IRQ_MKO_UD,BSISTAT_TERM
-;000075    	if (state&0x2000) mko_activity_timeout = MKO_TIMEOUT_MS;
-0000000B    351D08                         	JBC   (state?IRQ_MKO_UD+1),5h,??_11_ELSE
-0000000E    B10A1E                         	LDB   _BL,#0Ah
-00000011    C70104001E                     	STB   _BL,mko_activity_timeout
+00000006    A30100001C                     	LD    _AX,BSISTAT_TERM
+0000000B    C318001C                       	ST    _AX,state?IRQ_MKO_UD[_SP]
+;000075    	if (state & (1<<13)) mko_activity_timeout = MKO_TIMEOUT_MS;
+0000000F    B318011C                       	LDB   _AL,(state?IRQ_MKO_UD+1)[_SP]
+00000013    351C08                         	JBC   _AL,5h,??_11_ELSE
+00000016    B10A1C                         	LDB   _AL,#0Ah
+00000019    C70104001C                     	STB   _AL,mko_activity_timeout
                   ??_11_ELSE:
-;000076        if ((state&0x0400) == 0) mko_read_flag = 1;  //проверка бита направления передачи из командного слова
-00000016    3A1D08                         	JBS   (state?IRQ_MKO_UD+1),2h,??_12_ELSE
-00000019    B1011C                         	LDB   _AL,#01h
-0000001C    C70100001C                     	STB   _AL,mko_read_flag
+;000076      if ((state & (1<<10)) == 0) {
+0000001E    B318011C                       	LDB   _AL,(state?IRQ_MKO_UD+1)[_SP]
+00000022    3A1C08                         	JBS   _AL,2h,??_12_ELSE
+;000077        mko_read_flag = 1;  //проверка бита направления передачи из командного слова
+00000025    B1011C                         	LDB   _AL,#01h
+00000028    C70100001C                     	STB   _AL,mko_read_flag
+;000078      }
                   ??_12_ELSE:
-;000077        _ei_();
-00000021    FB                             	EI    
-;000078    }
-00000022    CC1E                           	POP   _BX
-00000024    CC1C                           	POP   _AX
-00000026    F5                             	POPA  
-00000027    F0                             	RET   
+;000079      _ei_();
+0000002D    FB                             	EI    
+;000080    }
+0000002E    CC00                           	POP   00h
+00000030    CC1C                           	POP   _AX
+00000032    F5                             	POPA  
+00000033    F0                             	RET   
 .ENDF
 
-.\TestLinear\mko_ud.c: 382 byte(s), 2719 line(s), 0 error(s), 0 warning(s)
+.\TestLinear\mko_ud.c: 394 byte(s), 2720 line(s), 0 error(s), 0 warning(s)
 

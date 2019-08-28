@@ -7,7 +7,7 @@
 
 Warning[C24] .\TestLinear\dnt_fun.c(47,55): Conversion may loose significant digits
 Warning[C24] .\TestLinear\dnt_fun.c(48,56): Conversion may loose significant digits
-Warning[C24] .\TestLinear\dnt_fun.c(266,72): Conversion may loose significant digits
+Warning[C24] .\TestLinear\dnt_fun.c(272,72): Conversion may loose significant digits
               DNT_Frame_Init:
 ;FILE: .\TestLinear\dnt_fun.c
 ;000019    void DNT_Frame_Init(typeDNTFrame *dnt_data_frame_ptr, typeDNTOperationData* dnt_ptr)
@@ -25,7 +25,7 @@ Warning[C24] .\TestLinear\dnt_fun.c(266,72): Conversion may loose significant di
 ;000025      dnt_data_frame_ptr->definer = _get_frame_definer(dnt_ptr, 0);
 0000001A    A0261C                         	LD    _AX,dnt_ptr?DNT_Frame_Init
 0000001D    111E                           	CLRB  _BL
-0000001F    EF730B                         	LCALL _get_frame_definer
+0000001F    EF900B                         	LCALL _get_frame_definer
 00000022    C324021C                       	ST    _AX,02h[dnt_data_frame_ptr?DNT_Frame_Init]
 ;000026      dnt_data_frame_ptr->num = 0x0000;
 00000026    C3240400                       	ST    00h,04h[dnt_data_frame_ptr?DNT_Frame_Init]
@@ -64,7 +64,7 @@ Warning[C24] .\TestLinear\dnt_fun.c(266,72): Conversion may loose significant di
 ;000043        dnt_data_frame_ptr->definer = _get_frame_definer(dnt_ptr, 0);
 00000066    A0261C                         	LD    _AX,dnt_ptr?DNT_Frame_Create
 00000069    111E                           	CLRB  _BL
-0000006B    EF270B                         	LCALL _get_frame_definer
+0000006B    EF440B                         	LCALL _get_frame_definer
 0000006E    C324021C                       	ST    _AX,02h[dnt_data_frame_ptr?DNT_Frame_Create]
 ;000044        dnt_ptr->frame_num ++;
 00000072    A3260420                       	LD    _CX,04h[dnt_ptr?DNT_Frame_Create]
@@ -85,1374 +85,1391 @@ Warning[C24] .\TestLinear\dnt_fun.c(266,72): Conversion may loose significant di
 ;000048        dnt_data_frame_ptr->time_lo = dnt_ptr->time & 0xFFFF;
 0000009A    A22620                         	LD    _CX,[dnt_ptr?DNT_Frame_Create]
 0000009D    C3240820                       	ST    _CX,08h[dnt_data_frame_ptr?DNT_Frame_Create]
-;000050        dnt_data_frame_ptr->current = dnt_ptr->current_result;
-000000A1    A3260620                       	LD    _CX,06h[dnt_ptr?DNT_Frame_Create]
-000000A5    C3240A20                       	ST    _CX,0Ah[dnt_data_frame_ptr?DNT_Frame_Create]
-;000051        dnt_data_frame_ptr->temperature = dnt_ptr->temperature.value;
-000000A9    A327A00020                     	LD    _CX,00A0h[dnt_ptr?DNT_Frame_Create]
-000000AE    C3241020                       	ST    _CX,10h[dnt_data_frame_ptr?DNT_Frame_Create]
-;000052        dnt_data_frame_ptr->shut_off_grid_voltage = dnt_ptr->shut_off_grid.value;
-000000B2    A327940020                     	LD    _CX,0094h[dnt_ptr?DNT_Frame_Create]
-000000B7    C3241220                       	ST    _CX,12h[dnt_data_frame_ptr?DNT_Frame_Create]
-;000053        dnt_data_frame_ptr->signal = dnt_ptr->signal.value;
-000000BB    A3261020                       	LD    _CX,10h[dnt_ptr?DNT_Frame_Create]
-000000BF    C3240C20                       	ST    _CX,0Ch[dnt_data_frame_ptr?DNT_Frame_Create]
-;000054        dnt_data_frame_ptr->zero = dnt_ptr->zero.value;
-000000C3    A3265420                       	LD    _CX,54h[dnt_ptr?DNT_Frame_Create]
-000000C7    C3240E20                       	ST    _CX,0Eh[dnt_data_frame_ptr?DNT_Frame_Create]
-;000055        dnt_data_frame_ptr->dnt_state = dnt_ptr->control.ku & 0x03;
-000000CB    A327B20020                     	LD    _CX,00B2h[dnt_ptr?DNT_Frame_Create]
-000000D0    61030020                       	AND   _CX,#0003h
-000000D4    C3241420                       	ST    _CX,14h[dnt_data_frame_ptr?DNT_Frame_Create]
-;000057        dnt_data_frame_ptr->crc16 = crc16_ccitt((uint8_t*)dnt_data_frame_ptr, 62);
-000000D8    A0241C                         	LD    _AX,dnt_data_frame_ptr?DNT_Frame_Create
-000000DB    B13E1E                         	LDB   _BL,#3Eh
-000000DE    EF1FFF                         	LCALL crc16_ccitt
-000000E1    C3243E1C                       	ST    _AX,3Eh[dnt_data_frame_ptr?DNT_Frame_Create]
-;000059        MKO_data_to_transmit((uint16_t*)dnt_data_frame_ptr, 30); //складываем данные на 30й подадрес
-000000E5    A0241C                         	LD    _AX,dnt_data_frame_ptr?DNT_Frame_Create
-000000E8    B11E1E                         	LDB   _BL,#1Eh
-000000EB    EF12FF                         	LCALL MKO_data_to_transmit
-;000060    }
-000000EE    CC26                           	POP   _FX
-000000F0    CC24                           	POP   _EX
-000000F2    F0                             	RET   
+;000050        if (dnt_ptr->control.mode & 0x10){  // режим констант
+000000A1    B327AC0020                     	LDB   _CL,00ACh[dnt_ptr?DNT_Frame_Create]
+000000A6    342015                         	JBC   _CL,4h,??_2_ELSE
+;000051            dnt_data_frame_ptr->dnt_state = 0x0003;
+000000A9    AD0320                         	LDBZE _CX,#03h
+000000AC    C3241420                       	ST    _CX,14h[dnt_data_frame_ptr?DNT_Frame_Create]
+;000052            dnt_data_frame_ptr->current = 0x0102;
+000000B0    A1020120                       	LD    _CX,#0102h
+000000B4    C3240A20                       	ST    _CX,0Ah[dnt_data_frame_ptr?DNT_Frame_Create]
+;000053            dnt_data_frame_ptr->temperature = 0x0405;
+000000B8    A1050420                       	LD    _CX,#0405h
+;000054        }
+000000BC    201A                           	SJMP  ??_80_COMMON
+                   ??_2_ELSE:
+;000055        else{  // нормальный режим
+;000056            dnt_data_frame_ptr->dnt_state = dnt_ptr->control.ku & 0x03;
+000000BE    A327B20020                     	LD    _CX,00B2h[dnt_ptr?DNT_Frame_Create]
+000000C3    61030020                       	AND   _CX,#0003h
+000000C7    C3241420                       	ST    _CX,14h[dnt_data_frame_ptr?DNT_Frame_Create]
+;000057            dnt_data_frame_ptr->current = dnt_ptr->current_result;
+000000CB    A3260620                       	LD    _CX,06h[dnt_ptr?DNT_Frame_Create]
+000000CF    C3240A20                       	ST    _CX,0Ah[dnt_data_frame_ptr?DNT_Frame_Create]
+;000058            dnt_data_frame_ptr->temperature = dnt_ptr->temperature.value;
+000000D3    A327A00020                     	LD    _CX,00A0h[dnt_ptr?DNT_Frame_Create]
+                ??_80_COMMON:
+000000D8    C3241020                       	ST    _CX,10h[dnt_data_frame_ptr?DNT_Frame_Create]
+;000059        }
+;000060        dnt_data_frame_ptr->shut_off_grid_voltage = dnt_ptr->shut_off_grid.value;
+000000DC    A327940020                     	LD    _CX,0094h[dnt_ptr?DNT_Frame_Create]
+000000E1    C3241220                       	ST    _CX,12h[dnt_data_frame_ptr?DNT_Frame_Create]
+;000061        dnt_data_frame_ptr->signal = dnt_ptr->signal.value;
+000000E5    A3261020                       	LD    _CX,10h[dnt_ptr?DNT_Frame_Create]
+000000E9    C3240C20                       	ST    _CX,0Ch[dnt_data_frame_ptr?DNT_Frame_Create]
+;000062        dnt_data_frame_ptr->zero = dnt_ptr->zero.value;
+000000ED    A3265420                       	LD    _CX,54h[dnt_ptr?DNT_Frame_Create]
+000000F1    C3240E20                       	ST    _CX,0Eh[dnt_data_frame_ptr?DNT_Frame_Create]
+;000064        dnt_data_frame_ptr->crc16 = crc16_ccitt((uint8_t*)dnt_data_frame_ptr, 62);
+000000F5    A0241C                         	LD    _AX,dnt_data_frame_ptr?DNT_Frame_Create
+000000F8    B13E1E                         	LDB   _BL,#3Eh
+000000FB    EF02FF                         	LCALL crc16_ccitt
+000000FE    C3243E1C                       	ST    _AX,3Eh[dnt_data_frame_ptr?DNT_Frame_Create]
+;000066        MKO_data_to_transmit((uint16_t*)dnt_data_frame_ptr, 30); //складываем данные на 30й подадрес
+00000102    A0241C                         	LD    _AX,dnt_data_frame_ptr?DNT_Frame_Create
+00000105    B11E1E                         	LDB   _BL,#1Eh
+00000108    EFF5FE                         	LCALL MKO_data_to_transmit
+;000067    }
+0000010B    CC26                           	POP   _FX
+0000010D    CC24                           	POP   _EX
+0000010F    F0                             	RET   
 .ENDF
 Update_DNT_Prameters_from_MKO:
-;000062    void Update_DNT_Prameters_from_MKO(typeDNTOperationData* dnt_ptr)
-000000F3    C824                           	PUSH  _EX
-000000F5    69400018                       	SUB   _SP,#0040h
-000000F9    A01C24                         	LD    _EX,_AX
-;000064      uint16_t dnt_data[32] = {0};
-000000FC    C3180000                       	ST    00h,dnt_data?Update_DNT_Prameters_from_MKO[_SP]
-00000100    AD1F1E                         	LDBZE _BX,#1Fh
-00000103    450200181C                     	ADD   _AX,_SP,#(dnt_data?Update_DNT_Prameters_from_MKO+2)
-              ??_2_FILL_LOOP:
-00000108    C21D00                         	ST    00h,[_AX]+
-0000010B    051E                           	DEC   _BX
-0000010D    D7F9                           	JNE   ??_2_FILL_LOOP
-;000066        memset((uint8_t*)dnt_data, 0xFE, sizeof(typeDNTFrame));
-0000010F    450000181C                     	ADD   _AX,_SP,#dnt_data?Update_DNT_Prameters_from_MKO
-00000114    ADFE1E                         	LDBZE _BX,#0FEh
-00000117    AD4020                         	LDBZE _CX,#40h
-0000011A    EFE3FE                         	LCALL memset
-;000068      MKO_receive_data(dnt_data, 29);
-0000011D    450000181C                     	ADD   _AX,_SP,#dnt_data?Update_DNT_Prameters_from_MKO
-00000122    B11D1E                         	LDB   _BL,#1Dh
-00000125    EFD8FE                         	LCALL MKO_receive_data
-;000070      if ((dnt_data[0] == 0x0FF1) && (dnt_data[1] == (_get_frame_definer(dnt_ptr, 1)&0xFC07))) // проверка на запись в субадрес, но исключаем заводской номер (как заготовка под широковещ. команду)
-00000128    A318001C                       	LD    _AX,dnt_data?Update_DNT_Prameters_from_MKO[_SP]
-0000012C    89F10F1C                       	CMP   _AX,#0FF1h
-00000130    DF02                           	JE    ??_3_ELSE_BYPASS_130
-00000132    20BB                           	SJMP  ??_3_ELSE
-        ??_3_ELSE_BYPASS_130:
-00000134    A0241C                         	LD    _AX,dnt_ptr?Update_DNT_Prameters_from_MKO
-00000137    B1011E                         	LDB   _BL,#01h
-0000013A    EF580A                         	LCALL _get_frame_definer
-0000013D    6107FC1C                       	AND   _AX,#0FC07h
-00000141    A318021E                       	LD    _BX,(dnt_data?Update_DNT_Prameters_from_MKO+2)[_SP]
-00000145    881C1E                         	CMP   _BX,_AX
-00000148    DF02                           	JE    ??_3_ELSE_BYPASS_148
-0000014A    20A3                           	SJMP  ??_3_ELSE
-        ??_3_ELSE_BYPASS_148:
-;000071      {
-;000072        dnt_ptr->control.measure_leng_s = (uint16_t)_check_bounds(dnt_data[2], 1, 20);
-0000014C    A3180420                       	LD    _CX,(dnt_data?Update_DNT_Prameters_from_MKO+4)[_SP]
-00000150    0122                           	CLR   _DX
-00000152    AD141C                         	LDBZE _AX,#14h
-00000155    011E                           	CLR   _BX
-00000157    C51C20                         	CMPL  _DCX,_BAX
-0000015A    DE03                           	JLT   ??_5_END
-0000015C    AD1420                         	LDBZE _CX,#14h
-                    ??_5_END:
-0000015F    AD021C                         	LDBZE _AX,#02h
-00000162    C51C20                         	CMPL  _DCX,_BAX
-00000165    D603                           	JGE   ??_6_END
-00000167    AD0120                         	LDBZE _CX,#01h
+;000069    void Update_DNT_Prameters_from_MKO(typeDNTOperationData* dnt_ptr)
+00000110    C824                           	PUSH  _EX
+00000112    69400018                       	SUB   _SP,#0040h
+00000116    A01C24                         	LD    _EX,_AX
+;000071      uint16_t dnt_data[32] = {0};
+00000119    C3180000                       	ST    00h,dnt_data?Update_DNT_Prameters_from_MKO[_SP]
+0000011D    AD1F1E                         	LDBZE _BX,#1Fh
+00000120    450200181C                     	ADD   _AX,_SP,#(dnt_data?Update_DNT_Prameters_from_MKO+2)
+              ??_3_FILL_LOOP:
+00000125    C21D00                         	ST    00h,[_AX]+
+00000128    051E                           	DEC   _BX
+0000012A    D7F9                           	JNE   ??_3_FILL_LOOP
+;000073        memset((uint8_t*)dnt_data, 0xFE, sizeof(typeDNTFrame));
+0000012C    450000181C                     	ADD   _AX,_SP,#dnt_data?Update_DNT_Prameters_from_MKO
+00000131    ADFE1E                         	LDBZE _BX,#0FEh
+00000134    AD4020                         	LDBZE _CX,#40h
+00000137    EFC6FE                         	LCALL memset
+;000075      MKO_receive_data(dnt_data, 29);
+0000013A    450000181C                     	ADD   _AX,_SP,#dnt_data?Update_DNT_Prameters_from_MKO
+0000013F    B11D1E                         	LDB   _BL,#1Dh
+00000142    EFBBFE                         	LCALL MKO_receive_data
+;000077      if ((dnt_data[0] == 0x0FF1) && ((dnt_data[1]&0xFC07) == (_get_frame_definer(dnt_ptr, 1)&0xFC07))) // проверка на запись в субадрес, но исключаем заводской номер (как заготовка под широковещ. команду)
+00000145    A318001C                       	LD    _AX,dnt_data?Update_DNT_Prameters_from_MKO[_SP]
+00000149    89F10F1C                       	CMP   _AX,#0FF1h
+0000014D    DF02                           	JE    ??_4_ELSE_BYPASS_14D
+0000014F    20BB                           	SJMP  ??_4_ELSE
+        ??_4_ELSE_BYPASS_14D:
+00000151    A0241C                         	LD    _AX,dnt_ptr?Update_DNT_Prameters_from_MKO
+00000154    B1011E                         	LDB   _BL,#01h
+00000157    EF580A                         	LCALL _get_frame_definer
+0000015A    8718021C                       	XOR   _AX,(dnt_data?Update_DNT_Prameters_from_MKO+2)[_SP]
+0000015E    6107FC1C                       	AND   _AX,#0FC07h
+00000162    88001C                         	CMP   _AX,0
+00000165    DF02                           	JE    ??_4_ELSE_BYPASS_165
+00000167    20A3                           	SJMP  ??_4_ELSE
+        ??_4_ELSE_BYPASS_165:
+;000078      {
+;000079        dnt_ptr->control.measure_leng_s = (uint16_t)_check_bounds(dnt_data[2], 1, 20);
+00000169    A3180420                       	LD    _CX,(dnt_data?Update_DNT_Prameters_from_MKO+4)[_SP]
+0000016D    0122                           	CLR   _DX
+0000016F    AD141C                         	LDBZE _AX,#14h
+00000172    011E                           	CLR   _BX
+00000174    C51C20                         	CMPL  _DCX,_BAX
+00000177    DE03                           	JLT   ??_6_END
+00000179    AD1420                         	LDBZE _CX,#14h
                     ??_6_END:
-0000016A    C325AE0020                     	ST    _CX,00AEh[dnt_ptr?Update_DNT_Prameters_from_MKO]
-;000073        dnt_ptr->control.dead_time_ms = (uint16_t)_check_bounds(dnt_data[3], 20, (dnt_ptr->control.measure_leng_s*1000/4));
-0000016F    A325AE0020                     	LD    _CX,00AEh[dnt_ptr?Update_DNT_Prameters_from_MKO]
-00000174    6DE80320                       	MULU  _DCX,#03E8h
-00000178    080220                         	SHR   _CX,#02h
-0000017B    0122                           	CLR   _DX
-0000017D    A318061C                       	LD    _AX,(dnt_data?Update_DNT_Prameters_from_MKO+6)[_SP]
-00000181    C5201C                         	CMPL  _BAX,_DCX
-00000184    D606                           	JGE   ??_7_ELSE
-00000186    A01C20                         	LD    _CX,_AX
-00000189    A01E22                         	LD    _DX,_BX
-                   ??_7_ELSE:
-0000018C    AD151C                         	LDBZE _AX,#15h
-0000018F    C51C20                         	CMPL  _DCX,_BAX
-00000192    D603                           	JGE   ??_8_END
-00000194    AD1420                         	LDBZE _CX,#14h
-                    ??_8_END:
-00000197    C325B00020                     	ST    _CX,00B0h[dnt_ptr?Update_DNT_Prameters_from_MKO]
-;000074        dnt_ptr->control.osc_mode = dnt_data[4] & 0x01;
-0000019C    A318081C                       	LD    _AX,(dnt_data?Update_DNT_Prameters_from_MKO+8)[_SP]
-000001A0    6101001C                       	AND   _AX,#0001h
-000001A4    C3250A011C                     	ST    _AX,010Ah[dnt_ptr?Update_DNT_Prameters_from_MKO]
-;000075        dnt_ptr->control.osc_ku = dnt_data[5] & 0x3;
-000001A9    A3180A1C                       	LD    _AX,(dnt_data?Update_DNT_Prameters_from_MKO+10)[_SP]
-000001AD    6103001C                       	AND   _AX,#0003h
-000001B1    C32508011C                     	ST    _AX,0108h[dnt_ptr?Update_DNT_Prameters_from_MKO]
-;000078        dnt_ptr->control.mode = dnt_data[6] & 0xFF;
-000001B6    AF180C1C                       	LDBZE _AX,(dnt_data?Update_DNT_Prameters_from_MKO+12)[_SP]
-000001BA    C325AC001C                     	ST    _AX,00ACh[dnt_ptr?Update_DNT_Prameters_from_MKO]
-;000079    	Update_MKO_from_DNT_Parameters(dnt_ptr);
-000001BF    A0241C                         	LD    _AX,dnt_ptr?Update_DNT_Prameters_from_MKO
-000001C2    282D                           	SCALL Update_MKO_from_DNT_Parameters
-;000080        if (dnt_data[6]&0x01 != 0)
-000001C4    B3180C1C                       	LDB   _AL,(dnt_data?Update_DNT_Prameters_from_MKO+12)[_SP]
-000001C8    301C24                         	JBC   _AL,0h,??_9_ELSE
-;000081        {
-;000083            Oscilloscope(dnt_ptr->control.osc_ku, dnt_ptr->control.osc_mode, dnt_ptr->control.dead_time_ms);
-000001CB    A32508011C                     	LD    _AX,0108h[dnt_ptr?Update_DNT_Prameters_from_MKO]
-000001D0    A3250A011E                     	LD    _BX,010Ah[dnt_ptr?Update_DNT_Prameters_from_MKO]
-000001D5    A325B00020                     	LD    _CX,00B0h[dnt_ptr?Update_DNT_Prameters_from_MKO]
-000001DA    EF23FE                         	LCALL Oscilloscope
-;000084            dnt_data[6] = 0;
-000001DD    C3180C00                       	ST    00h,(dnt_data?Update_DNT_Prameters_from_MKO+12)[_SP]
-;000085    		dnt_ptr->control.mode = dnt_data[6] & 0xFF;
-000001E1    AF180C1C                       	LDBZE _AX,(dnt_data?Update_DNT_Prameters_from_MKO+12)[_SP]
-000001E5    C325AC001C                     	ST    _AX,00ACh[dnt_ptr?Update_DNT_Prameters_from_MKO]
-;000086    		Update_MKO_from_DNT_Parameters(dnt_ptr);
-000001EA    A0241C                         	LD    _AX,dnt_ptr?Update_DNT_Prameters_from_MKO
-000001ED    2802                           	SCALL Update_MKO_from_DNT_Parameters
-;000087        }
-                   ??_9_ELSE:
-;000088      }
-                   ??_3_ELSE:
-;000089    }
-000001EF    2075                           	SJMP  COMMON?END_Update_DNT_Prameters_from_MKO
+0000017C    AD021C                         	LDBZE _AX,#02h
+0000017F    C51C20                         	CMPL  _DCX,_BAX
+00000182    D603                           	JGE   ??_7_END
+00000184    AD0120                         	LDBZE _CX,#01h
+                    ??_7_END:
+00000187    C325AE0020                     	ST    _CX,00AEh[dnt_ptr?Update_DNT_Prameters_from_MKO]
+;000080        dnt_ptr->control.dead_time_ms = (uint16_t)_check_bounds(dnt_data[3], 20, (dnt_ptr->control.measure_leng_s*1000/4));
+0000018C    A325AE0020                     	LD    _CX,00AEh[dnt_ptr?Update_DNT_Prameters_from_MKO]
+00000191    6DE80320                       	MULU  _DCX,#03E8h
+00000195    080220                         	SHR   _CX,#02h
+00000198    0122                           	CLR   _DX
+0000019A    A318061C                       	LD    _AX,(dnt_data?Update_DNT_Prameters_from_MKO+6)[_SP]
+0000019E    C5201C                         	CMPL  _BAX,_DCX
+000001A1    D606                           	JGE   ??_8_ELSE
+000001A3    A01C20                         	LD    _CX,_AX
+000001A6    A01E22                         	LD    _DX,_BX
+                   ??_8_ELSE:
+000001A9    AD151C                         	LDBZE _AX,#15h
+000001AC    C51C20                         	CMPL  _DCX,_BAX
+000001AF    D603                           	JGE   ??_9_END
+000001B1    AD1420                         	LDBZE _CX,#14h
+                    ??_9_END:
+000001B4    C325B00020                     	ST    _CX,00B0h[dnt_ptr?Update_DNT_Prameters_from_MKO]
+;000081        dnt_ptr->control.osc_mode = dnt_data[4] & 0x01;
+000001B9    A318081C                       	LD    _AX,(dnt_data?Update_DNT_Prameters_from_MKO+8)[_SP]
+000001BD    6101001C                       	AND   _AX,#0001h
+000001C1    C3250A011C                     	ST    _AX,010Ah[dnt_ptr?Update_DNT_Prameters_from_MKO]
+;000082        dnt_ptr->control.osc_ku = dnt_data[5] & 0x3;
+000001C6    A3180A1C                       	LD    _AX,(dnt_data?Update_DNT_Prameters_from_MKO+10)[_SP]
+000001CA    6103001C                       	AND   _AX,#0003h
+000001CE    C32508011C                     	ST    _AX,0108h[dnt_ptr?Update_DNT_Prameters_from_MKO]
+;000084        dnt_ptr->control.mode = dnt_data[6] & 0xFF;
+000001D3    AF180C1C                       	LDBZE _AX,(dnt_data?Update_DNT_Prameters_from_MKO+12)[_SP]
+000001D7    C325AC001C                     	ST    _AX,00ACh[dnt_ptr?Update_DNT_Prameters_from_MKO]
+;000085        Update_MKO_from_DNT_Parameters(dnt_ptr);
+000001DC    A0241C                         	LD    _AX,dnt_ptr?Update_DNT_Prameters_from_MKO
+000001DF    282D                           	SCALL Update_MKO_from_DNT_Parameters
+;000086        if (dnt_data[6]&0x01 != 0)
+000001E1    B3180C1C                       	LDB   _AL,(dnt_data?Update_DNT_Prameters_from_MKO+12)[_SP]
+000001E5    301C24                         	JBC   _AL,0h,??_10_ELSE
+;000087        {
+;000089            Oscilloscope(dnt_ptr->control.osc_ku, dnt_ptr->control.osc_mode, dnt_ptr->control.dead_time_ms);
+000001E8    A32508011C                     	LD    _AX,0108h[dnt_ptr?Update_DNT_Prameters_from_MKO]
+000001ED    A3250A011E                     	LD    _BX,010Ah[dnt_ptr?Update_DNT_Prameters_from_MKO]
+000001F2    A325B00020                     	LD    _CX,00B0h[dnt_ptr?Update_DNT_Prameters_from_MKO]
+000001F7    EF06FE                         	LCALL Oscilloscope
+;000090            dnt_data[6] = 0;
+000001FA    C3180C00                       	ST    00h,(dnt_data?Update_DNT_Prameters_from_MKO+12)[_SP]
+;000091            dnt_ptr->control.mode = dnt_data[6] & 0xFF;
+000001FE    AF180C1C                       	LDBZE _AX,(dnt_data?Update_DNT_Prameters_from_MKO+12)[_SP]
+00000202    C325AC001C                     	ST    _AX,00ACh[dnt_ptr?Update_DNT_Prameters_from_MKO]
+;000092            Update_MKO_from_DNT_Parameters(dnt_ptr);
+00000207    A0241C                         	LD    _AX,dnt_ptr?Update_DNT_Prameters_from_MKO
+0000020A    2802                           	SCALL Update_MKO_from_DNT_Parameters
+;000093        }
+                  ??_10_ELSE:
+;000094      }
+                   ??_4_ELSE:
+;000095    }
+0000020C    2075                           	SJMP  COMMON?END_Update_DNT_Prameters_from_MKO
 .ENDF
 Update_MKO_from_DNT_Parameters:
-;000091    void Update_MKO_from_DNT_Parameters(typeDNTOperationData* dnt_ptr)
-000001F1    C824                           	PUSH  _EX
-000001F3    69400018                       	SUB   _SP,#0040h
-000001F7    A01C24                         	LD    _EX,_AX
-;000093      uint16_t dnt_data[32] = {0};
-000001FA    C3180000                       	ST    00h,dnt_data?Update_MKO_from_DNT_Parameters[_SP]
-000001FE    AD1F20                         	LDBZE _CX,#1Fh
-00000201    450200181E                     	ADD   _BX,_SP,#(dnt_data?Update_MKO_from_DNT_Parameters+2)
-             ??_10_FILL_LOOP:
-00000206    C21F00                         	ST    00h,[_BX]+
-00000209    0520                           	DEC   _CX
-0000020B    D7F9                           	JNE   ??_10_FILL_LOOP
-;000094      dnt_data[0] = 0x0FF1;
-0000020D    A1F10F1E                       	LD    _BX,#0FF1h
-00000211    C318001E                       	ST    _BX,dnt_data?Update_MKO_from_DNT_Parameters[_SP]
-;000095      dnt_data[1] = _get_frame_definer(dnt_ptr, 1);
-00000215    B1011E                         	LDB   _BL,#01h
-00000218    EF7A09                         	LCALL _get_frame_definer
-0000021B    C318021C                       	ST    _AX,(dnt_data?Update_MKO_from_DNT_Parameters+2)[_SP]
-;000096      dnt_data[2] = dnt_ptr->control.measure_leng_s;
-0000021F    A325AE001E                     	LD    _BX,00AEh[dnt_ptr?Update_MKO_from_DNT_Parameters]
-00000224    C318041E                       	ST    _BX,(dnt_data?Update_MKO_from_DNT_Parameters+4)[_SP]
-;000097      dnt_data[3] = dnt_ptr->control.dead_time_ms;
-00000228    A325B0001E                     	LD    _BX,00B0h[dnt_ptr?Update_MKO_from_DNT_Parameters]
-0000022D    C318061E                       	ST    _BX,(dnt_data?Update_MKO_from_DNT_Parameters+6)[_SP]
-;000098      dnt_data[4] = dnt_ptr->control.osc_mode;
-00000231    A3250A011E                     	LD    _BX,010Ah[dnt_ptr?Update_MKO_from_DNT_Parameters]
-00000236    C318081E                       	ST    _BX,(dnt_data?Update_MKO_from_DNT_Parameters+8)[_SP]
-;000099      dnt_data[5] = dnt_ptr->control.osc_ku;
-0000023A    A32508011E                     	LD    _BX,0108h[dnt_ptr?Update_MKO_from_DNT_Parameters]
-0000023F    C3180A1E                       	ST    _BX,(dnt_data?Update_MKO_from_DNT_Parameters+10)[_SP]
-;000100      dnt_data[6] = dnt_ptr->control.mode;
-00000243    A325AC001E                     	LD    _BX,00ACh[dnt_ptr?Update_MKO_from_DNT_Parameters]
-00000248    C3180C1E                       	ST    _BX,(dnt_data?Update_MKO_from_DNT_Parameters+12)[_SP]
-;000101      dnt_data[31] = crc16_ccitt((uint8_t*)dnt_data, 62);
-0000024C    450000181C                     	ADD   _AX,_SP,#dnt_data?Update_MKO_from_DNT_Parameters
-00000251    B13E1E                         	LDB   _BL,#3Eh
-00000254    EFA9FD                         	LCALL crc16_ccitt
-00000257    C3183E1C                       	ST    _AX,(dnt_data?Update_MKO_from_DNT_Parameters+62)[_SP]
-;000102      MKO_data_to_transmit(dnt_data, 29); //складываем в регистр чтения для удобства проверки записи данных
-0000025B    450000181C                     	ADD   _AX,_SP,#dnt_data?Update_MKO_from_DNT_Parameters
-00000260    B11D1E                         	LDB   _BL,#1Dh
-00000263    EF9AFD                         	LCALL MKO_data_to_transmit
-;000103    }
+;000097    void Update_MKO_from_DNT_Parameters(typeDNTOperationData* dnt_ptr)
+0000020E    C824                           	PUSH  _EX
+00000210    69400018                       	SUB   _SP,#0040h
+00000214    A01C24                         	LD    _EX,_AX
+;000099      uint16_t dnt_data[32] = {0};
+00000217    C3180000                       	ST    00h,dnt_data?Update_MKO_from_DNT_Parameters[_SP]
+0000021B    AD1F20                         	LDBZE _CX,#1Fh
+0000021E    450200181E                     	ADD   _BX,_SP,#(dnt_data?Update_MKO_from_DNT_Parameters+2)
+             ??_11_FILL_LOOP:
+00000223    C21F00                         	ST    00h,[_BX]+
+00000226    0520                           	DEC   _CX
+00000228    D7F9                           	JNE   ??_11_FILL_LOOP
+;000100      dnt_data[0] = 0x0FF1;
+0000022A    A1F10F1E                       	LD    _BX,#0FF1h
+0000022E    C318001E                       	ST    _BX,dnt_data?Update_MKO_from_DNT_Parameters[_SP]
+;000101      dnt_data[1] = _get_frame_definer(dnt_ptr, 1);
+00000232    B1011E                         	LDB   _BL,#01h
+00000235    EF7A09                         	LCALL _get_frame_definer
+00000238    C318021C                       	ST    _AX,(dnt_data?Update_MKO_from_DNT_Parameters+2)[_SP]
+;000102      dnt_data[2] = dnt_ptr->control.measure_leng_s;
+0000023C    A325AE001E                     	LD    _BX,00AEh[dnt_ptr?Update_MKO_from_DNT_Parameters]
+00000241    C318041E                       	ST    _BX,(dnt_data?Update_MKO_from_DNT_Parameters+4)[_SP]
+;000103      dnt_data[3] = dnt_ptr->control.dead_time_ms;
+00000245    A325B0001E                     	LD    _BX,00B0h[dnt_ptr?Update_MKO_from_DNT_Parameters]
+0000024A    C318061E                       	ST    _BX,(dnt_data?Update_MKO_from_DNT_Parameters+6)[_SP]
+;000104      dnt_data[4] = dnt_ptr->control.osc_mode;
+0000024E    A3250A011E                     	LD    _BX,010Ah[dnt_ptr?Update_MKO_from_DNT_Parameters]
+00000253    C318081E                       	ST    _BX,(dnt_data?Update_MKO_from_DNT_Parameters+8)[_SP]
+;000105      dnt_data[5] = dnt_ptr->control.osc_ku;
+00000257    A32508011E                     	LD    _BX,0108h[dnt_ptr?Update_MKO_from_DNT_Parameters]
+0000025C    C3180A1E                       	ST    _BX,(dnt_data?Update_MKO_from_DNT_Parameters+10)[_SP]
+;000106      dnt_data[6] = dnt_ptr->control.mode;
+00000260    A325AC001E                     	LD    _BX,00ACh[dnt_ptr?Update_MKO_from_DNT_Parameters]
+00000265    C3180C1E                       	ST    _BX,(dnt_data?Update_MKO_from_DNT_Parameters+12)[_SP]
+;000107      dnt_data[31] = crc16_ccitt((uint8_t*)dnt_data, 62);
+00000269    450000181C                     	ADD   _AX,_SP,#dnt_data?Update_MKO_from_DNT_Parameters
+0000026E    B13E1E                         	LDB   _BL,#3Eh
+00000271    EF8CFD                         	LCALL crc16_ccitt
+00000274    C3183E1C                       	ST    _AX,(dnt_data?Update_MKO_from_DNT_Parameters+62)[_SP]
+;000108      MKO_data_to_transmit(dnt_data, 29); //складываем в регистр чтения для удобства проверки записи данных
+00000278    450000181C                     	ADD   _AX,_SP,#dnt_data?Update_MKO_from_DNT_Parameters
+0000027D    B11D1E                         	LDB   _BL,#1Dh
+00000280    EF7DFD                         	LCALL MKO_data_to_transmit
+;000109    }
 COMMON?END_Update_DNT_Prameters_from_MKO:
-00000266    65400018                       	ADD   _SP,#0040h
-0000026A    CC24                           	POP   _EX
-0000026C    F0                             	RET   
+00000283    65400018                       	ADD   _SP,#0040h
+00000287    CC24                           	POP   _EX
+00000289    F0                             	RET   
 .ENDF
          DNT_Parameters_Init:
-;000105    void DNT_Parameters_Init(typeDNTOperationData* dnt_ptr, uint16_t meas_leng_s, uint16_t dead_time_ms, uint16_t mode)
-;000107        dnt_ptr->control.measure_leng_s = meas_leng_s;
-0000026D    C31DAE001E                     	ST    meas_leng_s?DNT_Parameters_Init,00AEh[dnt_ptr?DNT_Parameters_Init]
-;000108        dnt_ptr->control.dead_time_ms = dead_time_ms;
-00000272    C31DB00020                     	ST    dead_time_ms?DNT_Parameters_Init,00B0h[dnt_ptr?DNT_Parameters_Init]
-;000109        dnt_ptr->control.osc_mode = 0;
-00000277    C31D0A0100                     	ST    00h,010Ah[dnt_ptr?DNT_Parameters_Init]
-;000110        dnt_ptr->control.osc_ku = 0;
-0000027C    C31D080100                     	ST    00h,0108h[dnt_ptr?DNT_Parameters_Init]
-;000111        dnt_ptr->control.mode = mode;
-00000281    C31DAC0022                     	ST    mode?DNT_Parameters_Init,00ACh[dnt_ptr?DNT_Parameters_Init]
-;000112    }
-00000286    F0                             	RET   
+;000111    void DNT_Parameters_Init(typeDNTOperationData* dnt_ptr, uint16_t meas_leng_s, uint16_t dead_time_ms, uint16_t mode)
+;000113        dnt_ptr->control.measure_leng_s = meas_leng_s;
+0000028A    C31DAE001E                     	ST    meas_leng_s?DNT_Parameters_Init,00AEh[dnt_ptr?DNT_Parameters_Init]
+;000114        dnt_ptr->control.dead_time_ms = dead_time_ms;
+0000028F    C31DB00020                     	ST    dead_time_ms?DNT_Parameters_Init,00B0h[dnt_ptr?DNT_Parameters_Init]
+;000115        dnt_ptr->control.osc_mode = 0;
+00000294    C31D0A0100                     	ST    00h,010Ah[dnt_ptr?DNT_Parameters_Init]
+;000116        dnt_ptr->control.osc_ku = 0;
+00000299    C31D080100                     	ST    00h,0108h[dnt_ptr?DNT_Parameters_Init]
+;000117        dnt_ptr->control.mode = mode;
+0000029E    C31DAC0022                     	ST    mode?DNT_Parameters_Init,00ACh[dnt_ptr?DNT_Parameters_Init]
+;000118    }
+000002A3    F0                             	RET   
 .ENDF
       DNT_Frame_Definer_Init:
-;000114    void DNT_Frame_Definer_Init(typeDNTOperationData* dnt_ptr, uint8_t dev_type, uint8_t zav_num)
-;000116        dnt_ptr->frame_modificator = 0x01;
-00000287    B10120                         	LDB   _CL,#01h
-0000028A    C71C0820                       	STB   _CL,08h[dnt_ptr?DNT_Frame_Definer_Init]
-;000117        dnt_ptr->device_number = dev_type;
-0000028E    C71C091E                       	STB   dev_type?DNT_Frame_Definer_Init,09h[dnt_ptr?DNT_Frame_Definer_Init]
-;000118        dnt_ptr->zavod_number = zav_num;
-00000292    C71C0A1F                       	STB   zav_num?DNT_Frame_Definer_Init,0Ah[dnt_ptr?DNT_Frame_Definer_Init]
-;000119    }
-00000296    F0                             	RET   
+;000120    void DNT_Frame_Definer_Init(typeDNTOperationData* dnt_ptr, uint8_t dev_type, uint8_t zav_num)
+;000122        dnt_ptr->frame_modificator = 0x01;
+000002A4    B10120                         	LDB   _CL,#01h
+000002A7    C71C0820                       	STB   _CL,08h[dnt_ptr?DNT_Frame_Definer_Init]
+;000123        dnt_ptr->device_number = dev_type;
+000002AB    C71C091E                       	STB   dev_type?DNT_Frame_Definer_Init,09h[dnt_ptr?DNT_Frame_Definer_Init]
+;000124        dnt_ptr->zavod_number = zav_num;
+000002AF    C71C0A1F                       	STB   zav_num?DNT_Frame_Definer_Init,0Ah[dnt_ptr?DNT_Frame_Definer_Init]
+;000125    }
+000002B3    F0                             	RET   
 .ENDF
                _check_bounds:
-;000121    int32_t _check_bounds(int32_t var, int32_t bound_min, int32_t bound_max)
-00000297    C824                           	PUSH  _EX
-00000299    C826                           	PUSH  _FX
-0000029B    A01C24                         	LD    _EX,_AX
-0000029E    A01E26                         	LD    _FX,_BX
-000002A1    A0201C                         	LD    _AX,_CX
-000002A4    A0221E                         	LD    _BX,_DX
-000002A7    A3180620                       	LD    _CX,06h[_SP]
-000002AB    A3180822                       	LD    _DX,08h[_SP]
-;000124        uint32_tmp_var = min(var, bound_max);
-000002AF    C52024                         	CMPL  var?_check_bounds,uint32_tmp_var?_check_bounds
-000002B2    D606                           	JGE   ??_11_ELSE
-000002B4    A02420                         	LD    uint32_tmp_var?_check_bounds,var?_check_bounds
-000002B7    A02622                         	LD    (uint32_tmp_var?_check_bounds+2),(var?_check_bounds+2)
-                  ??_11_ELSE:
-;000125        uint32_tmp_var = max(uint32_tmp_var, bound_min);
-000002BA    C5201C                         	CMPL  bound_min?_check_bounds,uint32_tmp_var?_check_bounds
-000002BD    D606                           	JGE   ??_12_ELSE
-000002BF    A0201C                         	LD    bound_min?_check_bounds,uint32_tmp_var?_check_bounds
-000002C2    A0221E                         	LD    (bound_min?_check_bounds+2),(uint32_tmp_var?_check_bounds+2)
+;000127    int32_t _check_bounds(int32_t var, int32_t bound_min, int32_t bound_max)
+000002B4    C824                           	PUSH  _EX
+000002B6    C826                           	PUSH  _FX
+000002B8    A01C24                         	LD    _EX,_AX
+000002BB    A01E26                         	LD    _FX,_BX
+000002BE    A0201C                         	LD    _AX,_CX
+000002C1    A0221E                         	LD    _BX,_DX
+000002C4    A3180620                       	LD    _CX,06h[_SP]
+000002C8    A3180822                       	LD    _DX,08h[_SP]
+;000130        uint32_tmp_var = min(var, bound_max);
+000002CC    C52024                         	CMPL  var?_check_bounds,uint32_tmp_var?_check_bounds
+000002CF    D606                           	JGE   ??_12_ELSE
+000002D1    A02420                         	LD    uint32_tmp_var?_check_bounds,var?_check_bounds
+000002D4    A02622                         	LD    (uint32_tmp_var?_check_bounds+2),(var?_check_bounds+2)
                   ??_12_ELSE:
-;000126        return uint32_tmp_var;
-;000127    }
-000002C5    CC26                           	POP   _FX
-000002C7    CC24                           	POP   _EX
-000002C9    F0                             	RET   
+;000131        uint32_tmp_var = max(uint32_tmp_var, bound_min);
+000002D7    C5201C                         	CMPL  bound_min?_check_bounds,uint32_tmp_var?_check_bounds
+000002DA    D606                           	JGE   ??_13_ELSE
+000002DC    A0201C                         	LD    bound_min?_check_bounds,uint32_tmp_var?_check_bounds
+000002DF    A0221E                         	LD    (bound_min?_check_bounds+2),(uint32_tmp_var?_check_bounds+2)
+                  ??_13_ELSE:
+;000132        return uint32_tmp_var;
+;000133    }
+000002E2    CC26                           	POP   _FX
+000002E4    CC24                           	POP   _EX
+000002E6    F0                             	RET   
 .ENDF
       Current_Calc_Step_10ms:
-;000130    uint8_t Current_Calc_Step_10ms(typeDNTOperationData* dnt_ptr) //некая  функция, которая должна запускать один раз в 1 мс, для осуществления итеративного процесса подсчета тока
-000002CA    C824                           	PUSH  _EX
-000002CC    C826                           	PUSH  _FX
-000002CE    C828                           	PUSH  _GX
-000002D0    C82A                           	PUSH  _HX
-000002D2    C800                           	PUSH  00h
-000002D4    A01C24                         	LD    _EX,_AX
-;000135        if (dnt_ptr->control.mode & 0x04){ //запустили циклический режим
-000002D7    A325AC001C                     	LD    _AX,00ACh[dnt_ptr?Current_Calc_Step_10ms]
-000002DC    3A1C02                         	JBS   _AL,2h,??_13_ELSE_BYPASS_2DC
-000002DF    20FD                           	SJMP  ??_13_ELSE
-       ??_13_ELSE_BYPASS_2DC:
-;000136            if (dnt_ptr->control.measure_cycle_time_ms == 0){ //инициализация переменных для подсчета тока
-000002E1    A325B40020                     	LD    _CX,00B4h[dnt_ptr?Current_Calc_Step_10ms]
-000002E6    A325B60022                     	LD    _DX,00B6h[dnt_ptr?Current_Calc_Step_10ms]
-000002EB    011C                           	CLR   _AX
-000002ED    011E                           	CLR   _BX
-000002EF    C51C20                         	CMPL  _DCX,_BAX
-000002F2    D70D                           	JNE   ??_14_ELSE
-;000137                _ku_change_checker(dnt_ptr);
-000002F4    A0241C                         	LD    _AX,dnt_ptr?Current_Calc_Step_10ms
-000002F7    EF5B07                         	LCALL _ku_change_checker
-;000138                _cycle_measure_struct_init(dnt_ptr);
-000002FA    A0241C                         	LD    _AX,dnt_ptr?Current_Calc_Step_10ms
-000002FD    2B4E                           	SCALL _cycle_measure_struct_init
-;000139            }
-000002FF    21D7                           	SJMP  ??_13_END
-                  ??_14_ELSE:
-;000140            else{
-;000141                dnt_ptr->control.measure_cycle_time_ms += 10; //не гарантировано точные часы подсчета времени цикла
-00000301    A325B40020                     	LD    _CX,00B4h[dnt_ptr?Current_Calc_Step_10ms]
-00000306    A325B60022                     	LD    _DX,00B6h[dnt_ptr?Current_Calc_Step_10ms]
-0000030B    650A0020                       	ADD   _CX,#000Ah
-0000030F    A40022                         	ADDC  _DX,0
-00000312    C325B40020                     	ST    _CX,00B4h[dnt_ptr?Current_Calc_Step_10ms]
-00000317    C325B60022                     	ST    _DX,00B6h[dnt_ptr?Current_Calc_Step_10ms]
-;000143                if ((dnt_ptr->control.measure_cycle_time_ms > 0) && (dnt_ptr->control.measure_cycle_time_ms < dnt_ptr->control.zero_cycle_ref_point)){ //определяем мертвое время для измерения нуля
-0000031C    A325B40020                     	LD    _CX,00B4h[dnt_ptr?Current_Calc_Step_10ms]
-00000321    A325B60022                     	LD    _DX,00B6h[dnt_ptr?Current_Calc_Step_10ms]
-00000326    C51C20                         	CMPL  _DCX,_BAX
-00000329    DF3F                           	JE    ??_15_ELSE
-0000032B    A325BC001C                     	LD    _AX,00BCh[dnt_ptr?Current_Calc_Step_10ms]
-00000330    A325BE001E                     	LD    _BX,00BEh[dnt_ptr?Current_Calc_Step_10ms]
-00000335    C51C20                         	CMPL  _DCX,_BAX
-00000338    DB30                           	JC    ??_15_ELSE
-;000144                    IOPORT1 = 0x38&(0x00|ku_gpio_set(dnt_ptr->control.ku)); //определяем состояние gpio и КУ для измерения  нуля
-0000033A    A325B2001C                     	LD    _AX,00B2h[dnt_ptr?Current_Calc_Step_10ms]
-0000033F    2AE6                           	SCALL ku_gpio_set
-00000341    71381C                         	ANDB  _AL,#38h
-00000344    B01C00                         	LDB   IOPORT1,_AL
-;000145                    if ((dnt_ptr->control.measure_cycle_time_ms >=  dnt_ptr->control.zero_dead_time_ref_point)){ //измерение нуля
-00000347    A325B40020                     	LD    _CX,00B4h[dnt_ptr?Current_Calc_Step_10ms]
-0000034C    A325B60022                     	LD    _DX,00B6h[dnt_ptr?Current_Calc_Step_10ms]
-00000351    A325B8001C                     	LD    _AX,00B8h[dnt_ptr?Current_Calc_Step_10ms]
-00000356    A325BA001E                     	LD    _BX,00BAh[dnt_ptr?Current_Calc_Step_10ms]
-0000035B    C51C20                         	CMPL  _DCX,_BAX
-0000035E    D308                           	JNC   ??_17_ELSE
-;000146                         _adc_data_get(&dnt_ptr->zero);
-00000360    455000241C                     	ADD   _AX,dnt_ptr?Current_Calc_Step_10ms,#0050h
-00000365    EF1605                         	LCALL _adc_data_get
-;000147                    }
-                  ??_17_ELSE:
-;000148                }
-00000368    216E                           	SJMP  ??_13_END
+;000136    uint8_t Current_Calc_Step_10ms(typeDNTOperationData* dnt_ptr) //некая  функция, которая должна запускать один раз в 1 мс, для осуществления итеративного процесса подсчета тока
+000002E7    C824                           	PUSH  _EX
+000002E9    C826                           	PUSH  _FX
+000002EB    C828                           	PUSH  _GX
+000002ED    C82A                           	PUSH  _HX
+000002EF    C800                           	PUSH  00h
+000002F1    A01C24                         	LD    _EX,_AX
+;000141        if (dnt_ptr->control.mode & 0x04){ //запустили циклический режим
+000002F4    A325AC001C                     	LD    _AX,00ACh[dnt_ptr?Current_Calc_Step_10ms]
+000002F9    3A1C02                         	JBS   _AL,2h,??_14_ELSE_BYPASS_2F9
+000002FC    20FD                           	SJMP  ??_14_ELSE
+       ??_14_ELSE_BYPASS_2F9:
+;000142            if (dnt_ptr->control.measure_cycle_time_ms == 0){ //инициализация переменных для подсчета тока
+000002FE    A325B40020                     	LD    _CX,00B4h[dnt_ptr?Current_Calc_Step_10ms]
+00000303    A325B60022                     	LD    _DX,00B6h[dnt_ptr?Current_Calc_Step_10ms]
+00000308    011C                           	CLR   _AX
+0000030A    011E                           	CLR   _BX
+0000030C    C51C20                         	CMPL  _DCX,_BAX
+0000030F    D70D                           	JNE   ??_15_ELSE
+;000143                _ku_change_checker(dnt_ptr);
+00000311    A0241C                         	LD    _AX,dnt_ptr?Current_Calc_Step_10ms
+00000314    EF5B07                         	LCALL _ku_change_checker
+;000144                _cycle_measure_struct_init(dnt_ptr);
+00000317    A0241C                         	LD    _AX,dnt_ptr?Current_Calc_Step_10ms
+0000031A    2B4E                           	SCALL _cycle_measure_struct_init
+;000145            }
+0000031C    21D7                           	SJMP  ??_14_END
                   ??_15_ELSE:
-;000149                else if ((dnt_ptr->control.measure_cycle_time_ms >= dnt_ptr->control.zero_cycle_ref_point) && (dnt_ptr->control.measure_cycle_time_ms < dnt_ptr->control.signal_cycle_ref_point)){ //мертвое время измерения сигнала
-0000036A    A325BC001C                     	LD    _AX,00BCh[dnt_ptr?Current_Calc_Step_10ms]
-0000036F    A325BE001E                     	LD    _BX,00BEh[dnt_ptr?Current_Calc_Step_10ms]
-00000374    C51C20                         	CMPL  _DCX,_BAX
-00000377    D342                           	JNC   ??_18_ELSE
-00000379    A325C4001C                     	LD    _AX,00C4h[dnt_ptr?Current_Calc_Step_10ms]
-0000037E    A325C6001E                     	LD    _BX,00C6h[dnt_ptr?Current_Calc_Step_10ms]
-00000383    C51C20                         	CMPL  _DCX,_BAX
-00000386    DB33                           	JC    ??_18_ELSE
-;000150                    IOPORT1 = 0x38&(0x08|ku_gpio_set(dnt_ptr->control.ku)); //определяем состояние gpio и КУ для измерения сигнала
-00000388    A325B2001C                     	LD    _AX,00B2h[dnt_ptr?Current_Calc_Step_10ms]
-0000038D    2A98                           	SCALL ku_gpio_set
-0000038F    91081C                         	ORB   _AL,#08h
-00000392    71381C                         	ANDB  _AL,#38h
-00000395    B01C00                         	LDB   IOPORT1,_AL
-;000151                    if ((dnt_ptr->control.measure_cycle_time_ms >= dnt_ptr->control.signal_dead_time_ref_point)){ //измерение сигнала
-00000398    A325B40020                     	LD    _CX,00B4h[dnt_ptr?Current_Calc_Step_10ms]
-0000039D    A325B60022                     	LD    _DX,00B6h[dnt_ptr?Current_Calc_Step_10ms]
-000003A2    A325C0001C                     	LD    _AX,00C0h[dnt_ptr?Current_Calc_Step_10ms]
-000003A7    A325C2001E                     	LD    _BX,00C2h[dnt_ptr?Current_Calc_Step_10ms]
-000003AC    C51C20                         	CMPL  _DCX,_BAX
-000003AF    D32B                           	JNC   ??_18_END
-;000152                        _adc_data_get(&dnt_ptr->signal);
-000003B1    450C00241C                     	ADD   _AX,dnt_ptr?Current_Calc_Step_10ms,#000Ch
-000003B6    EFC504                         	LCALL _adc_data_get
+;000146            else{
+;000147                dnt_ptr->control.measure_cycle_time_ms += 10; //не гарантировано точные часы подсчета времени цикла
+0000031E    A325B40020                     	LD    _CX,00B4h[dnt_ptr?Current_Calc_Step_10ms]
+00000323    A325B60022                     	LD    _DX,00B6h[dnt_ptr?Current_Calc_Step_10ms]
+00000328    650A0020                       	ADD   _CX,#000Ah
+0000032C    A40022                         	ADDC  _DX,0
+0000032F    C325B40020                     	ST    _CX,00B4h[dnt_ptr?Current_Calc_Step_10ms]
+00000334    C325B60022                     	ST    _DX,00B6h[dnt_ptr?Current_Calc_Step_10ms]
+;000149                if ((dnt_ptr->control.measure_cycle_time_ms > 0) && (dnt_ptr->control.measure_cycle_time_ms < dnt_ptr->control.zero_cycle_ref_point)){ //определяем мертвое время для измерения нуля
+00000339    A325B40020                     	LD    _CX,00B4h[dnt_ptr?Current_Calc_Step_10ms]
+0000033E    A325B60022                     	LD    _DX,00B6h[dnt_ptr?Current_Calc_Step_10ms]
+00000343    C51C20                         	CMPL  _DCX,_BAX
+00000346    DF3F                           	JE    ??_16_ELSE
+00000348    A325BC001C                     	LD    _AX,00BCh[dnt_ptr?Current_Calc_Step_10ms]
+0000034D    A325BE001E                     	LD    _BX,00BEh[dnt_ptr?Current_Calc_Step_10ms]
+00000352    C51C20                         	CMPL  _DCX,_BAX
+00000355    DB30                           	JC    ??_16_ELSE
+;000150                    IOPORT1 = 0x38&(0x00|ku_gpio_set(dnt_ptr->control.ku)); //определяем состояние gpio и КУ для измерения  нуля
+00000357    A325B2001C                     	LD    _AX,00B2h[dnt_ptr?Current_Calc_Step_10ms]
+0000035C    2AE6                           	SCALL ku_gpio_set
+0000035E    71381C                         	ANDB  _AL,#38h
+00000361    B01C00                         	LDB   IOPORT1,_AL
+;000151                    if ((dnt_ptr->control.measure_cycle_time_ms >=  dnt_ptr->control.zero_dead_time_ref_point)){ //измерение нуля
+00000364    A325B40020                     	LD    _CX,00B4h[dnt_ptr?Current_Calc_Step_10ms]
+00000369    A325B60022                     	LD    _DX,00B6h[dnt_ptr?Current_Calc_Step_10ms]
+0000036E    A325B8001C                     	LD    _AX,00B8h[dnt_ptr?Current_Calc_Step_10ms]
+00000373    A325BA001E                     	LD    _BX,00BAh[dnt_ptr?Current_Calc_Step_10ms]
+00000378    C51C20                         	CMPL  _DCX,_BAX
+0000037B    D308                           	JNC   ??_18_ELSE
+;000152                         _adc_data_get(&dnt_ptr->zero);
+0000037D    455000241C                     	ADD   _AX,dnt_ptr?Current_Calc_Step_10ms,#0050h
+00000382    EF1605                         	LCALL _adc_data_get
 ;000153                    }
-;000154                }
-000003B9    211D                           	SJMP  ??_13_END
                   ??_18_ELSE:
-;000155                else if (dnt_ptr->control.measure_cycle_time_ms >= dnt_ptr->control.signal_cycle_ref_point){
-000003BB    A325C4001C                     	LD    _AX,00C4h[dnt_ptr?Current_Calc_Step_10ms]
-000003C0    A325C6001E                     	LD    _BX,00C6h[dnt_ptr?Current_Calc_Step_10ms]
-000003C5    C51C20                         	CMPL  _DCX,_BAX
-000003C8    D312                           	JNC   ??_21_ELSE
-;000156                    _current_result_calc(dnt_ptr);
-000003CA    A0241C                         	LD    _AX,dnt_ptr?Current_Calc_Step_10ms
-000003CD    EF0805                         	LCALL _current_result_calc
-;000157                    dnt_ptr->control.measure_cycle_time_ms = 0;
-000003D0    C325B40000                     	ST    00h,00B4h[dnt_ptr?Current_Calc_Step_10ms]
-000003D5    C325B60000                     	ST    00h,00B6h[dnt_ptr?Current_Calc_Step_10ms]
-;000158                    IOPORT1 = 0x38&(0x00|ku_gpio_set(dnt_ptr->control.ku)); //сбрасываем ток с обмотки реле
-;000160                    return 1; //передаем сигнал о готовности измерения
-000003DA    20EA                           	SJMP  ??_79_COMMON
-;000161                }
-                  ??_21_ELSE:
-                   ??_18_END:
-;000162            }
-;000163        }
-000003DC    20FA                           	SJMP  ??_13_END
-                  ??_13_ELSE:
-;000164        else if (dnt_ptr->control.mode & 0x02){ //запустили одиночное измерение
-000003DE    391C02                         	JBS   _AL,1h,??_22_ELSE_BYPASS_3DE
-000003E1    20F5                           	SJMP  ??_22_ELSE
-       ??_22_ELSE_BYPASS_3DE:
-;000165            if (dnt_ptr->control.measure_cycle_time_ms == 0){ //инициализация переменных для подсчета тока
-000003E3    A325B40020                     	LD    _CX,00B4h[dnt_ptr?Current_Calc_Step_10ms]
-000003E8    A325B60022                     	LD    _DX,00B6h[dnt_ptr?Current_Calc_Step_10ms]
-000003ED    011C                           	CLR   _AX
-000003EF    011E                           	CLR   _BX
-000003F1    C51C20                         	CMPL  _DCX,_BAX
-000003F4    D707                           	JNE   ??_23_ELSE
-;000166                _single_measure_struct_init(dnt_ptr);
-000003F6    A0241C                         	LD    _AX,dnt_ptr?Current_Calc_Step_10ms
-000003F9    2AF3                           	SCALL _single_measure_struct_init
-;000167            }
-000003FB    20DB                           	SJMP  ??_23_END
-                  ??_23_ELSE:
-;000168            else{
-;000169                dnt_ptr->control.measure_cycle_time_ms += 10; //не гарантировано точные часы подсчета времени цикла
-000003FD    A325B40020                     	LD    _CX,00B4h[dnt_ptr?Current_Calc_Step_10ms]
-00000402    A325B60022                     	LD    _DX,00B6h[dnt_ptr?Current_Calc_Step_10ms]
-00000407    650A0020                       	ADD   _CX,#000Ah
-0000040B    A40022                         	ADDC  _DX,0
-0000040E    C325B40020                     	ST    _CX,00B4h[dnt_ptr?Current_Calc_Step_10ms]
-00000413    C325B60022                     	ST    _DX,00B6h[dnt_ptr?Current_Calc_Step_10ms]
-;000171                for(i=0; i<8; i++){
-                  ??_24_LOOP:
-;000172                    if (i<4) {
-00000418    8904001E                       	CMP   i?Current_Calc_Step_10ms,#0004h
-0000041C    DB0B                           	JC    ??_25_ELSE
-;000173                        type=0x00;
-0000041E    C3180000                       	ST    00h,type?Current_Calc_Step_10ms[_SP]
-;000174                        signal_ptr = &dnt_ptr->zero;
-00000422    455000241C                     	ADD   signal_ptr?Current_Calc_Step_10ms,dnt_ptr?Current_Calc_Step_10ms,#0050h
-;000175                    }
-00000427    200C                           	SJMP  ??_25_END
-                  ??_25_ELSE:
-;000176                    else {
-;000177                        type=0x08;
-00000429    AD0828                         	LDBZE _GX,#08h
-0000042C    C3180028                       	ST    _GX,type?Current_Calc_Step_10ms[_SP]
-;000178                        signal_ptr = &dnt_ptr->signal;
-00000430    450C00241C                     	ADD   signal_ptr?Current_Calc_Step_10ms,dnt_ptr?Current_Calc_Step_10ms,#000Ch
-;000179                    }
-                   ??_25_END:
-;000180                    if (dnt_ptr->control.measure_cycle_time_ms < dnt_ptr->control.single_ref_points[2*i]) {
-00000435    A01E26                         	LD    _FX,i?Current_Calc_Step_10ms
-00000438    090326                         	SHL   _FX,#03h
-0000043B    642426                         	ADD   _FX,dnt_ptr?Current_Calc_Step_10ms
-0000043E    A325B40020                     	LD    _CX,00B4h[dnt_ptr?Current_Calc_Step_10ms]
-00000443    A325B60022                     	LD    _DX,00B6h[dnt_ptr?Current_Calc_Step_10ms]
-00000448    A327C80028                     	LD    _GX,00C8h[_FX]
-0000044D    A327CA002A                     	LD    _HX,00CAh[_FX]
-00000452    C52820                         	CMPL  _DCX,_HGX
-00000455    DB13                           	JC    ??_26_ELSE
-;000181                        IOPORT1 = 0x38&(type|ku_gpio_set(i&0x03)); //определяем состояние gpio и КУ для измерения  нуля
-00000457    4103001E1C                     	AND   _AX,i?Current_Calc_Step_10ms,#0003h
-0000045C    29C9                           	SCALL ku_gpio_set
-0000045E    9318001C                       	ORB   _AL,type?Current_Calc_Step_10ms[_SP]
-00000462    71381C                         	ANDB  _AL,#38h
-00000465    B01C00                         	LDB   IOPORT1,_AL
-;000182                        break;
-00000468    2020                           	SJMP  ??_24_BREAK
-;000183                    }
-                  ??_26_ELSE:
-;000184                    else if(dnt_ptr->control.measure_cycle_time_ms < dnt_ptr->control.single_ref_points[2*i+1]) {
-0000046A    A327CC0028                     	LD    _GX,00CCh[_FX]
-0000046F    A327CE002A                     	LD    _HX,00CEh[_FX]
-00000474    C52820                         	CMPL  _DCX,_HGX
-00000477    DB09                           	JC    ??_27_ELSE
-;000185                        _single_meas_adc_data_get(signal_ptr, i&0x3);
-00000479    6103001E                       	AND   i?Current_Calc_Step_10ms,#0003h
-0000047D    EFB204                         	LCALL _single_meas_adc_data_get
-;000186                        break;
-00000480    2008                           	SJMP  ??_24_BREAK
-;000187                    }
-                  ??_27_ELSE:
-;000188                }
-00000482    071E                           	INC   i?Current_Calc_Step_10ms
-00000484    8908001E                       	CMP   i?Current_Calc_Step_10ms,#0008h
-00000488    D38E                           	JNC   ??_24_LOOP
-                 ??_24_BREAK:
-;000189                if (dnt_ptr->control.measure_cycle_time_ms >= dnt_ptr->control.single_ref_points[15]) {
-0000048A    A325B40020                     	LD    _CX,00B4h[dnt_ptr?Current_Calc_Step_10ms]
-0000048F    A325B60022                     	LD    _DX,00B6h[dnt_ptr?Current_Calc_Step_10ms]
-00000494    A32504011C                     	LD    _AX,0104h[dnt_ptr?Current_Calc_Step_10ms]
-00000499    A32506011E                     	LD    _BX,0106h[dnt_ptr?Current_Calc_Step_10ms]
-0000049E    C51C20                         	CMPL  _DCX,_BAX
-000004A1    D335                           	JNC   ??_28_ELSE
-;000190                    _single_meas_current_result_calc(dnt_ptr);
-000004A3    A0241C                         	LD    _AX,dnt_ptr?Current_Calc_Step_10ms
-000004A6    EF0B05                         	LCALL _single_meas_current_result_calc
-;000191                    dnt_ptr->control.measure_cycle_time_ms = 0;
-000004A9    C325B40000                     	ST    00h,00B4h[dnt_ptr?Current_Calc_Step_10ms]
-000004AE    C325B60000                     	ST    00h,00B6h[dnt_ptr?Current_Calc_Step_10ms]
-;000192                    dnt_ptr->control.mode &= ~(0x02); //сбрасываем флаг единичного запуска
-000004B3    A325AC001C                     	LD    _AX,00ACh[dnt_ptr?Current_Calc_Step_10ms]
-000004B8    61FDFF1C                       	AND   _AX,#0FFFDh
-000004BC    C325AC001C                     	ST    _AX,00ACh[dnt_ptr?Current_Calc_Step_10ms]
-;000193                    Update_MKO_from_DNT_Parameters(dnt_ptr); //прописываем флаг на ПА
-000004C1    A0241C                         	LD    _AX,dnt_ptr?Current_Calc_Step_10ms
-000004C4    2D2B                           	SCALL Update_MKO_from_DNT_Parameters
-;000194                    IOPORT1 = 0x38&(0x00|ku_gpio_set(dnt_ptr->control.ku)); //сбрасываем ток с обмотки реле
-                ??_79_COMMON:
-000004C6    A325B2001C                     	LD    _AX,00B2h[dnt_ptr?Current_Calc_Step_10ms]
-000004CB    295A                           	SCALL ku_gpio_set
-000004CD    71381C                         	ANDB  _AL,#38h
-000004D0    B01C00                         	LDB   IOPORT1,_AL
-;000195                    return 1; //передаем сигнал о готовности измерения
-000004D3    B1011C                         	LDB   _AL,#01h
-000004D6    2002                           	SJMP  ??_EXIT?_Current_Calc_Step_10ms
-;000196                }
-                  ??_28_ELSE:
-;000197            }
-                   ??_23_END:
-;000198        }
+;000154                }
+00000385    216E                           	SJMP  ??_14_END
+                  ??_16_ELSE:
+;000155                else if ((dnt_ptr->control.measure_cycle_time_ms >= dnt_ptr->control.zero_cycle_ref_point) && (dnt_ptr->control.measure_cycle_time_ms < dnt_ptr->control.signal_cycle_ref_point)){ //мертвое время измерения сигнала
+00000387    A325BC001C                     	LD    _AX,00BCh[dnt_ptr?Current_Calc_Step_10ms]
+0000038C    A325BE001E                     	LD    _BX,00BEh[dnt_ptr?Current_Calc_Step_10ms]
+00000391    C51C20                         	CMPL  _DCX,_BAX
+00000394    D342                           	JNC   ??_19_ELSE
+00000396    A325C4001C                     	LD    _AX,00C4h[dnt_ptr?Current_Calc_Step_10ms]
+0000039B    A325C6001E                     	LD    _BX,00C6h[dnt_ptr?Current_Calc_Step_10ms]
+000003A0    C51C20                         	CMPL  _DCX,_BAX
+000003A3    DB33                           	JC    ??_19_ELSE
+;000156                    IOPORT1 = 0x38&(0x08|ku_gpio_set(dnt_ptr->control.ku)); //определяем состояние gpio и КУ для измерения сигнала
+000003A5    A325B2001C                     	LD    _AX,00B2h[dnt_ptr?Current_Calc_Step_10ms]
+000003AA    2A98                           	SCALL ku_gpio_set
+000003AC    91081C                         	ORB   _AL,#08h
+000003AF    71381C                         	ANDB  _AL,#38h
+000003B2    B01C00                         	LDB   IOPORT1,_AL
+;000157                    if ((dnt_ptr->control.measure_cycle_time_ms >= dnt_ptr->control.signal_dead_time_ref_point)){ //измерение сигнала
+000003B5    A325B40020                     	LD    _CX,00B4h[dnt_ptr?Current_Calc_Step_10ms]
+000003BA    A325B60022                     	LD    _DX,00B6h[dnt_ptr?Current_Calc_Step_10ms]
+000003BF    A325C0001C                     	LD    _AX,00C0h[dnt_ptr?Current_Calc_Step_10ms]
+000003C4    A325C2001E                     	LD    _BX,00C2h[dnt_ptr?Current_Calc_Step_10ms]
+000003C9    C51C20                         	CMPL  _DCX,_BAX
+000003CC    D32B                           	JNC   ??_19_END
+;000158                        _adc_data_get(&dnt_ptr->signal);
+000003CE    450C00241C                     	ADD   _AX,dnt_ptr?Current_Calc_Step_10ms,#000Ch
+000003D3    EFC504                         	LCALL _adc_data_get
+;000159                    }
+;000160                }
+000003D6    211D                           	SJMP  ??_14_END
+                  ??_19_ELSE:
+;000161                else if (dnt_ptr->control.measure_cycle_time_ms >= dnt_ptr->control.signal_cycle_ref_point){
+000003D8    A325C4001C                     	LD    _AX,00C4h[dnt_ptr?Current_Calc_Step_10ms]
+000003DD    A325C6001E                     	LD    _BX,00C6h[dnt_ptr?Current_Calc_Step_10ms]
+000003E2    C51C20                         	CMPL  _DCX,_BAX
+000003E5    D312                           	JNC   ??_22_ELSE
+;000162                    _current_result_calc(dnt_ptr);
+000003E7    A0241C                         	LD    _AX,dnt_ptr?Current_Calc_Step_10ms
+000003EA    EF0805                         	LCALL _current_result_calc
+;000163                    dnt_ptr->control.measure_cycle_time_ms = 0;
+000003ED    C325B40000                     	ST    00h,00B4h[dnt_ptr?Current_Calc_Step_10ms]
+000003F2    C325B60000                     	ST    00h,00B6h[dnt_ptr?Current_Calc_Step_10ms]
+;000164                    IOPORT1 = 0x38&(0x00|ku_gpio_set(dnt_ptr->control.ku)); //сбрасываем ток с обмотки реле
+;000166                    return 1; //передаем сигнал о готовности измерения
+000003F7    20EA                           	SJMP  ??_81_COMMON
+;000167                }
                   ??_22_ELSE:
-                   ??_13_END:
-;000199        return 0;
-000004D8    111C                           	CLRB  _AL
-;000200    }
+                   ??_19_END:
+;000168            }
+;000169        }
+000003F9    20FA                           	SJMP  ??_14_END
+                  ??_14_ELSE:
+;000170        else if (dnt_ptr->control.mode & 0x02){ //запустили одиночное измерение
+000003FB    391C02                         	JBS   _AL,1h,??_23_ELSE_BYPASS_3FB
+000003FE    20F5                           	SJMP  ??_23_ELSE
+       ??_23_ELSE_BYPASS_3FB:
+;000171            if (dnt_ptr->control.measure_cycle_time_ms == 0){ //инициализация переменных для подсчета тока
+00000400    A325B40020                     	LD    _CX,00B4h[dnt_ptr?Current_Calc_Step_10ms]
+00000405    A325B60022                     	LD    _DX,00B6h[dnt_ptr?Current_Calc_Step_10ms]
+0000040A    011C                           	CLR   _AX
+0000040C    011E                           	CLR   _BX
+0000040E    C51C20                         	CMPL  _DCX,_BAX
+00000411    D707                           	JNE   ??_24_ELSE
+;000172                _single_measure_struct_init(dnt_ptr);
+00000413    A0241C                         	LD    _AX,dnt_ptr?Current_Calc_Step_10ms
+00000416    2AF3                           	SCALL _single_measure_struct_init
+;000173            }
+00000418    20DB                           	SJMP  ??_24_END
+                  ??_24_ELSE:
+;000174            else{
+;000175                dnt_ptr->control.measure_cycle_time_ms += 10; //не гарантировано точные часы подсчета времени цикла
+0000041A    A325B40020                     	LD    _CX,00B4h[dnt_ptr?Current_Calc_Step_10ms]
+0000041F    A325B60022                     	LD    _DX,00B6h[dnt_ptr?Current_Calc_Step_10ms]
+00000424    650A0020                       	ADD   _CX,#000Ah
+00000428    A40022                         	ADDC  _DX,0
+0000042B    C325B40020                     	ST    _CX,00B4h[dnt_ptr?Current_Calc_Step_10ms]
+00000430    C325B60022                     	ST    _DX,00B6h[dnt_ptr?Current_Calc_Step_10ms]
+;000177                for(i=0; i<8; i++){
+                  ??_25_LOOP:
+;000178                    if (i<4) {
+00000435    8904001E                       	CMP   i?Current_Calc_Step_10ms,#0004h
+00000439    DB0B                           	JC    ??_26_ELSE
+;000179                        type=0x00;
+0000043B    C3180000                       	ST    00h,type?Current_Calc_Step_10ms[_SP]
+;000180                        signal_ptr = &dnt_ptr->zero;
+0000043F    455000241C                     	ADD   signal_ptr?Current_Calc_Step_10ms,dnt_ptr?Current_Calc_Step_10ms,#0050h
+;000181                    }
+00000444    200C                           	SJMP  ??_26_END
+                  ??_26_ELSE:
+;000182                    else {
+;000183                        type=0x08;
+00000446    AD0828                         	LDBZE _GX,#08h
+00000449    C3180028                       	ST    _GX,type?Current_Calc_Step_10ms[_SP]
+;000184                        signal_ptr = &dnt_ptr->signal;
+0000044D    450C00241C                     	ADD   signal_ptr?Current_Calc_Step_10ms,dnt_ptr?Current_Calc_Step_10ms,#000Ch
+;000185                    }
+                   ??_26_END:
+;000186                    if (dnt_ptr->control.measure_cycle_time_ms < dnt_ptr->control.single_ref_points[2*i]) {
+00000452    A01E26                         	LD    _FX,i?Current_Calc_Step_10ms
+00000455    090326                         	SHL   _FX,#03h
+00000458    642426                         	ADD   _FX,dnt_ptr?Current_Calc_Step_10ms
+0000045B    A325B40020                     	LD    _CX,00B4h[dnt_ptr?Current_Calc_Step_10ms]
+00000460    A325B60022                     	LD    _DX,00B6h[dnt_ptr?Current_Calc_Step_10ms]
+00000465    A327C80028                     	LD    _GX,00C8h[_FX]
+0000046A    A327CA002A                     	LD    _HX,00CAh[_FX]
+0000046F    C52820                         	CMPL  _DCX,_HGX
+00000472    DB13                           	JC    ??_27_ELSE
+;000187                        IOPORT1 = 0x38&(type|ku_gpio_set(i&0x03)); //определяем состояние gpio и КУ для измерения  нуля
+00000474    4103001E1C                     	AND   _AX,i?Current_Calc_Step_10ms,#0003h
+00000479    29C9                           	SCALL ku_gpio_set
+0000047B    9318001C                       	ORB   _AL,type?Current_Calc_Step_10ms[_SP]
+0000047F    71381C                         	ANDB  _AL,#38h
+00000482    B01C00                         	LDB   IOPORT1,_AL
+;000188                        break;
+00000485    2020                           	SJMP  ??_25_BREAK
+;000189                    }
+                  ??_27_ELSE:
+;000190                    else if(dnt_ptr->control.measure_cycle_time_ms < dnt_ptr->control.single_ref_points[2*i+1]) {
+00000487    A327CC0028                     	LD    _GX,00CCh[_FX]
+0000048C    A327CE002A                     	LD    _HX,00CEh[_FX]
+00000491    C52820                         	CMPL  _DCX,_HGX
+00000494    DB09                           	JC    ??_28_ELSE
+;000191                        _single_meas_adc_data_get(signal_ptr, i&0x3);
+00000496    6103001E                       	AND   i?Current_Calc_Step_10ms,#0003h
+0000049A    EFB204                         	LCALL _single_meas_adc_data_get
+;000192                        break;
+0000049D    2008                           	SJMP  ??_25_BREAK
+;000193                    }
+                  ??_28_ELSE:
+;000194                }
+0000049F    071E                           	INC   i?Current_Calc_Step_10ms
+000004A1    8908001E                       	CMP   i?Current_Calc_Step_10ms,#0008h
+000004A5    D38E                           	JNC   ??_25_LOOP
+                 ??_25_BREAK:
+;000195                if (dnt_ptr->control.measure_cycle_time_ms >= dnt_ptr->control.single_ref_points[15]) {
+000004A7    A325B40020                     	LD    _CX,00B4h[dnt_ptr?Current_Calc_Step_10ms]
+000004AC    A325B60022                     	LD    _DX,00B6h[dnt_ptr?Current_Calc_Step_10ms]
+000004B1    A32504011C                     	LD    _AX,0104h[dnt_ptr?Current_Calc_Step_10ms]
+000004B6    A32506011E                     	LD    _BX,0106h[dnt_ptr?Current_Calc_Step_10ms]
+000004BB    C51C20                         	CMPL  _DCX,_BAX
+000004BE    D335                           	JNC   ??_29_ELSE
+;000196                    _single_meas_current_result_calc(dnt_ptr);
+000004C0    A0241C                         	LD    _AX,dnt_ptr?Current_Calc_Step_10ms
+000004C3    EF0B05                         	LCALL _single_meas_current_result_calc
+;000197                    dnt_ptr->control.measure_cycle_time_ms = 0;
+000004C6    C325B40000                     	ST    00h,00B4h[dnt_ptr?Current_Calc_Step_10ms]
+000004CB    C325B60000                     	ST    00h,00B6h[dnt_ptr?Current_Calc_Step_10ms]
+;000198                    dnt_ptr->control.mode &= ~(0x02); //сбрасываем флаг единичного запуска
+000004D0    A325AC001C                     	LD    _AX,00ACh[dnt_ptr?Current_Calc_Step_10ms]
+000004D5    61FDFF1C                       	AND   _AX,#0FFFDh
+000004D9    C325AC001C                     	ST    _AX,00ACh[dnt_ptr?Current_Calc_Step_10ms]
+;000199                    Update_MKO_from_DNT_Parameters(dnt_ptr); //прописываем флаг на ПА
+000004DE    A0241C                         	LD    _AX,dnt_ptr?Current_Calc_Step_10ms
+000004E1    2D2B                           	SCALL Update_MKO_from_DNT_Parameters
+;000200                    IOPORT1 = 0x38&(0x00|ku_gpio_set(dnt_ptr->control.ku)); //сбрасываем ток с обмотки реле
+                ??_81_COMMON:
+000004E3    A325B2001C                     	LD    _AX,00B2h[dnt_ptr?Current_Calc_Step_10ms]
+000004E8    295A                           	SCALL ku_gpio_set
+000004EA    71381C                         	ANDB  _AL,#38h
+000004ED    B01C00                         	LDB   IOPORT1,_AL
+;000201                    return 1; //передаем сигнал о готовности измерения
+000004F0    B1011C                         	LDB   _AL,#01h
+000004F3    2002                           	SJMP  ??_EXIT?_Current_Calc_Step_10ms
+;000202                }
+                  ??_29_ELSE:
+;000203            }
+                   ??_24_END:
+;000204        }
+                  ??_23_ELSE:
+                   ??_14_END:
+;000205        return 0;
+000004F5    111C                           	CLRB  _AL
+;000206    }
 ??_EXIT?_Current_Calc_Step_10ms:
-000004DA    CC00                           	POP   00h
-000004DC    239E                           	SJMP  COMMON?END_Current_Calc_Step_10ms
+000004F7    CC00                           	POP   00h
+000004F9    239E                           	SJMP  COMMON?END_Current_Calc_Step_10ms
 .ENDF
          Temp_Calc_Step_10ms:
-;000202    uint8_t Temp_Calc_Step_10ms(typeDNTOperationData* dnt_ptr)
-000004DE    C824                           	PUSH  _EX
-000004E0    A01C24                         	LD    _EX,_AX
-;000204        if (dnt_ptr->control.temp_cycle_time_ms < 128){
-000004E3    A325100120                     	LD    _CX,0110h[dnt_ptr?Temp_Calc_Step_10ms]
-000004E8    A325120122                     	LD    _DX,0112h[dnt_ptr?Temp_Calc_Step_10ms]
-000004ED    AD801C                         	LDBZE _AX,#80h
-000004F0    011E                           	CLR   _BX
-000004F2    C51C20                         	CMPL  _DCX,_BAX
-000004F5    DB3A                           	JC    ??_29_ELSE
-;000205            dnt_ptr->temperature.value_summ_buffer += temperature_adc_value_get();
-000004F7    EF06FB                         	LCALL temperature_adc_value_get
-000004FA    011E                           	CLR   _BX
-000004FC    A325A40020                     	LD    _CX,00A4h[dnt_ptr?Temp_Calc_Step_10ms]
-00000501    A325A60022                     	LD    _DX,00A6h[dnt_ptr?Temp_Calc_Step_10ms]
-00000506    641C20                         	ADD   _CX,_AX
-00000509    A41E22                         	ADDC  _DX,_BX
-0000050C    C325A40020                     	ST    _CX,00A4h[dnt_ptr?Temp_Calc_Step_10ms]
-00000511    C325A60022                     	ST    _DX,00A6h[dnt_ptr?Temp_Calc_Step_10ms]
-;000206            dnt_ptr->control.temp_cycle_time_ms ++;
-00000516    A325100120                     	LD    _CX,0110h[dnt_ptr?Temp_Calc_Step_10ms]
-0000051B    A325120122                     	LD    _DX,0112h[dnt_ptr?Temp_Calc_Step_10ms]
-00000520    0720                           	INC   _CX
-00000522    A40022                         	ADDC  _DX,0
-00000525    C325100120                     	ST    _CX,0110h[dnt_ptr?Temp_Calc_Step_10ms]
-0000052A    C325120122                     	ST    _DX,0112h[dnt_ptr?Temp_Calc_Step_10ms]
-;000207        }
-0000052F    202E                           	SJMP  ??_29_END
-                  ??_29_ELSE:
-;000208        else if (dnt_ptr->control.temp_cycle_time_ms >= 128){
-00000531    C51C20                         	CMPL  _DCX,_BAX
-00000534    D329                           	JNC   ??_30_ELSE
-;000209            dnt_ptr->temperature.value = temperature_adc_to_degree((uint16_t)(dnt_ptr->temperature.value_summ_buffer>>7));
-00000536    A325A4001C                     	LD    _AX,00A4h[dnt_ptr?Temp_Calc_Step_10ms]
-0000053B    A325A6001E                     	LD    _BX,00A6h[dnt_ptr?Temp_Calc_Step_10ms]
-00000540    0E071C                         	SHRAL _BAX,#07h
-00000543    EFBAFA                         	LCALL temperature_adc_to_degree
-00000546    C325A0001C                     	ST    _AX,00A0h[dnt_ptr?Temp_Calc_Step_10ms]
-;000210            dnt_ptr->temperature.value_summ_buffer = 0;
-0000054B    C325A40000                     	ST    00h,00A4h[dnt_ptr?Temp_Calc_Step_10ms]
-00000550    C325A60000                     	ST    00h,00A6h[dnt_ptr?Temp_Calc_Step_10ms]
-;000211            dnt_ptr->control.temp_cycle_time_ms = 0;
-00000555    C325100100                     	ST    00h,0110h[dnt_ptr?Temp_Calc_Step_10ms]
-0000055A    C325120100                     	ST    00h,0112h[dnt_ptr?Temp_Calc_Step_10ms]
-;000212        }
+;000208    uint8_t Temp_Calc_Step_10ms(typeDNTOperationData* dnt_ptr)
+000004FB    C824                           	PUSH  _EX
+000004FD    A01C24                         	LD    _EX,_AX
+;000210        if (dnt_ptr->control.temp_cycle_time_ms < 128){
+00000500    A325100120                     	LD    _CX,0110h[dnt_ptr?Temp_Calc_Step_10ms]
+00000505    A325120122                     	LD    _DX,0112h[dnt_ptr?Temp_Calc_Step_10ms]
+0000050A    AD801C                         	LDBZE _AX,#80h
+0000050D    011E                           	CLR   _BX
+0000050F    C51C20                         	CMPL  _DCX,_BAX
+00000512    DB3A                           	JC    ??_30_ELSE
+;000211            dnt_ptr->temperature.value_summ_buffer += temperature_adc_value_get();
+00000514    EFE9FA                         	LCALL temperature_adc_value_get
+00000517    011E                           	CLR   _BX
+00000519    A325A40020                     	LD    _CX,00A4h[dnt_ptr?Temp_Calc_Step_10ms]
+0000051E    A325A60022                     	LD    _DX,00A6h[dnt_ptr?Temp_Calc_Step_10ms]
+00000523    641C20                         	ADD   _CX,_AX
+00000526    A41E22                         	ADDC  _DX,_BX
+00000529    C325A40020                     	ST    _CX,00A4h[dnt_ptr?Temp_Calc_Step_10ms]
+0000052E    C325A60022                     	ST    _DX,00A6h[dnt_ptr?Temp_Calc_Step_10ms]
+;000212            dnt_ptr->control.temp_cycle_time_ms ++;
+00000533    A325100120                     	LD    _CX,0110h[dnt_ptr?Temp_Calc_Step_10ms]
+00000538    A325120122                     	LD    _DX,0112h[dnt_ptr?Temp_Calc_Step_10ms]
+0000053D    0720                           	INC   _CX
+0000053F    A40022                         	ADDC  _DX,0
+00000542    C325100120                     	ST    _CX,0110h[dnt_ptr?Temp_Calc_Step_10ms]
+00000547    C325120122                     	ST    _DX,0112h[dnt_ptr?Temp_Calc_Step_10ms]
+;000213        }
+0000054C    202E                           	SJMP  ??_30_END
                   ??_30_ELSE:
-                   ??_29_END:
-;000213        return 0;
-0000055F    111C                           	CLRB  _AL
-;000214    }
-00000561    CC24                           	POP   _EX
-00000563    F0                             	RET   
+;000214        else if (dnt_ptr->control.temp_cycle_time_ms >= 128){
+0000054E    C51C20                         	CMPL  _DCX,_BAX
+00000551    D329                           	JNC   ??_31_ELSE
+;000215            dnt_ptr->temperature.value = temperature_adc_to_degree((uint16_t)(dnt_ptr->temperature.value_summ_buffer>>7));
+00000553    A325A4001C                     	LD    _AX,00A4h[dnt_ptr?Temp_Calc_Step_10ms]
+00000558    A325A6001E                     	LD    _BX,00A6h[dnt_ptr?Temp_Calc_Step_10ms]
+0000055D    0E071C                         	SHRAL _BAX,#07h
+00000560    EF9DFA                         	LCALL temperature_adc_to_degree
+00000563    C325A0001C                     	ST    _AX,00A0h[dnt_ptr?Temp_Calc_Step_10ms]
+;000216            dnt_ptr->temperature.value_summ_buffer = 0;
+00000568    C325A40000                     	ST    00h,00A4h[dnt_ptr?Temp_Calc_Step_10ms]
+0000056D    C325A60000                     	ST    00h,00A6h[dnt_ptr?Temp_Calc_Step_10ms]
+;000217            dnt_ptr->control.temp_cycle_time_ms = 0;
+00000572    C325100100                     	ST    00h,0110h[dnt_ptr?Temp_Calc_Step_10ms]
+00000577    C325120100                     	ST    00h,0112h[dnt_ptr?Temp_Calc_Step_10ms]
+;000218        }
+                  ??_31_ELSE:
+                   ??_30_END:
+;000219        return 0;
+0000057C    111C                           	CLRB  _AL
+;000220    }
+0000057E    CC24                           	POP   _EX
+00000580    F0                             	RET   
 .ENDF
  Grid_Voltage_Calc_Step_10ms:
-;000216    uint8_t Grid_Voltage_Calc_Step_10ms(typeDNTOperationData* dnt_ptr)
-00000564    C824                           	PUSH  _EX
-00000566    A01C24                         	LD    _EX,_AX
-;000218        if (dnt_ptr->control.grid_voltage_cycle_time_ms < 128){
-00000569    A325140120                     	LD    _CX,0114h[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
-0000056E    A325160122                     	LD    _DX,0116h[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
-00000573    AD801C                         	LDBZE _AX,#80h
-00000576    011E                           	CLR   _BX
-00000578    C51C20                         	CMPL  _DCX,_BAX
-0000057B    DB77                           	JC    ??_31_ELSE
-;000219            dnt_ptr->shut_off_grid.value_summ_buffer += grid_voltage_adc_value_get();
-0000057D    EF80FA                         	LCALL grid_voltage_adc_value_get
-00000580    011E                           	CLR   _BX
-00000582    A325980020                     	LD    _CX,0098h[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
-00000587    A3259A0022                     	LD    _DX,009Ah[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
-0000058C    641C20                         	ADD   _CX,_AX
-0000058F    A41E22                         	ADDC  _DX,_BX
-00000592    C325980020                     	ST    _CX,0098h[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
-00000597    C3259A0022                     	ST    _DX,009Ah[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
-;000220            if (dnt_ptr->control.grid_voltage_cycle_time_ms == 0){
-0000059C    A325140120                     	LD    _CX,0114h[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
-000005A1    A325160122                     	LD    _DX,0116h[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
-000005A6    011C                           	CLR   _AX
-000005A8    C51C20                         	CMPL  _DCX,_BAX
-000005AB    D72C                           	JNE   ??_32_ELSE
-;000393    {
-000005AD    B3259E0020                     	LDB   _CL,009Eh[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
-000005B2    A32594001E                     	LD    _BX,0094h[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
-;000394      if (MON_50V/256 > 54) return Duty-1;
-000005B7    08081E                         	SHR   _BX,#08h
-000005BA    8937001E                       	CMP   _BX,#0037h
-000005BE    D304                           	JNC   ??_33_ELSE
-000005C0    1520                           	DECB  _CL
-000005C2    2008                           	SJMP  ??_EXIT?_grid_voltage_duty_feedback?20_Grid_Voltage_Calc_Step_10ms
-                  ??_33_ELSE:
-;000395      else if (MON_50V/256 < 50) return Duty+1;
-000005C4    8932001E                       	CMP   _BX,#0032h
-000005C8    DB02                           	JC    ??_34_ELSE
-000005CA    1720                           	INCB  _CL
+;000222    uint8_t Grid_Voltage_Calc_Step_10ms(typeDNTOperationData* dnt_ptr)
+00000581    C824                           	PUSH  _EX
+00000583    A01C24                         	LD    _EX,_AX
+;000224        if (dnt_ptr->control.grid_voltage_cycle_time_ms < 128){
+00000586    A325140120                     	LD    _CX,0114h[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
+0000058B    A325160122                     	LD    _DX,0116h[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
+00000590    AD801C                         	LDBZE _AX,#80h
+00000593    011E                           	CLR   _BX
+00000595    C51C20                         	CMPL  _DCX,_BAX
+00000598    DB77                           	JC    ??_32_ELSE
+;000225            dnt_ptr->shut_off_grid.value_summ_buffer += grid_voltage_adc_value_get();
+0000059A    EF63FA                         	LCALL grid_voltage_adc_value_get
+0000059D    011E                           	CLR   _BX
+0000059F    A325980020                     	LD    _CX,0098h[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
+000005A4    A3259A0022                     	LD    _DX,009Ah[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
+000005A9    641C20                         	ADD   _CX,_AX
+000005AC    A41E22                         	ADDC  _DX,_BX
+000005AF    C325980020                     	ST    _CX,0098h[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
+000005B4    C3259A0022                     	ST    _DX,009Ah[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
+;000226            if (dnt_ptr->control.grid_voltage_cycle_time_ms == 0){
+000005B9    A325140120                     	LD    _CX,0114h[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
+000005BE    A325160122                     	LD    _DX,0116h[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
+000005C3    011C                           	CLR   _AX
+000005C5    C51C20                         	CMPL  _DCX,_BAX
+000005C8    D72C                           	JNE   ??_33_ELSE
+;000399    {
+000005CA    B3259E0020                     	LDB   _CL,009Eh[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
+000005CF    A32594001E                     	LD    _BX,0094h[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
+;000400      if (MON_50V/256 > 54) return Duty-1;
+000005D4    08081E                         	SHR   _BX,#08h
+000005D7    8937001E                       	CMP   _BX,#0037h
+000005DB    D304                           	JNC   ??_34_ELSE
+000005DD    1520                           	DECB  _CL
+000005DF    2008                           	SJMP  ??_EXIT?_grid_voltage_duty_feedback?20_Grid_Voltage_Calc_Step_10ms
                   ??_34_ELSE:
-;000394      if (MON_50V/256 > 54) return Duty-1;
-??_EXIT?_grid_voltage_duty_feedback?20_Grid_Voltage_Calc_Step_10ms:
-000005CC    C7259E0020                     	STB   _CL,009Eh[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
-;000396    }
-;000222                PWM_Duty(dnt_ptr->shut_off_grid.duty);
-000005D1    B3259E001C                     	LDB   _AL,009Eh[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
-000005D6    EF27FA                         	LCALL PWM_Duty
-;000223            }
-                  ??_32_ELSE:
-;000224            dnt_ptr->control.grid_voltage_cycle_time_ms ++;
-000005D9    A325140120                     	LD    _CX,0114h[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
-000005DE    A325160122                     	LD    _DX,0116h[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
-000005E3    0720                           	INC   _CX
-000005E5    A40022                         	ADDC  _DX,0
-000005E8    C325140120                     	ST    _CX,0114h[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
-000005ED    C325160122                     	ST    _DX,0116h[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
-;000225        }
-000005F2    202E                           	SJMP  ??_31_END
-                  ??_31_ELSE:
-;000226        else if (dnt_ptr->control.grid_voltage_cycle_time_ms >= 128){
-000005F4    C51C20                         	CMPL  _DCX,_BAX
-000005F7    D329                           	JNC   ??_35_ELSE
-;000227            dnt_ptr->shut_off_grid.value = grid_voltage_adc_to_voltage((uint16_t)(dnt_ptr->shut_off_grid.value_summ_buffer>>7));
-000005F9    A32598001C                     	LD    _AX,0098h[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
-000005FE    A3259A001E                     	LD    _BX,009Ah[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
-00000603    0E071C                         	SHRAL _BAX,#07h
-00000606    EFF7F9                         	LCALL grid_voltage_adc_to_voltage
-00000609    C32594001C                     	ST    _AX,0094h[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
-;000228            dnt_ptr->shut_off_grid.value_summ_buffer = 0;
-0000060E    C325980000                     	ST    00h,0098h[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
-00000613    C3259A0000                     	ST    00h,009Ah[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
-;000229            dnt_ptr->control.grid_voltage_cycle_time_ms = 0;
-00000618    C325140100                     	ST    00h,0114h[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
-0000061D    C325160100                     	ST    00h,0116h[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
-;000230        }
+;000401      else if (MON_50V/256 < 50) return Duty+1;
+000005E1    8932001E                       	CMP   _BX,#0032h
+000005E5    DB02                           	JC    ??_35_ELSE
+000005E7    1720                           	INCB  _CL
                   ??_35_ELSE:
-                   ??_31_END:
-;000231        return 0;
-00000622    111C                           	CLRB  _AL
-;000232    }
-00000624    CC24                           	POP   _EX
-00000626    F0                             	RET   
+;000400      if (MON_50V/256 > 54) return Duty-1;
+??_EXIT?_grid_voltage_duty_feedback?20_Grid_Voltage_Calc_Step_10ms:
+000005E9    C7259E0020                     	STB   _CL,009Eh[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
+;000402    }
+;000228                PWM_Duty(dnt_ptr->shut_off_grid.duty);
+000005EE    B3259E001C                     	LDB   _AL,009Eh[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
+000005F3    EF0AFA                         	LCALL PWM_Duty
+;000229            }
+                  ??_33_ELSE:
+;000230            dnt_ptr->control.grid_voltage_cycle_time_ms ++;
+000005F6    A325140120                     	LD    _CX,0114h[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
+000005FB    A325160122                     	LD    _DX,0116h[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
+00000600    0720                           	INC   _CX
+00000602    A40022                         	ADDC  _DX,0
+00000605    C325140120                     	ST    _CX,0114h[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
+0000060A    C325160122                     	ST    _DX,0116h[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
+;000231        }
+0000060F    202E                           	SJMP  ??_32_END
+                  ??_32_ELSE:
+;000232        else if (dnt_ptr->control.grid_voltage_cycle_time_ms >= 128){
+00000611    C51C20                         	CMPL  _DCX,_BAX
+00000614    D329                           	JNC   ??_36_ELSE
+;000233            dnt_ptr->shut_off_grid.value = grid_voltage_adc_to_voltage((uint16_t)(dnt_ptr->shut_off_grid.value_summ_buffer>>7));
+00000616    A32598001C                     	LD    _AX,0098h[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
+0000061B    A3259A001E                     	LD    _BX,009Ah[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
+00000620    0E071C                         	SHRAL _BAX,#07h
+00000623    EFDAF9                         	LCALL grid_voltage_adc_to_voltage
+00000626    C32594001C                     	ST    _AX,0094h[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
+;000234            dnt_ptr->shut_off_grid.value_summ_buffer = 0;
+0000062B    C325980000                     	ST    00h,0098h[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
+00000630    C3259A0000                     	ST    00h,009Ah[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
+;000235            dnt_ptr->control.grid_voltage_cycle_time_ms = 0;
+00000635    C325140100                     	ST    00h,0114h[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
+0000063A    C325160100                     	ST    00h,0116h[dnt_ptr?Grid_Voltage_Calc_Step_10ms]
+;000236        }
+                  ??_36_ELSE:
+                   ??_32_END:
+;000237        return 0;
+0000063F    111C                           	CLRB  _AL
+;000238    }
+00000641    CC24                           	POP   _EX
+00000643    F0                             	RET   
 .ENDF
                  ku_gpio_set:
-;000234    uint8_t ku_gpio_set(uint16_t ku) //функция для преобразования КУ в маску для GPIO
-;000236      if (ku == 0) return 0x00;
-00000627    88001C                         	CMP   ku?ku_gpio_set,0
-0000062A    DF1E                           	JE    ??_80_COMMON
-;000237      else if (ku == 1) return 0x20;
-0000062C    8901001C                       	CMP   ku?ku_gpio_set,#0001h
-00000630    D704                           	JNE   ??_37_ELSE
-00000632    B1201C                         	LDB   _AL,#20h
-00000635    F0                             	RET   
-                  ??_37_ELSE:
-;000238      else if (ku == 2) return 0x10;
-00000636    8902001C                       	CMP   ku?ku_gpio_set,#0002h
-0000063A    D704                           	JNE   ??_38_ELSE
-0000063C    B1101C                         	LDB   _AL,#10h
-0000063F    F0                             	RET   
+;000240    uint8_t ku_gpio_set(uint16_t ku) //функция для преобразования КУ в маску для GPIO
+;000242      if (ku == 0) return 0x00;
+00000644    88001C                         	CMP   ku?ku_gpio_set,0
+00000647    DF1E                           	JE    ??_82_COMMON
+;000243      else if (ku == 1) return 0x20;
+00000649    8901001C                       	CMP   ku?ku_gpio_set,#0001h
+0000064D    D704                           	JNE   ??_38_ELSE
+0000064F    B1201C                         	LDB   _AL,#20h
+00000652    F0                             	RET   
                   ??_38_ELSE:
-;000239      else if (ku == 3) return 0x30;
-00000640    8903001C                       	CMP   ku?ku_gpio_set,#0003h
-00000644    D704                           	JNE   ??_39_ELSE
-00000646    B1301C                         	LDB   _AL,#30h
-00000649    F0                             	RET   
+;000244      else if (ku == 2) return 0x10;
+00000653    8902001C                       	CMP   ku?ku_gpio_set,#0002h
+00000657    D704                           	JNE   ??_39_ELSE
+00000659    B1101C                         	LDB   _AL,#10h
+0000065C    F0                             	RET   
                   ??_39_ELSE:
-;000240      else return 0x00;
-                ??_80_COMMON:
-0000064A    111C                           	CLRB  _AL
-;000241    }
-0000064C    F0                             	RET   
+;000245      else if (ku == 3) return 0x30;
+0000065D    8903001C                       	CMP   ku?ku_gpio_set,#0003h
+00000661    D704                           	JNE   ??_40_ELSE
+00000663    B1301C                         	LDB   _AL,#30h
+00000666    F0                             	RET   
+                  ??_40_ELSE:
+;000246      else return 0x00;
+                ??_82_COMMON:
+00000667    111C                           	CLRB  _AL
+;000247    }
+00000669    F0                             	RET   
 .ENDF
   _cycle_measure_struct_init:
-;000243    void _cycle_measure_struct_init(typeDNTOperationData* dnt_ptr)
-;000245      dnt_ptr->control.measure_cycle_time_ms = 1;
-0000064D    AD0120                         	LDBZE _CX,#01h
-00000650    0122                           	CLR   _DX
-00000652    C31DB40020                     	ST    _CX,00B4h[dnt_ptr?_cycle_measure_struct_init]
-00000657    C31DB60022                     	ST    _DX,00B6h[dnt_ptr?_cycle_measure_struct_init]
-;000246      dnt_ptr->control.zero_dead_time_ref_point = dnt_ptr->control.dead_time_ms;
-0000065C    A31DB00020                     	LD    _CX,00B0h[dnt_ptr?_cycle_measure_struct_init]
-00000661    C31DB80020                     	ST    _CX,00B8h[dnt_ptr?_cycle_measure_struct_init]
-00000666    C31DBA0022                     	ST    _DX,00BAh[dnt_ptr?_cycle_measure_struct_init]
-;000247      dnt_ptr->control.zero_cycle_ref_point = (dnt_ptr->control.measure_leng_s*1000/2) - 5;
-0000066B    A31DAE0020                     	LD    _CX,00AEh[dnt_ptr?_cycle_measure_struct_init]
-00000670    6DE80320                       	MULU  _DCX,#03E8h
-00000674    080120                         	SHR   _CX,#01h
-00000677    69050020                       	SUB   _CX,#0005h
-0000067B    0122                           	CLR   _DX
-0000067D    C31DBC0020                     	ST    _CX,00BCh[dnt_ptr?_cycle_measure_struct_init]
-00000682    C31DBE0022                     	ST    _DX,00BEh[dnt_ptr?_cycle_measure_struct_init]
-;000248      dnt_ptr->control.signal_dead_time_ref_point = dnt_ptr->control.dead_time_ms + (dnt_ptr->control.measure_leng_s*1000/2) - 10;
-00000687    A31DAE0020                     	LD    _CX,00AEh[dnt_ptr?_cycle_measure_struct_init]
-0000068C    6DE80320                       	MULU  _DCX,#03E8h
-00000690    080120                         	SHR   _CX,#01h
-00000693    671DB00020                     	ADD   _CX,00B0h[dnt_ptr?_cycle_measure_struct_init]
-00000698    690A0020                       	SUB   _CX,#000Ah
-0000069C    0122                           	CLR   _DX
-0000069E    C31DC00020                     	ST    _CX,00C0h[dnt_ptr?_cycle_measure_struct_init]
-000006A3    C31DC20022                     	ST    _DX,00C2h[dnt_ptr?_cycle_measure_struct_init]
-;000249      dnt_ptr->control.signal_cycle_ref_point = dnt_ptr->control.measure_leng_s*1000 - 10; //оставляем запас по вермени в 20мс для того, что бы успеть обработать данные
-000006A8    A31DAE0020                     	LD    _CX,00AEh[dnt_ptr?_cycle_measure_struct_init]
-000006AD    6DE80320                       	MULU  _DCX,#03E8h
-000006B1    690A0020                       	SUB   _CX,#000Ah
-000006B5    0122                           	CLR   _DX
-000006B7    C31DC40020                     	ST    _CX,00C4h[dnt_ptr?_cycle_measure_struct_init]
-000006BC    C31DC60022                     	ST    _DX,00C6h[dnt_ptr?_cycle_measure_struct_init]
-;000251      dnt_ptr->signal.value_summ_buffer = 0;
-000006C1    C31C1400                       	ST    00h,14h[dnt_ptr?_cycle_measure_struct_init]
-000006C5    C31C1600                       	ST    00h,16h[dnt_ptr?_cycle_measure_struct_init]
-;000252      dnt_ptr->signal.value_summ_number = 0;
-000006C9    C31C1800                       	ST    00h,18h[dnt_ptr?_cycle_measure_struct_init]
-;000253      dnt_ptr->signal.value_max = 0;
-000006CD    C31C1A00                       	ST    00h,1Ah[dnt_ptr?_cycle_measure_struct_init]
-;000254      dnt_ptr->signal.value_min = 17000;
-000006D1    A168421E                       	LD    _BX,#4268h
-000006D5    C31C1C1E                       	ST    _BX,1Ch[dnt_ptr?_cycle_measure_struct_init]
-;000256      dnt_ptr->zero.value_summ_buffer = 0;
-000006D9    C31C5800                       	ST    00h,58h[dnt_ptr?_cycle_measure_struct_init]
-000006DD    C31C5A00                       	ST    00h,5Ah[dnt_ptr?_cycle_measure_struct_init]
-;000257      dnt_ptr->zero.value_summ_number = 0;
-000006E1    C31C5C00                       	ST    00h,5Ch[dnt_ptr?_cycle_measure_struct_init]
-;000258      dnt_ptr->zero.value_max = 0;
-000006E5    C31C5E00                       	ST    00h,5Eh[dnt_ptr?_cycle_measure_struct_init]
-;000259      dnt_ptr->zero.value_min = 17000;
-000006E9    C31C601E                       	ST    _BX,60h[dnt_ptr?_cycle_measure_struct_init]
-;000260    }
-000006ED    F0                             	RET   
+;000249    void _cycle_measure_struct_init(typeDNTOperationData* dnt_ptr)
+;000251      dnt_ptr->control.measure_cycle_time_ms = 1;
+0000066A    AD0120                         	LDBZE _CX,#01h
+0000066D    0122                           	CLR   _DX
+0000066F    C31DB40020                     	ST    _CX,00B4h[dnt_ptr?_cycle_measure_struct_init]
+00000674    C31DB60022                     	ST    _DX,00B6h[dnt_ptr?_cycle_measure_struct_init]
+;000252      dnt_ptr->control.zero_dead_time_ref_point = dnt_ptr->control.dead_time_ms;
+00000679    A31DB00020                     	LD    _CX,00B0h[dnt_ptr?_cycle_measure_struct_init]
+0000067E    C31DB80020                     	ST    _CX,00B8h[dnt_ptr?_cycle_measure_struct_init]
+00000683    C31DBA0022                     	ST    _DX,00BAh[dnt_ptr?_cycle_measure_struct_init]
+;000253      dnt_ptr->control.zero_cycle_ref_point = (dnt_ptr->control.measure_leng_s*1000/2) - 5;
+00000688    A31DAE0020                     	LD    _CX,00AEh[dnt_ptr?_cycle_measure_struct_init]
+0000068D    6DE80320                       	MULU  _DCX,#03E8h
+00000691    080120                         	SHR   _CX,#01h
+00000694    69050020                       	SUB   _CX,#0005h
+00000698    0122                           	CLR   _DX
+0000069A    C31DBC0020                     	ST    _CX,00BCh[dnt_ptr?_cycle_measure_struct_init]
+0000069F    C31DBE0022                     	ST    _DX,00BEh[dnt_ptr?_cycle_measure_struct_init]
+;000254      dnt_ptr->control.signal_dead_time_ref_point = dnt_ptr->control.dead_time_ms + (dnt_ptr->control.measure_leng_s*1000/2) - 10;
+000006A4    A31DAE0020                     	LD    _CX,00AEh[dnt_ptr?_cycle_measure_struct_init]
+000006A9    6DE80320                       	MULU  _DCX,#03E8h
+000006AD    080120                         	SHR   _CX,#01h
+000006B0    671DB00020                     	ADD   _CX,00B0h[dnt_ptr?_cycle_measure_struct_init]
+000006B5    690A0020                       	SUB   _CX,#000Ah
+000006B9    0122                           	CLR   _DX
+000006BB    C31DC00020                     	ST    _CX,00C0h[dnt_ptr?_cycle_measure_struct_init]
+000006C0    C31DC20022                     	ST    _DX,00C2h[dnt_ptr?_cycle_measure_struct_init]
+;000255      dnt_ptr->control.signal_cycle_ref_point = dnt_ptr->control.measure_leng_s*1000 - 10; //оставляем запас по вермени в 20мс для того, что бы успеть обработать данные
+000006C5    A31DAE0020                     	LD    _CX,00AEh[dnt_ptr?_cycle_measure_struct_init]
+000006CA    6DE80320                       	MULU  _DCX,#03E8h
+000006CE    690A0020                       	SUB   _CX,#000Ah
+000006D2    0122                           	CLR   _DX
+000006D4    C31DC40020                     	ST    _CX,00C4h[dnt_ptr?_cycle_measure_struct_init]
+000006D9    C31DC60022                     	ST    _DX,00C6h[dnt_ptr?_cycle_measure_struct_init]
+;000257      dnt_ptr->signal.value_summ_buffer = 0;
+000006DE    C31C1400                       	ST    00h,14h[dnt_ptr?_cycle_measure_struct_init]
+000006E2    C31C1600                       	ST    00h,16h[dnt_ptr?_cycle_measure_struct_init]
+;000258      dnt_ptr->signal.value_summ_number = 0;
+000006E6    C31C1800                       	ST    00h,18h[dnt_ptr?_cycle_measure_struct_init]
+;000259      dnt_ptr->signal.value_max = 0;
+000006EA    C31C1A00                       	ST    00h,1Ah[dnt_ptr?_cycle_measure_struct_init]
+;000260      dnt_ptr->signal.value_min = 17000;
+000006EE    A168421E                       	LD    _BX,#4268h
+000006F2    C31C1C1E                       	ST    _BX,1Ch[dnt_ptr?_cycle_measure_struct_init]
+;000262      dnt_ptr->zero.value_summ_buffer = 0;
+000006F6    C31C5800                       	ST    00h,58h[dnt_ptr?_cycle_measure_struct_init]
+000006FA    C31C5A00                       	ST    00h,5Ah[dnt_ptr?_cycle_measure_struct_init]
+;000263      dnt_ptr->zero.value_summ_number = 0;
+000006FE    C31C5C00                       	ST    00h,5Ch[dnt_ptr?_cycle_measure_struct_init]
+;000264      dnt_ptr->zero.value_max = 0;
+00000702    C31C5E00                       	ST    00h,5Eh[dnt_ptr?_cycle_measure_struct_init]
+;000265      dnt_ptr->zero.value_min = 17000;
+00000706    C31C601E                       	ST    _BX,60h[dnt_ptr?_cycle_measure_struct_init]
+;000266    }
+0000070A    F0                             	RET   
 .ENDF
  _single_measure_struct_init:
-;000262    void _single_measure_struct_init(typeDNTOperationData* dnt_ptr)
-000006EE    C824                           	PUSH  _EX
-000006F0    C826                           	PUSH  _FX
-000006F2    C828                           	PUSH  _GX
-000006F4    C82A                           	PUSH  _HX
-000006F6    69060018                       	SUB   _SP,#0006h
-000006FA    A01C26                         	LD    _FX,_AX
-;000266        single_cycle_time_s = max(2, dnt_ptr->control.measure_cycle_time_ms); //выбираем время цикла, не меньше 2 сек
-000006FD    A327B40020                     	LD    _CX,00B4h[dnt_ptr?_single_measure_struct_init]
-00000702    A327B60022                     	LD    _DX,00B6h[dnt_ptr?_single_measure_struct_init]
-00000707    AD021C                         	LDBZE _AX,#02h
-0000070A    011E                           	CLR   _BX
-0000070C    C51C20                         	CMPL  _DCX,_BAX
-0000070F    D305                           	JNC   ??_40_END
-00000711    A327B4001C                     	LD    _AX,00B4h[dnt_ptr?_single_measure_struct_init]
-                   ??_40_END:
-00000716    C318001C                       	ST    _AX,single_cycle_time_s?_single_measure_struct_init[_SP]
-;000267        short_dead_time = min(single_cycle_time_s*1000/32, dnt_ptr->control.dead_time_ms); //выбираем мертвое время для КУ1, 10, но не меньше половини от измирительного цикла
-0000071A    A3180028                       	LD    _GX,single_cycle_time_s?_single_measure_struct_init[_SP]
-0000071E    6DE80328                       	MULU  _HGX,#03E8h
-00000722    A0282A                         	LD    short_dead_time?_single_measure_struct_init,_GX
-00000725    08052A                         	SHR   short_dead_time?_single_measure_struct_init,#05h
-00000728    A327B0001C                     	LD    _AX,00B0h[dnt_ptr?_single_measure_struct_init]
-0000072D    881C2A                         	CMP   short_dead_time?_single_measure_struct_init,_AX
-00000730    D303                           	JNC   ??_41_END
-00000732    A01C2A                         	LD    short_dead_time?_single_measure_struct_init,_AX
+;000268    void _single_measure_struct_init(typeDNTOperationData* dnt_ptr)
+0000070B    C824                           	PUSH  _EX
+0000070D    C826                           	PUSH  _FX
+0000070F    C828                           	PUSH  _GX
+00000711    C82A                           	PUSH  _HX
+00000713    69060018                       	SUB   _SP,#0006h
+00000717    A01C26                         	LD    _FX,_AX
+;000272        single_cycle_time_s = max(2, dnt_ptr->control.measure_cycle_time_ms); //выбираем время цикла, не меньше 2 сек
+0000071A    A327B40020                     	LD    _CX,00B4h[dnt_ptr?_single_measure_struct_init]
+0000071F    A327B60022                     	LD    _DX,00B6h[dnt_ptr?_single_measure_struct_init]
+00000724    AD021C                         	LDBZE _AX,#02h
+00000727    011E                           	CLR   _BX
+00000729    C51C20                         	CMPL  _DCX,_BAX
+0000072C    D305                           	JNC   ??_41_END
+0000072E    A327B4001C                     	LD    _AX,00B4h[dnt_ptr?_single_measure_struct_init]
                    ??_41_END:
-;000268        long_short_time = min(single_cycle_time_s*1000/16, dnt_ptr->control.dead_time_ms); //выбираем мертвое время для КУ1, 10, но не меньше половини от измирительного цикла
-00000735    080428                         	SHR   _GX,#04h
-00000738    881C28                         	CMP   _GX,_AX
-0000073B    DB03                           	JC    ??_42_ELSE
-0000073D    A0281C                         	LD    _AX,_GX
-                  ??_42_ELSE:
-00000740    C318021C                       	ST    _AX,long_short_time?_single_measure_struct_init[_SP]
-;000270        dnt_ptr->control.measure_cycle_time_ms = 1;
-00000744    AD011C                         	LDBZE _AX,#01h
-00000747    C327B4001C                     	ST    _AX,00B4h[dnt_ptr?_single_measure_struct_init]
-0000074C    C327B6001E                     	ST    _BX,00B6h[dnt_ptr?_single_measure_struct_init]
-;000272        for(i=0; i<2; i++){
-00000751    C7180400                       	STB   00h,i?_single_measure_struct_init[_SP]
-                  ??_43_LOOP:
-;000273            dnt_ptr->control.single_ref_points[0+i*8] = i*8*single_cycle_time_s*1000/16 + short_dead_time;
-00000755    AF180420                       	LDBZE _CX,i?_single_measure_struct_init[_SP]
-00000759    090320                         	SHL   _CX,#03h
-0000075C    A02024                         	LD    _EX,_CX
-0000075F    090224                         	SHL   _EX,#02h
-00000762    642624                         	ADD   _EX,dnt_ptr?_single_measure_struct_init
-00000765    6F180020                       	MULU  _DCX,single_cycle_time_s?_single_measure_struct_init[_SP]
-00000769    6DE80320                       	MULU  _DCX,#03E8h
-0000076D    080420                         	SHR   _CX,#04h
-00000770    442A201C                       	ADD   _AX,_CX,short_dead_time?_single_measure_struct_init
-00000774    011E                           	CLR   _BX
-00000776    C325C8001C                     	ST    _AX,00C8h[_EX]
-0000077B    C325CA001E                     	ST    _BX,00CAh[_EX]
-;000274            dnt_ptr->control.single_ref_points[1+i*8] = i*8*single_cycle_time_s*1000/16 + single_cycle_time_s*1000/16;
-00000780    44282022                       	ADD   _DX,_CX,_GX
-00000784    A0221C                         	LD    _AX,_DX
-00000787    C325CC001C                     	ST    _AX,00CCh[_EX]
-0000078C    C325CE001E                     	ST    _BX,00CEh[_EX]
-;000275            dnt_ptr->control.single_ref_points[2+i*8] = i*8*single_cycle_time_s*1000/16 + single_cycle_time_s*1000/16 + short_dead_time;
-00000791    642A1C                         	ADD   _AX,short_dead_time?_single_measure_struct_init
-00000794    C325D0001C                     	ST    _AX,00D0h[_EX]
-00000799    C325D2001E                     	ST    _BX,00D2h[_EX]
-;000276            dnt_ptr->control.single_ref_points[3+i*8] = i*8*single_cycle_time_s*1000/16 + 2*single_cycle_time_s*1000/16;
-0000079E    A318001C                       	LD    _AX,single_cycle_time_s?_single_measure_struct_init[_SP]
-000007A2    6DD0071C                       	MULU  _BAX,#07D0h
-000007A6    A01C22                         	LD    _DX,_AX
-000007A9    080422                         	SHR   _DX,#04h
-000007AC    642022                         	ADD   _DX,_CX
-000007AF    A0221C                         	LD    _AX,_DX
-000007B2    011E                           	CLR   _BX
-000007B4    C325D4001C                     	ST    _AX,00D4h[_EX]
-000007B9    C325D6001E                     	ST    _BX,00D6h[_EX]
-;000277            dnt_ptr->control.single_ref_points[4+i*8] = i*8*single_cycle_time_s*1000/16 + 2*single_cycle_time_s*1000/16 + short_dead_time;
-000007BE    642A1C                         	ADD   _AX,short_dead_time?_single_measure_struct_init
-000007C1    C325D8001C                     	ST    _AX,00D8h[_EX]
-000007C6    C325DA001E                     	ST    _BX,00DAh[_EX]
-;000278            dnt_ptr->control.single_ref_points[5+i*8] = i*8*single_cycle_time_s*1000/16 + 4*single_cycle_time_s*1000/16;
-000007CB    A318001C                       	LD    _AX,single_cycle_time_s?_single_measure_struct_init[_SP]
-000007CF    6DA00F1C                       	MULU  _BAX,#0FA0h
-000007D3    A01C22                         	LD    _DX,_AX
-000007D6    080422                         	SHR   _DX,#04h
-000007D9    642022                         	ADD   _DX,_CX
-000007DC    A0221C                         	LD    _AX,_DX
-000007DF    011E                           	CLR   _BX
-000007E1    C325DC001C                     	ST    _AX,00DCh[_EX]
-000007E6    C325DE001E                     	ST    _BX,00DEh[_EX]
-;000279            dnt_ptr->control.single_ref_points[6+i*8] = i*8*single_cycle_time_s*1000/16 + 4*single_cycle_time_s*1000/16 + long_short_time;
-000007EB    6718021C                       	ADD   _AX,long_short_time?_single_measure_struct_init[_SP]
-000007EF    C325E0001C                     	ST    _AX,00E0h[_EX]
-000007F4    C325E2001E                     	ST    _BX,00E2h[_EX]
-;000280            dnt_ptr->control.single_ref_points[7+i*8] = i*8*single_cycle_time_s*1000/16 + 8*single_cycle_time_s*1000/16;
-000007F9    A318001C                       	LD    _AX,single_cycle_time_s?_single_measure_struct_init[_SP]
-000007FD    6D401F1C                       	MULU  _BAX,#1F40h
-00000801    08041C                         	SHR   _AX,#04h
-00000804    64201C                         	ADD   _AX,_CX
-00000807    011E                           	CLR   _BX
-00000809    C325E4001C                     	ST    _AX,00E4h[_EX]
-0000080E    C325E6001E                     	ST    _BX,00E6h[_EX]
-;000281        }
-00000813    B318041C                       	LDB   _AL,i?_single_measure_struct_init[_SP]
-00000817    171C                           	INCB  _AL
-00000819    C718041C                       	STB   _AL,i?_single_measure_struct_init[_SP]
-0000081D    99021C                         	CMPB  _AL,#02h
-00000820    DB02                           	JC    ??_43_LOOP_BYPASS_820
-00000822    2731                           	SJMP  ??_43_LOOP
-       ??_43_LOOP_BYPASS_820:
-;000283        for(i=0; i<4; i++){
-00000824    C7180400                       	STB   00h,i?_single_measure_struct_init[_SP]
+00000733    C318001C                       	ST    _AX,single_cycle_time_s?_single_measure_struct_init[_SP]
+;000273        short_dead_time = min(single_cycle_time_s*1000/32, dnt_ptr->control.dead_time_ms); //выбираем мертвое время для КУ1, 10, но не меньше половини от измирительного цикла
+00000737    A3180028                       	LD    _GX,single_cycle_time_s?_single_measure_struct_init[_SP]
+0000073B    6DE80328                       	MULU  _HGX,#03E8h
+0000073F    A0282A                         	LD    short_dead_time?_single_measure_struct_init,_GX
+00000742    08052A                         	SHR   short_dead_time?_single_measure_struct_init,#05h
+00000745    A327B0001C                     	LD    _AX,00B0h[dnt_ptr?_single_measure_struct_init]
+0000074A    881C2A                         	CMP   short_dead_time?_single_measure_struct_init,_AX
+0000074D    D303                           	JNC   ??_42_END
+0000074F    A01C2A                         	LD    short_dead_time?_single_measure_struct_init,_AX
+                   ??_42_END:
+;000274        long_short_time = min(single_cycle_time_s*1000/16, dnt_ptr->control.dead_time_ms); //выбираем мертвое время для КУ1, 10, но не меньше половини от измирительного цикла
+00000752    080428                         	SHR   _GX,#04h
+00000755    881C28                         	CMP   _GX,_AX
+00000758    DB03                           	JC    ??_43_ELSE
+0000075A    A0281C                         	LD    _AX,_GX
+                  ??_43_ELSE:
+0000075D    C318021C                       	ST    _AX,long_short_time?_single_measure_struct_init[_SP]
+;000276        dnt_ptr->control.measure_cycle_time_ms = 1;
+00000761    AD011C                         	LDBZE _AX,#01h
+00000764    C327B4001C                     	ST    _AX,00B4h[dnt_ptr?_single_measure_struct_init]
+00000769    C327B6001E                     	ST    _BX,00B6h[dnt_ptr?_single_measure_struct_init]
+;000278        for(i=0; i<2; i++){
+0000076E    C7180400                       	STB   00h,i?_single_measure_struct_init[_SP]
                   ??_44_LOOP:
-;000284            dnt_ptr->signal.value_summ_buffer_arr[i] = 0;
-00000828    AF18041E                       	LDBZE _BX,i?_single_measure_struct_init[_SP]
-0000082C    A01E1C                         	LD    _AX,_BX
-0000082F    09021C                         	SHL   _AX,#02h
-00000832    64261C                         	ADD   _AX,dnt_ptr?_single_measure_struct_init
-00000835    C31C2800                       	ST    00h,28h[_AX]
-00000839    C31C2A00                       	ST    00h,2Ah[_AX]
-;000285            dnt_ptr->signal.value_summ_number_arr[i] = 0;
-0000083D    09011E                         	SHL   _BX,#01h
-00000840    64261E                         	ADD   _BX,dnt_ptr?_single_measure_struct_init
-00000843    C31E3800                       	ST    00h,38h[_BX]
-;000286            dnt_ptr->signal.value_max_arr[i] = 0;
-00000847    C31E4000                       	ST    00h,40h[_BX]
-;000287            dnt_ptr->signal.value_min_arr[i] = 17000;
-0000084B    A1684220                       	LD    _CX,#4268h
-0000084F    C31E4820                       	ST    _CX,48h[_BX]
-;000289            dnt_ptr->zero.value_summ_buffer_arr[i] = 0;
-00000853    C31C6C00                       	ST    00h,6Ch[_AX]
-00000857    C31C6E00                       	ST    00h,6Eh[_AX]
-;000290            dnt_ptr->zero.value_summ_number_arr[i] = 0;
-0000085B    C31E7C00                       	ST    00h,7Ch[_BX]
-;000291            dnt_ptr->zero.value_max_arr[i] = 0;
-0000085F    C31F840000                     	ST    00h,0084h[_BX]
-;000292            dnt_ptr->zero.value_min_arr[i] = 17000;
-00000864    C31F8C0020                     	ST    _CX,008Ch[_BX]
-;000293        }
-00000869    B318041C                       	LDB   _AL,i?_single_measure_struct_init[_SP]
-0000086D    171C                           	INCB  _AL
-0000086F    C718041C                       	STB   _AL,i?_single_measure_struct_init[_SP]
-00000873    99041C                         	CMPB  _AL,#04h
-00000876    D3B0                           	JNC   ??_44_LOOP
-;000294    }
-00000878    65060018                       	ADD   _SP,#0006h
+;000279            dnt_ptr->control.single_ref_points[0+i*8] = i*8*single_cycle_time_s*1000/16 + short_dead_time;
+00000772    AF180420                       	LDBZE _CX,i?_single_measure_struct_init[_SP]
+00000776    090320                         	SHL   _CX,#03h
+00000779    A02024                         	LD    _EX,_CX
+0000077C    090224                         	SHL   _EX,#02h
+0000077F    642624                         	ADD   _EX,dnt_ptr?_single_measure_struct_init
+00000782    6F180020                       	MULU  _DCX,single_cycle_time_s?_single_measure_struct_init[_SP]
+00000786    6DE80320                       	MULU  _DCX,#03E8h
+0000078A    080420                         	SHR   _CX,#04h
+0000078D    442A201C                       	ADD   _AX,_CX,short_dead_time?_single_measure_struct_init
+00000791    011E                           	CLR   _BX
+00000793    C325C8001C                     	ST    _AX,00C8h[_EX]
+00000798    C325CA001E                     	ST    _BX,00CAh[_EX]
+;000280            dnt_ptr->control.single_ref_points[1+i*8] = i*8*single_cycle_time_s*1000/16 + single_cycle_time_s*1000/16;
+0000079D    44282022                       	ADD   _DX,_CX,_GX
+000007A1    A0221C                         	LD    _AX,_DX
+000007A4    C325CC001C                     	ST    _AX,00CCh[_EX]
+000007A9    C325CE001E                     	ST    _BX,00CEh[_EX]
+;000281            dnt_ptr->control.single_ref_points[2+i*8] = i*8*single_cycle_time_s*1000/16 + single_cycle_time_s*1000/16 + short_dead_time;
+000007AE    642A1C                         	ADD   _AX,short_dead_time?_single_measure_struct_init
+000007B1    C325D0001C                     	ST    _AX,00D0h[_EX]
+000007B6    C325D2001E                     	ST    _BX,00D2h[_EX]
+;000282            dnt_ptr->control.single_ref_points[3+i*8] = i*8*single_cycle_time_s*1000/16 + 2*single_cycle_time_s*1000/16;
+000007BB    A318001C                       	LD    _AX,single_cycle_time_s?_single_measure_struct_init[_SP]
+000007BF    6DD0071C                       	MULU  _BAX,#07D0h
+000007C3    A01C22                         	LD    _DX,_AX
+000007C6    080422                         	SHR   _DX,#04h
+000007C9    642022                         	ADD   _DX,_CX
+000007CC    A0221C                         	LD    _AX,_DX
+000007CF    011E                           	CLR   _BX
+000007D1    C325D4001C                     	ST    _AX,00D4h[_EX]
+000007D6    C325D6001E                     	ST    _BX,00D6h[_EX]
+;000283            dnt_ptr->control.single_ref_points[4+i*8] = i*8*single_cycle_time_s*1000/16 + 2*single_cycle_time_s*1000/16 + short_dead_time;
+000007DB    642A1C                         	ADD   _AX,short_dead_time?_single_measure_struct_init
+000007DE    C325D8001C                     	ST    _AX,00D8h[_EX]
+000007E3    C325DA001E                     	ST    _BX,00DAh[_EX]
+;000284            dnt_ptr->control.single_ref_points[5+i*8] = i*8*single_cycle_time_s*1000/16 + 4*single_cycle_time_s*1000/16;
+000007E8    A318001C                       	LD    _AX,single_cycle_time_s?_single_measure_struct_init[_SP]
+000007EC    6DA00F1C                       	MULU  _BAX,#0FA0h
+000007F0    A01C22                         	LD    _DX,_AX
+000007F3    080422                         	SHR   _DX,#04h
+000007F6    642022                         	ADD   _DX,_CX
+000007F9    A0221C                         	LD    _AX,_DX
+000007FC    011E                           	CLR   _BX
+000007FE    C325DC001C                     	ST    _AX,00DCh[_EX]
+00000803    C325DE001E                     	ST    _BX,00DEh[_EX]
+;000285            dnt_ptr->control.single_ref_points[6+i*8] = i*8*single_cycle_time_s*1000/16 + 4*single_cycle_time_s*1000/16 + long_short_time;
+00000808    6718021C                       	ADD   _AX,long_short_time?_single_measure_struct_init[_SP]
+0000080C    C325E0001C                     	ST    _AX,00E0h[_EX]
+00000811    C325E2001E                     	ST    _BX,00E2h[_EX]
+;000286            dnt_ptr->control.single_ref_points[7+i*8] = i*8*single_cycle_time_s*1000/16 + 8*single_cycle_time_s*1000/16;
+00000816    A318001C                       	LD    _AX,single_cycle_time_s?_single_measure_struct_init[_SP]
+0000081A    6D401F1C                       	MULU  _BAX,#1F40h
+0000081E    08041C                         	SHR   _AX,#04h
+00000821    64201C                         	ADD   _AX,_CX
+00000824    011E                           	CLR   _BX
+00000826    C325E4001C                     	ST    _AX,00E4h[_EX]
+0000082B    C325E6001E                     	ST    _BX,00E6h[_EX]
+;000287        }
+00000830    B318041C                       	LDB   _AL,i?_single_measure_struct_init[_SP]
+00000834    171C                           	INCB  _AL
+00000836    C718041C                       	STB   _AL,i?_single_measure_struct_init[_SP]
+0000083A    99021C                         	CMPB  _AL,#02h
+0000083D    DB02                           	JC    ??_44_LOOP_BYPASS_83D
+0000083F    2731                           	SJMP  ??_44_LOOP
+       ??_44_LOOP_BYPASS_83D:
+;000289        for(i=0; i<4; i++){
+00000841    C7180400                       	STB   00h,i?_single_measure_struct_init[_SP]
+                  ??_45_LOOP:
+;000290            dnt_ptr->signal.value_summ_buffer_arr[i] = 0;
+00000845    AF18041E                       	LDBZE _BX,i?_single_measure_struct_init[_SP]
+00000849    A01E1C                         	LD    _AX,_BX
+0000084C    09021C                         	SHL   _AX,#02h
+0000084F    64261C                         	ADD   _AX,dnt_ptr?_single_measure_struct_init
+00000852    C31C2800                       	ST    00h,28h[_AX]
+00000856    C31C2A00                       	ST    00h,2Ah[_AX]
+;000291            dnt_ptr->signal.value_summ_number_arr[i] = 0;
+0000085A    09011E                         	SHL   _BX,#01h
+0000085D    64261E                         	ADD   _BX,dnt_ptr?_single_measure_struct_init
+00000860    C31E3800                       	ST    00h,38h[_BX]
+;000292            dnt_ptr->signal.value_max_arr[i] = 0;
+00000864    C31E4000                       	ST    00h,40h[_BX]
+;000293            dnt_ptr->signal.value_min_arr[i] = 17000;
+00000868    A1684220                       	LD    _CX,#4268h
+0000086C    C31E4820                       	ST    _CX,48h[_BX]
+;000295            dnt_ptr->zero.value_summ_buffer_arr[i] = 0;
+00000870    C31C6C00                       	ST    00h,6Ch[_AX]
+00000874    C31C6E00                       	ST    00h,6Eh[_AX]
+;000296            dnt_ptr->zero.value_summ_number_arr[i] = 0;
+00000878    C31E7C00                       	ST    00h,7Ch[_BX]
+;000297            dnt_ptr->zero.value_max_arr[i] = 0;
+0000087C    C31F840000                     	ST    00h,0084h[_BX]
+;000298            dnt_ptr->zero.value_min_arr[i] = 17000;
+00000881    C31F8C0020                     	ST    _CX,008Ch[_BX]
+;000299        }
+00000886    B318041C                       	LDB   _AL,i?_single_measure_struct_init[_SP]
+0000088A    171C                           	INCB  _AL
+0000088C    C718041C                       	STB   _AL,i?_single_measure_struct_init[_SP]
+00000890    99041C                         	CMPB  _AL,#04h
+00000893    D3B0                           	JNC   ??_45_LOOP
+;000300    }
+00000895    65060018                       	ADD   _SP,#0006h
 COMMON?END_Current_Calc_Step_10ms:
-0000087C    21CE                           	SJMP  COMMON?END__single_meas_adc_data_get
+00000899    21CE                           	SJMP  COMMON?END__single_meas_adc_data_get
 .ENDF
                _adc_data_get:
-;000296    void _adc_data_get(typeDNTCurrent *signal_ptr)
-0000087E    C824                           	PUSH  _EX
-00000880    C828                           	PUSH  _GX
-00000882    C82A                           	PUSH  _HX
-00000884    A01C24                         	LD    _EX,_AX
-;000299        _di_();
-00000887    FA                             	DI    
-;000300        adc_var =  adc_value_get();
-00000888    EF75F7                         	LCALL adc_value_get
-;000301        _ei_();
-0000088B    FB                             	EI    
-;000302        signal_ptr->value_summ_buffer += adc_var;
-0000088C    A01C28                         	LD    _GX,adc_var?_adc_data_get
-0000088F    012A                           	CLR   _HX
-00000891    A3240820                       	LD    _CX,08h[signal_ptr?_adc_data_get]
-00000895    A3240A22                       	LD    _DX,0Ah[signal_ptr?_adc_data_get]
-00000899    642820                         	ADD   _CX,_GX
-0000089C    A42A22                         	ADDC  _DX,_HX
-0000089F    C3240820                       	ST    _CX,08h[signal_ptr?_adc_data_get]
-000008A3    C3240A22                       	ST    _DX,0Ah[signal_ptr?_adc_data_get]
-;000303        signal_ptr->value_summ_number += 1;
-000008A7    A3240C1E                       	LD    _BX,0Ch[signal_ptr?_adc_data_get]
-000008AB    071E                           	INC   _BX
-000008AD    C3240C1E                       	ST    _BX,0Ch[signal_ptr?_adc_data_get]
-;000304        signal_ptr->value_max = max(signal_ptr->value_max, adc_var);
-000008B1    A3240E1E                       	LD    _BX,0Eh[signal_ptr?_adc_data_get]
-000008B5    881E1C                         	CMP   adc_var?_adc_data_get,_BX
-000008B8    D303                           	JNC   ??_45_END
-000008BA    A01C1E                         	LD    _BX,adc_var?_adc_data_get
-                   ??_45_END:
-000008BD    C3240E1E                       	ST    _BX,0Eh[signal_ptr?_adc_data_get]
-;000305        signal_ptr->value_min = min(signal_ptr->value_min, adc_var);
-000008C1    A324101E                       	LD    _BX,10h[signal_ptr?_adc_data_get]
-000008C5    881C1E                         	CMP   _BX,adc_var?_adc_data_get
-000008C8    DB03                           	JC    ??_46_ELSE
-000008CA    A01E1C                         	LD    adc_var?_adc_data_get,_BX
-                  ??_46_ELSE:
-000008CD    C324101C                       	ST    adc_var?_adc_data_get,10h[signal_ptr?_adc_data_get]
-;000306    }
-000008D1    CC2A                           	POP   _HX
-000008D3    CC28                           	POP   _GX
-000008D5    CC24                           	POP   _EX
-000008D7    F0                             	RET   
+;000302    void _adc_data_get(typeDNTCurrent *signal_ptr)
+0000089B    C824                           	PUSH  _EX
+0000089D    C828                           	PUSH  _GX
+0000089F    C82A                           	PUSH  _HX
+000008A1    A01C24                         	LD    _EX,_AX
+;000305        _di_();
+000008A4    FA                             	DI    
+;000306        adc_var =  adc_value_get();
+000008A5    EF58F7                         	LCALL adc_value_get
+;000307        _ei_();
+000008A8    FB                             	EI    
+;000308        signal_ptr->value_summ_buffer += adc_var;
+000008A9    A01C28                         	LD    _GX,adc_var?_adc_data_get
+000008AC    012A                           	CLR   _HX
+000008AE    A3240820                       	LD    _CX,08h[signal_ptr?_adc_data_get]
+000008B2    A3240A22                       	LD    _DX,0Ah[signal_ptr?_adc_data_get]
+000008B6    642820                         	ADD   _CX,_GX
+000008B9    A42A22                         	ADDC  _DX,_HX
+000008BC    C3240820                       	ST    _CX,08h[signal_ptr?_adc_data_get]
+000008C0    C3240A22                       	ST    _DX,0Ah[signal_ptr?_adc_data_get]
+;000309        signal_ptr->value_summ_number += 1;
+000008C4    A3240C1E                       	LD    _BX,0Ch[signal_ptr?_adc_data_get]
+000008C8    071E                           	INC   _BX
+000008CA    C3240C1E                       	ST    _BX,0Ch[signal_ptr?_adc_data_get]
+;000310        signal_ptr->value_max = max(signal_ptr->value_max, adc_var);
+000008CE    A3240E1E                       	LD    _BX,0Eh[signal_ptr?_adc_data_get]
+000008D2    881E1C                         	CMP   adc_var?_adc_data_get,_BX
+000008D5    D303                           	JNC   ??_46_END
+000008D7    A01C1E                         	LD    _BX,adc_var?_adc_data_get
+                   ??_46_END:
+000008DA    C3240E1E                       	ST    _BX,0Eh[signal_ptr?_adc_data_get]
+;000311        signal_ptr->value_min = min(signal_ptr->value_min, adc_var);
+000008DE    A324101E                       	LD    _BX,10h[signal_ptr?_adc_data_get]
+000008E2    881C1E                         	CMP   _BX,adc_var?_adc_data_get
+000008E5    DB03                           	JC    ??_47_ELSE
+000008E7    A01E1C                         	LD    adc_var?_adc_data_get,_BX
+                  ??_47_ELSE:
+000008EA    C324101C                       	ST    adc_var?_adc_data_get,10h[signal_ptr?_adc_data_get]
+;000312    }
+000008EE    CC2A                           	POP   _HX
+000008F0    CC28                           	POP   _GX
+000008F2    CC24                           	POP   _EX
+000008F4    F0                             	RET   
 .ENDF
         _current_result_calc:
-;000308    void _current_result_calc(typeDNTOperationData* dnt_ptr)
-000008D8    C824                           	PUSH  _EX
-000008DA    A01C24                         	LD    _EX,_AX
-;000310        if ((dnt_ptr->signal.value_summ_number == 0) || (dnt_ptr->zero.value_summ_number == 0)) {
-000008DD    A3241820                       	LD    _CX,18h[dnt_ptr?_current_result_calc]
-000008E1    880020                         	CMP   _CX,0
-000008E4    DF09                           	JE    ??_47_IF
-000008E6    A3245C1E                       	LD    _BX,5Ch[dnt_ptr?_current_result_calc]
-000008EA    88001E                         	CMP   _BX,0
-000008ED    D70E                           	JNE   ??_47_ELSE
-                    ??_47_IF:
-;000311            dnt_ptr->current_result = 0x0000;
-000008EF    C3240600                       	ST    00h,06h[dnt_ptr?_current_result_calc]
-;000312            dnt_ptr->signal.value = 0x0000;
-000008F3    C3241000                       	ST    00h,10h[dnt_ptr?_current_result_calc]
-;000313            dnt_ptr->zero.value = 0x0000;
-000008F7    C3245400                       	ST    00h,54h[dnt_ptr?_current_result_calc]
-;000314        }
-000008FB    2032                           	SJMP  ??_47_END
-                  ??_47_ELSE:
-;000315        else{
-;000316            dnt_ptr->signal.value = (int16_t)(dnt_ptr->signal.value_summ_buffer/dnt_ptr->signal.value_summ_number);
-000008FD    0122                           	CLR   _DX
-000008FF    A324141C                       	LD    _AX,14h[dnt_ptr?_current_result_calc]
-00000903    A324161E                       	LD    _BX,16h[dnt_ptr?_current_result_calc]
-00000907    EFF6F6                         	LCALL ??DIV32
-0000090A    C324101C                       	ST    _AX,10h[dnt_ptr?_current_result_calc]
-;000317            dnt_ptr->zero.value = (int16_t)(dnt_ptr->zero.value_summ_buffer/dnt_ptr->zero.value_summ_number);
-0000090E    A3245C20                       	LD    _CX,5Ch[dnt_ptr?_current_result_calc]
-00000912    0122                           	CLR   _DX
-00000914    A324581C                       	LD    _AX,58h[dnt_ptr?_current_result_calc]
-00000918    A3245A1E                       	LD    _BX,5Ah[dnt_ptr?_current_result_calc]
-0000091C    EFE1F6                         	LCALL ??DIV32
-0000091F    C324541C                       	ST    _AX,54h[dnt_ptr?_current_result_calc]
-;000318            dnt_ptr->current_result = dnt_ptr->signal.value - dnt_ptr->zero.value;
-00000923    A324101E                       	LD    _BX,10h[dnt_ptr?_current_result_calc]
-00000927    6B24541E                       	SUB   _BX,54h[dnt_ptr?_current_result_calc]
-0000092B    C324061E                       	ST    _BX,06h[dnt_ptr?_current_result_calc]
-;000319        }
-                   ??_47_END:
-;000320    }
-0000092F    CC24                           	POP   _EX
-00000931    F0                             	RET   
+;000314    void _current_result_calc(typeDNTOperationData* dnt_ptr)
+000008F5    C824                           	PUSH  _EX
+000008F7    A01C24                         	LD    _EX,_AX
+;000316        if ((dnt_ptr->signal.value_summ_number == 0) || (dnt_ptr->zero.value_summ_number == 0)) {
+000008FA    A3241820                       	LD    _CX,18h[dnt_ptr?_current_result_calc]
+000008FE    880020                         	CMP   _CX,0
+00000901    DF09                           	JE    ??_48_IF
+00000903    A3245C1E                       	LD    _BX,5Ch[dnt_ptr?_current_result_calc]
+00000907    88001E                         	CMP   _BX,0
+0000090A    D70E                           	JNE   ??_48_ELSE
+                    ??_48_IF:
+;000317            dnt_ptr->current_result = 0x0000;
+0000090C    C3240600                       	ST    00h,06h[dnt_ptr?_current_result_calc]
+;000318            dnt_ptr->signal.value = 0x0000;
+00000910    C3241000                       	ST    00h,10h[dnt_ptr?_current_result_calc]
+;000319            dnt_ptr->zero.value = 0x0000;
+00000914    C3245400                       	ST    00h,54h[dnt_ptr?_current_result_calc]
+;000320        }
+00000918    2032                           	SJMP  ??_48_END
+                  ??_48_ELSE:
+;000321        else{
+;000322            dnt_ptr->signal.value = (int16_t)(dnt_ptr->signal.value_summ_buffer/dnt_ptr->signal.value_summ_number);
+0000091A    0122                           	CLR   _DX
+0000091C    A324141C                       	LD    _AX,14h[dnt_ptr?_current_result_calc]
+00000920    A324161E                       	LD    _BX,16h[dnt_ptr?_current_result_calc]
+00000924    EFD9F6                         	LCALL ??DIV32
+00000927    C324101C                       	ST    _AX,10h[dnt_ptr?_current_result_calc]
+;000323            dnt_ptr->zero.value = (int16_t)(dnt_ptr->zero.value_summ_buffer/dnt_ptr->zero.value_summ_number);
+0000092B    A3245C20                       	LD    _CX,5Ch[dnt_ptr?_current_result_calc]
+0000092F    0122                           	CLR   _DX
+00000931    A324581C                       	LD    _AX,58h[dnt_ptr?_current_result_calc]
+00000935    A3245A1E                       	LD    _BX,5Ah[dnt_ptr?_current_result_calc]
+00000939    EFC4F6                         	LCALL ??DIV32
+0000093C    C324541C                       	ST    _AX,54h[dnt_ptr?_current_result_calc]
+;000324            dnt_ptr->current_result = dnt_ptr->signal.value - dnt_ptr->zero.value;
+00000940    A324101E                       	LD    _BX,10h[dnt_ptr?_current_result_calc]
+00000944    6B24541E                       	SUB   _BX,54h[dnt_ptr?_current_result_calc]
+00000948    C324061E                       	ST    _BX,06h[dnt_ptr?_current_result_calc]
+;000325        }
+                   ??_48_END:
+;000326    }
+0000094C    CC24                           	POP   _EX
+0000094E    F0                             	RET   
 .ENDF
    _single_meas_adc_data_get:
-;000322    void _single_meas_adc_data_get(typeDNTCurrent *signal_ptr, uint8_t ku)
-00000932    C824                           	PUSH  _EX
-00000934    C826                           	PUSH  _FX
-00000936    C828                           	PUSH  _GX
-00000938    C82A                           	PUSH  _HX
-0000093A    69040018                       	SUB   _SP,#0004h
-0000093E    B01E24                         	LDB   _EL,_BL
-00000941    A01C26                         	LD    _FX,_AX
-;000325        _di_();
-00000944    FA                             	DI    
-;000326        adc_var =  adc_value_get();
-00000945    EFB8F6                         	LCALL adc_value_get
-;000327        _ei_();
-00000948    FB                             	EI    
-;000328        signal_ptr->value_summ_buffer_arr[ku] += adc_var;
-00000949    1125                           	CLRB  _EH
-0000094B    A02420                         	LD    _CX,ku?_single_meas_adc_data_get
-0000094E    090220                         	SHL   _CX,#02h
-00000951    642620                         	ADD   _CX,signal_ptr?_single_meas_adc_data_get
-00000954    651C0020                       	ADD   _CX,#001Ch
-00000958    A01C28                         	LD    _GX,adc_var?_single_meas_adc_data_get
-0000095B    012A                           	CLR   _HX
-0000095D    C3180028                       	ST    _GX,00h[_SP]
-00000961    C318022A                       	ST    _HX,02h[_SP]
-00000965    A22028                         	LD    _GX,[_CX]
-00000968    A320022A                       	LD    _HX,02h[_CX]
-0000096C    67180028                       	ADD   _GX,00h[_SP]
-00000970    A718022A                       	ADDC  _HX,02h[_SP]
-00000974    C22028                         	ST    _GX,[_CX]
-00000977    C320022A                       	ST    _HX,02h[_CX]
-;000329        signal_ptr->value_summ_number_arr[ku] += 1;
-0000097B    090124                         	SHL   _EX,#01h
-0000097E    642624                         	ADD   _EX,signal_ptr?_single_meas_adc_data_get
-00000981    452C002420                     	ADD   _CX,_EX,#002Ch
-00000986    A22022                         	LD    _DX,[_CX]
-00000989    0722                           	INC   _DX
-0000098B    C22022                         	ST    _DX,[_CX]
-;000330        signal_ptr->value_max_arr[ku] = max(signal_ptr->value_max_arr[ku], adc_var);
-0000098E    A3243420                       	LD    _CX,34h[_EX]
-00000992    88201C                         	CMP   adc_var?_single_meas_adc_data_get,_CX
-00000995    D303                           	JNC   ??_49_END
-00000997    A01C20                         	LD    _CX,adc_var?_single_meas_adc_data_get
-                   ??_49_END:
-0000099A    C3243420                       	ST    _CX,34h[_EX]
-;000331        signal_ptr->value_min_arr[ku] = min(signal_ptr->value_max_arr[ku], adc_var);
-0000099E    A3243420                       	LD    _CX,34h[_EX]
-000009A2    881C20                         	CMP   _CX,adc_var?_single_meas_adc_data_get
-000009A5    DB03                           	JC    ??_50_ELSE
-000009A7    A0201C                         	LD    adc_var?_single_meas_adc_data_get,_CX
-                  ??_50_ELSE:
-000009AA    C3243C1C                       	ST    adc_var?_single_meas_adc_data_get,3Ch[_EX]
-;000332    }
-000009AE    65040018                       	ADD   _SP,#0004h
-000009B2    2098                           	SJMP  COMMON?END__single_meas_adc_data_get
+;000328    void _single_meas_adc_data_get(typeDNTCurrent *signal_ptr, uint8_t ku)
+0000094F    C824                           	PUSH  _EX
+00000951    C826                           	PUSH  _FX
+00000953    C828                           	PUSH  _GX
+00000955    C82A                           	PUSH  _HX
+00000957    69040018                       	SUB   _SP,#0004h
+0000095B    B01E24                         	LDB   _EL,_BL
+0000095E    A01C26                         	LD    _FX,_AX
+;000331        _di_();
+00000961    FA                             	DI    
+;000332        adc_var =  adc_value_get();
+00000962    EF9BF6                         	LCALL adc_value_get
+;000333        _ei_();
+00000965    FB                             	EI    
+;000334        signal_ptr->value_summ_buffer_arr[ku] += adc_var;
+00000966    1125                           	CLRB  _EH
+00000968    A02420                         	LD    _CX,ku?_single_meas_adc_data_get
+0000096B    090220                         	SHL   _CX,#02h
+0000096E    642620                         	ADD   _CX,signal_ptr?_single_meas_adc_data_get
+00000971    651C0020                       	ADD   _CX,#001Ch
+00000975    A01C28                         	LD    _GX,adc_var?_single_meas_adc_data_get
+00000978    012A                           	CLR   _HX
+0000097A    C3180028                       	ST    _GX,00h[_SP]
+0000097E    C318022A                       	ST    _HX,02h[_SP]
+00000982    A22028                         	LD    _GX,[_CX]
+00000985    A320022A                       	LD    _HX,02h[_CX]
+00000989    67180028                       	ADD   _GX,00h[_SP]
+0000098D    A718022A                       	ADDC  _HX,02h[_SP]
+00000991    C22028                         	ST    _GX,[_CX]
+00000994    C320022A                       	ST    _HX,02h[_CX]
+;000335        signal_ptr->value_summ_number_arr[ku] += 1;
+00000998    090124                         	SHL   _EX,#01h
+0000099B    642624                         	ADD   _EX,signal_ptr?_single_meas_adc_data_get
+0000099E    452C002420                     	ADD   _CX,_EX,#002Ch
+000009A3    A22022                         	LD    _DX,[_CX]
+000009A6    0722                           	INC   _DX
+000009A8    C22022                         	ST    _DX,[_CX]
+;000336        signal_ptr->value_max_arr[ku] = max(signal_ptr->value_max_arr[ku], adc_var);
+000009AB    A3243420                       	LD    _CX,34h[_EX]
+000009AF    88201C                         	CMP   adc_var?_single_meas_adc_data_get,_CX
+000009B2    D303                           	JNC   ??_50_END
+000009B4    A01C20                         	LD    _CX,adc_var?_single_meas_adc_data_get
+                   ??_50_END:
+000009B7    C3243420                       	ST    _CX,34h[_EX]
+;000337        signal_ptr->value_min_arr[ku] = min(signal_ptr->value_max_arr[ku], adc_var);
+000009BB    A3243420                       	LD    _CX,34h[_EX]
+000009BF    881C20                         	CMP   _CX,adc_var?_single_meas_adc_data_get
+000009C2    DB03                           	JC    ??_51_ELSE
+000009C4    A0201C                         	LD    adc_var?_single_meas_adc_data_get,_CX
+                  ??_51_ELSE:
+000009C7    C3243C1C                       	ST    adc_var?_single_meas_adc_data_get,3Ch[_EX]
+;000338    }
+000009CB    65040018                       	ADD   _SP,#0004h
+000009CF    2098                           	SJMP  COMMON?END__single_meas_adc_data_get
 .ENDF
 _single_meas_current_result_calc:
-;000334    void _single_meas_current_result_calc(typeDNTOperationData* dnt_ptr)
-000009B4    C824                           	PUSH  _EX
-000009B6    C826                           	PUSH  _FX
-000009B8    C828                           	PUSH  _GX
-000009BA    C82A                           	PUSH  _HX
-000009BC    A01C26                         	LD    _FX,_AX
-;000337        for (i=3; i>=0; i--){
-000009BF    B1031E                         	LDB   i?_single_meas_current_result_calc,#03h
-                  ??_51_LOOP:
-;000338            if ((dnt_ptr->signal.value_max_arr[i]  <=  16000) & (dnt_ptr->zero.value_max_arr[i]  <= 16000)) //проверяем, подходит ли нам данный КУ
-000009C2    BC1E2A                         	LDBSE _HX,i?_single_meas_current_result_calc
-000009C5    A02A24                         	LD    _EX,_HX
-000009C8    090124                         	SHL   _EX,#01h
-000009CB    642624                         	ADD   _EX,dnt_ptr?_single_meas_current_result_calc
-000009CE    A3244020                       	LD    _CX,40h[_EX]
-000009D2    89813E20                       	CMP   _CX,#3E81h
-000009D6    D66D                           	JGE   ??_52_ELSE
-000009D8    A325840020                     	LD    _CX,0084h[_EX]
-000009DD    89813E20                       	CMP   _CX,#3E81h
-000009E1    D662                           	JGE   ??_52_ELSE
-;000339            {
-;000340                if ((dnt_ptr->signal.value_summ_number_arr[i] == 0) || (dnt_ptr->zero.value_summ_number_arr[i] == 0)) {
-000009E3    A3243820                       	LD    _CX,38h[_EX]
-000009E7    880020                         	CMP   _CX,0
-000009EA    DF09                           	JE    ??_54_IF
-000009EC    A3247C1E                       	LD    _BX,7Ch[_EX]
-000009F0    88001E                         	CMP   _BX,0
-000009F3    D70E                           	JNE   ??_54_ELSE
-                    ??_54_IF:
-;000341                    dnt_ptr->current_result = 0x0000;
-000009F5    C3260600                       	ST    00h,06h[dnt_ptr?_single_meas_current_result_calc]
-;000342                    dnt_ptr->signal.value = 0x0000;
-000009F9    C3261000                       	ST    00h,10h[dnt_ptr?_single_meas_current_result_calc]
-;000343                    dnt_ptr->zero.value = 0x0000;
-000009FD    C3265400                       	ST    00h,54h[dnt_ptr?_single_meas_current_result_calc]
-;000344                }
-00000A01    203B                           	SJMP  ??_54_END
-                  ??_54_ELSE:
-;000345                else{
-;000346                    dnt_ptr->signal.value = (int16_t)(dnt_ptr->signal.value_summ_buffer_arr[i]/dnt_ptr->signal.value_summ_number_arr[i]);
-00000A03    A02A28                         	LD    _GX,_HX
-00000A06    090228                         	SHL   _GX,#02h
-00000A09    642628                         	ADD   _GX,dnt_ptr?_single_meas_current_result_calc
-00000A0C    0122                           	CLR   _DX
-00000A0E    A328281C                       	LD    _AX,28h[_GX]
-00000A12    A3282A1E                       	LD    _BX,2Ah[_GX]
-00000A16    EFE7F5                         	LCALL ??DIV32
-00000A19    C326101C                       	ST    _AX,10h[dnt_ptr?_single_meas_current_result_calc]
-;000347                    dnt_ptr->zero.value = (int16_t)(dnt_ptr->zero.value_summ_buffer_arr[i]/dnt_ptr->zero.value_summ_number_arr[i]);
-00000A1D    A3247C20                       	LD    _CX,7Ch[_EX]
-00000A21    0122                           	CLR   _DX
-00000A23    A3286C1C                       	LD    _AX,6Ch[_GX]
-00000A27    A3286E1E                       	LD    _BX,6Eh[_GX]
-00000A2B    EFD2F5                         	LCALL ??DIV32
-00000A2E    C326541C                       	ST    _AX,54h[dnt_ptr?_single_meas_current_result_calc]
-;000348                    dnt_ptr->current_result = dnt_ptr->signal.value - dnt_ptr->zero.value;
-00000A32    A326101E                       	LD    _BX,10h[dnt_ptr?_single_meas_current_result_calc]
-00000A36    6B26541E                       	SUB   _BX,54h[dnt_ptr?_single_meas_current_result_calc]
-00000A3A    C326061E                       	ST    _BX,06h[dnt_ptr?_single_meas_current_result_calc]
-;000349                }
-                   ??_54_END:
-;000350                dnt.control.ku = i;
-00000A3E    C301B2002A                     	ST    _HX,(dnt+0B2h)
-;000351                break;
-00000A43    2007                           	SJMP  ??_51_BREAK
-;000352            }
-                  ??_52_ELSE:
-;000353        }
-00000A45    151E                           	DECB  i?_single_meas_current_result_calc
-00000A47    3F1E02                         	JBS   i?_single_meas_current_result_calc,7h,??_51_LOOP_BYPASS_A47
-00000A4A    2776                           	SJMP  ??_51_LOOP
-       ??_51_LOOP_BYPASS_A47:
-                 ??_51_BREAK:
-;000354    }
+;000340    void _single_meas_current_result_calc(typeDNTOperationData* dnt_ptr)
+000009D1    C824                           	PUSH  _EX
+000009D3    C826                           	PUSH  _FX
+000009D5    C828                           	PUSH  _GX
+000009D7    C82A                           	PUSH  _HX
+000009D9    A01C26                         	LD    _FX,_AX
+;000343        for (i=3; i>=0; i--){
+000009DC    B1031E                         	LDB   i?_single_meas_current_result_calc,#03h
+                  ??_52_LOOP:
+;000344            if ((dnt_ptr->signal.value_max_arr[i]  <=  16000) & (dnt_ptr->zero.value_max_arr[i]  <= 16000)) //проверяем, подходит ли нам данный КУ
+000009DF    BC1E2A                         	LDBSE _HX,i?_single_meas_current_result_calc
+000009E2    A02A24                         	LD    _EX,_HX
+000009E5    090124                         	SHL   _EX,#01h
+000009E8    642624                         	ADD   _EX,dnt_ptr?_single_meas_current_result_calc
+000009EB    A3244020                       	LD    _CX,40h[_EX]
+000009EF    89813E20                       	CMP   _CX,#3E81h
+000009F3    D66D                           	JGE   ??_53_ELSE
+000009F5    A325840020                     	LD    _CX,0084h[_EX]
+000009FA    89813E20                       	CMP   _CX,#3E81h
+000009FE    D662                           	JGE   ??_53_ELSE
+;000345            {
+;000346                if ((dnt_ptr->signal.value_summ_number_arr[i] == 0) || (dnt_ptr->zero.value_summ_number_arr[i] == 0)) {
+00000A00    A3243820                       	LD    _CX,38h[_EX]
+00000A04    880020                         	CMP   _CX,0
+00000A07    DF09                           	JE    ??_55_IF
+00000A09    A3247C1E                       	LD    _BX,7Ch[_EX]
+00000A0D    88001E                         	CMP   _BX,0
+00000A10    D70E                           	JNE   ??_55_ELSE
+                    ??_55_IF:
+;000347                    dnt_ptr->current_result = 0x0000;
+00000A12    C3260600                       	ST    00h,06h[dnt_ptr?_single_meas_current_result_calc]
+;000348                    dnt_ptr->signal.value = 0x0000;
+00000A16    C3261000                       	ST    00h,10h[dnt_ptr?_single_meas_current_result_calc]
+;000349                    dnt_ptr->zero.value = 0x0000;
+00000A1A    C3265400                       	ST    00h,54h[dnt_ptr?_single_meas_current_result_calc]
+;000350                }
+00000A1E    203B                           	SJMP  ??_55_END
+                  ??_55_ELSE:
+;000351                else{
+;000352                    dnt_ptr->signal.value = (int16_t)(dnt_ptr->signal.value_summ_buffer_arr[i]/dnt_ptr->signal.value_summ_number_arr[i]);
+00000A20    A02A28                         	LD    _GX,_HX
+00000A23    090228                         	SHL   _GX,#02h
+00000A26    642628                         	ADD   _GX,dnt_ptr?_single_meas_current_result_calc
+00000A29    0122                           	CLR   _DX
+00000A2B    A328281C                       	LD    _AX,28h[_GX]
+00000A2F    A3282A1E                       	LD    _BX,2Ah[_GX]
+00000A33    EFCAF5                         	LCALL ??DIV32
+00000A36    C326101C                       	ST    _AX,10h[dnt_ptr?_single_meas_current_result_calc]
+;000353                    dnt_ptr->zero.value = (int16_t)(dnt_ptr->zero.value_summ_buffer_arr[i]/dnt_ptr->zero.value_summ_number_arr[i]);
+00000A3A    A3247C20                       	LD    _CX,7Ch[_EX]
+00000A3E    0122                           	CLR   _DX
+00000A40    A3286C1C                       	LD    _AX,6Ch[_GX]
+00000A44    A3286E1E                       	LD    _BX,6Eh[_GX]
+00000A48    EFB5F5                         	LCALL ??DIV32
+00000A4B    C326541C                       	ST    _AX,54h[dnt_ptr?_single_meas_current_result_calc]
+;000354                    dnt_ptr->current_result = dnt_ptr->signal.value - dnt_ptr->zero.value;
+00000A4F    A326101E                       	LD    _BX,10h[dnt_ptr?_single_meas_current_result_calc]
+00000A53    6B26541E                       	SUB   _BX,54h[dnt_ptr?_single_meas_current_result_calc]
+00000A57    C326061E                       	ST    _BX,06h[dnt_ptr?_single_meas_current_result_calc]
+;000355                }
+                   ??_55_END:
+;000356                dnt.control.ku = i;
+00000A5B    C301B2002A                     	ST    _HX,(dnt+0B2h)
+;000357                break;
+00000A60    2007                           	SJMP  ??_52_BREAK
+;000358            }
+                  ??_53_ELSE:
+;000359        }
+00000A62    151E                           	DECB  i?_single_meas_current_result_calc
+00000A64    3F1E02                         	JBS   i?_single_meas_current_result_calc,7h,??_52_LOOP_BYPASS_A64
+00000A67    2776                           	SJMP  ??_52_LOOP
+       ??_52_LOOP_BYPASS_A64:
+                 ??_52_BREAK:
+;000360    }
 COMMON?END__single_meas_adc_data_get:
-00000A4C    CC2A                           	POP   _HX
-00000A4E    CC28                           	POP   _GX
-00000A50    CC26                           	POP   _FX
-00000A52    CC24                           	POP   _EX
-00000A54    F0                             	RET   
+00000A69    CC2A                           	POP   _HX
+00000A6B    CC28                           	POP   _GX
+00000A6D    CC26                           	POP   _FX
+00000A6F    CC24                           	POP   _EX
+00000A71    F0                             	RET   
 .ENDF
           _ku_change_checker:
-;000357    void _ku_change_checker(typeDNTOperationData* dnt_ptr)
-00000A55    C824                           	PUSH  _EX
-00000A57    A01C24                         	LD    _EX,_AX
-;000360        switch (dnt_ptr->control.ku)
-00000A5A    A325B2001E                     	LD    _BX,00B2h[dnt_ptr?_ku_change_checker]
-00000A5F    88001E                         	CMP   _BX,0
-00000A62    D702                           	JNE   ??_56_CASE_0_BYPASS_A62
-00000A64    20F6                           	SJMP  ??_56_CASE_0
-     ??_56_CASE_0_BYPASS_A62:
-00000A66    8901001E                       	CMP   _BX,#0001h
-00000A6A    D702                           	JNE   ??_56_CASE_1_BYPASS_A6A
-00000A6C    2099                           	SJMP  ??_56_CASE_1
-     ??_56_CASE_1_BYPASS_A6A:
-00000A6E    8902001E                       	CMP   _BX,#0002h
-00000A72    DF39                           	JE    ??_56_CASE_2
-00000A74    8903001E                       	CMP   _BX,#0003h
-00000A78    DF02                           	JE    ??_56_DEFAULT_BYPASS_A78
-00000A7A    2111                           	SJMP  ??_56_DEFAULT
-    ??_56_DEFAULT_BYPASS_A78:
-;000361        {
-;000363                if ((abs(dnt_ptr->signal.value_max) > 16000) || (abs(dnt_ptr->zero.value_max) > 16000) || (abs(dnt_ptr->current_result) > 8000)) dnt_ptr->control.ku = 2;
-00000A7C    A3241A1C                       	LD    _AX,1Ah[dnt_ptr?_ku_change_checker]
-00000A80    EF7DF5                         	LCALL abs
-00000A83    89813E1C                       	CMP   _AX,#3E81h
-00000A87    D61A                           	JGE   ??_57_IF
-00000A89    A3245E1C                       	LD    _AX,5Eh[dnt_ptr?_ku_change_checker]
-00000A8D    EF70F5                         	LCALL abs
-00000A90    89813E1C                       	CMP   _AX,#3E81h
-00000A94    D60D                           	JGE   ??_57_IF
-00000A96    A324061C                       	LD    _AX,06h[dnt_ptr?_ku_change_checker]
-00000A9A    EF63F5                         	LCALL abs
-00000A9D    89411F1C                       	CMP   _AX,#1F41h
-00000AA1    DE08                           	JLT   ??_57_ELSE
-                    ??_57_IF:
-00000AA3    AD021E                         	LDBZE _BX,#02h
-00000AA6    C325B2001E                     	ST    _BX,00B2h[dnt_ptr?_ku_change_checker]
-                  ??_57_ELSE:
-;000364                break;
-00000AAB    20E5                           	SJMP  ??_56_BREAK
-                ??_56_CASE_2:
-;000366                if ((abs(dnt_ptr->signal.value_max) > 16000) || (abs(dnt_ptr->zero.value_max) > 16000) || (abs(dnt_ptr->current_result) > 8000)) dnt_ptr->control.ku = 1;
-00000AAD    A3241A1C                       	LD    _AX,1Ah[dnt_ptr?_ku_change_checker]
-00000AB1    EF4CF5                         	LCALL abs
-00000AB4    89813E1C                       	CMP   _AX,#3E81h
-00000AB8    D61A                           	JGE   ??_60_IF
-00000ABA    A3245E1C                       	LD    _AX,5Eh[dnt_ptr?_ku_change_checker]
-00000ABE    EF3FF5                         	LCALL abs
-00000AC1    89813E1C                       	CMP   _AX,#3E81h
-00000AC5    D60D                           	JGE   ??_60_IF
-00000AC7    A324061C                       	LD    _AX,06h[dnt_ptr?_ku_change_checker]
-00000ACB    EF32F5                         	LCALL abs
-00000ACE    89411F1C                       	CMP   _AX,#1F41h
-00000AD2    DE02                           	JLT   ??_60_ELSE
-                    ??_60_IF:
-00000AD4    20AD                           	SJMP  ??_82_COMMON
-                  ??_60_ELSE:
-;000367                else if ((abs(dnt_ptr->signal.value_min)  < 380) || (abs(dnt_ptr->zero.value_min) < 380) || (abs(dnt_ptr->current_result) < 320)) dnt_ptr->control.ku = 3;
-00000AD6    A3241C1C                       	LD    _AX,1Ch[dnt_ptr?_ku_change_checker]
-00000ADA    EF23F5                         	LCALL abs
-00000ADD    897C011C                       	CMP   _AX,#017Ch
-00000AE1    DE1A                           	JLT   ??_63_IF
-00000AE3    A324601C                       	LD    _AX,60h[dnt_ptr?_ku_change_checker]
-00000AE7    EF16F5                         	LCALL abs
-00000AEA    897C011C                       	CMP   _AX,#017Ch
-00000AEE    DE0D                           	JLT   ??_63_IF
-00000AF0    A324061C                       	LD    _AX,06h[dnt_ptr?_ku_change_checker]
-00000AF4    EF09F5                         	LCALL abs
-00000AF7    8940011C                       	CMP   _AX,#0140h
-00000AFB    D608                           	JGE   ??_63_ELSE
-                    ??_63_IF:
-00000AFD    AD031E                         	LDBZE _BX,#03h
-00000B00    C325B2001E                     	ST    _BX,00B2h[dnt_ptr?_ku_change_checker]
-                  ??_63_ELSE:
-;000368                break;
-00000B05    208B                           	SJMP  ??_56_BREAK
-                ??_56_CASE_1:
-;000370                if ((abs(dnt_ptr->signal.value_max) > 16000) || (abs(dnt_ptr->zero.value_max) > 16000) || (abs(dnt_ptr->current_result) > 8000)) dnt_ptr->control.ku = 0;
-00000B07    A3241A1C                       	LD    _AX,1Ah[dnt_ptr?_ku_change_checker]
-00000B0B    EFF2F4                         	LCALL abs
-00000B0E    89813E1C                       	CMP   _AX,#3E81h
-00000B12    D61A                           	JGE   ??_66_IF
-00000B14    A3245E1C                       	LD    _AX,5Eh[dnt_ptr?_ku_change_checker]
-00000B18    EFE5F4                         	LCALL abs
-00000B1B    89813E1C                       	CMP   _AX,#3E81h
-00000B1F    D60D                           	JGE   ??_66_IF
-00000B21    A324061C                       	LD    _AX,06h[dnt_ptr?_ku_change_checker]
-00000B25    EFD8F4                         	LCALL abs
-00000B28    89411F1C                       	CMP   _AX,#1F41h
-00000B2C    DE02                           	JLT   ??_66_ELSE
-                    ??_66_IF:
-00000B2E    205D                           	SJMP  ??_81_COMMON
-                  ??_66_ELSE:
-;000371                else if ((abs(dnt_ptr->signal.value_min)  < 380) || (abs(dnt_ptr->zero.value_min) < 380) || (abs(dnt_ptr->current_result) < 320)) dnt_ptr->control.ku = 2;
-00000B30    A3241C1C                       	LD    _AX,1Ch[dnt_ptr?_ku_change_checker]
-00000B34    EFC9F4                         	LCALL abs
-00000B37    897C011C                       	CMP   _AX,#017Ch
-00000B3B    DE1A                           	JLT   ??_69_IF
-00000B3D    A324601C                       	LD    _AX,60h[dnt_ptr?_ku_change_checker]
-00000B41    EFBCF4                         	LCALL abs
-00000B44    897C011C                       	CMP   _AX,#017Ch
-00000B48    DE0D                           	JLT   ??_69_IF
-00000B4A    A324061C                       	LD    _AX,06h[dnt_ptr?_ku_change_checker]
-00000B4E    EFAFF4                         	LCALL abs
-00000B51    8940011C                       	CMP   _AX,#0140h
-00000B55    D63B                           	JGE   ??_56_BREAK
-                    ??_69_IF:
-00000B57    AD021E                         	LDBZE _BX,#02h
-;000372                break;
-00000B5A    202A                           	SJMP  ??_83_COMMON
-                ??_56_CASE_0:
-;000374                if ((abs(dnt_ptr->signal.value_min) < 380) || (abs(dnt_ptr->zero.value_min) < 380) || (abs(dnt_ptr->current_result) < 320)) dnt_ptr->control.ku = 1;
-00000B5C    A3241C1C                       	LD    _AX,1Ch[dnt_ptr?_ku_change_checker]
-00000B60    EF9DF4                         	LCALL abs
-00000B63    897C011C                       	CMP   _AX,#017Ch
-00000B67    DE1A                           	JLT   ??_72_IF
-00000B69    A324601C                       	LD    _AX,60h[dnt_ptr?_ku_change_checker]
-00000B6D    EF90F4                         	LCALL abs
-00000B70    897C011C                       	CMP   _AX,#017Ch
-00000B74    DE0D                           	JLT   ??_72_IF
-00000B76    A324061C                       	LD    _AX,06h[dnt_ptr?_ku_change_checker]
-00000B7A    EF83F4                         	LCALL abs
-00000B7D    8940011C                       	CMP   _AX,#0140h
-00000B81    D60F                           	JGE   ??_56_BREAK
-                    ??_72_IF:
-                ??_82_COMMON:
-00000B83    AD011E                         	LDBZE _BX,#01h
-                ??_83_COMMON:
-00000B86    C325B2001E                     	ST    _BX,00B2h[dnt_ptr?_ku_change_checker]
-;000375                break;
-00000B8B    2005                           	SJMP  ??_56_BREAK
-               ??_56_DEFAULT:
-;000377                dnt_ptr->control.ku = 0;
-                ??_81_COMMON:
-00000B8D    C325B20000                     	ST    00h,00B2h[dnt_ptr?_ku_change_checker]
+;000363    void _ku_change_checker(typeDNTOperationData* dnt_ptr)
+00000A72    C824                           	PUSH  _EX
+00000A74    A01C24                         	LD    _EX,_AX
+;000366        switch (dnt_ptr->control.ku)
+00000A77    A325B2001E                     	LD    _BX,00B2h[dnt_ptr?_ku_change_checker]
+00000A7C    88001E                         	CMP   _BX,0
+00000A7F    D702                           	JNE   ??_57_CASE_0_BYPASS_A7F
+00000A81    20F6                           	SJMP  ??_57_CASE_0
+     ??_57_CASE_0_BYPASS_A7F:
+00000A83    8901001E                       	CMP   _BX,#0001h
+00000A87    D702                           	JNE   ??_57_CASE_1_BYPASS_A87
+00000A89    2099                           	SJMP  ??_57_CASE_1
+     ??_57_CASE_1_BYPASS_A87:
+00000A8B    8902001E                       	CMP   _BX,#0002h
+00000A8F    DF39                           	JE    ??_57_CASE_2
+00000A91    8903001E                       	CMP   _BX,#0003h
+00000A95    DF02                           	JE    ??_57_DEFAULT_BYPASS_A95
+00000A97    2111                           	SJMP  ??_57_DEFAULT
+    ??_57_DEFAULT_BYPASS_A95:
+;000367        {
+;000369                if ((abs(dnt_ptr->signal.value_max) > 16000) || (abs(dnt_ptr->zero.value_max) > 16000) || (abs(dnt_ptr->current_result) > 8000)) dnt_ptr->control.ku = 2;
+00000A99    A3241A1C                       	LD    _AX,1Ah[dnt_ptr?_ku_change_checker]
+00000A9D    EF60F5                         	LCALL abs
+00000AA0    89813E1C                       	CMP   _AX,#3E81h
+00000AA4    D61A                           	JGE   ??_58_IF
+00000AA6    A3245E1C                       	LD    _AX,5Eh[dnt_ptr?_ku_change_checker]
+00000AAA    EF53F5                         	LCALL abs
+00000AAD    89813E1C                       	CMP   _AX,#3E81h
+00000AB1    D60D                           	JGE   ??_58_IF
+00000AB3    A324061C                       	LD    _AX,06h[dnt_ptr?_ku_change_checker]
+00000AB7    EF46F5                         	LCALL abs
+00000ABA    89411F1C                       	CMP   _AX,#1F41h
+00000ABE    DE08                           	JLT   ??_58_ELSE
+                    ??_58_IF:
+00000AC0    AD021E                         	LDBZE _BX,#02h
+00000AC3    C325B2001E                     	ST    _BX,00B2h[dnt_ptr?_ku_change_checker]
+                  ??_58_ELSE:
+;000370                break;
+00000AC8    20E5                           	SJMP  ??_57_BREAK
+                ??_57_CASE_2:
+;000372                if ((abs(dnt_ptr->signal.value_max) > 16000) || (abs(dnt_ptr->zero.value_max) > 16000) || (abs(dnt_ptr->current_result) > 8000)) dnt_ptr->control.ku = 1;
+00000ACA    A3241A1C                       	LD    _AX,1Ah[dnt_ptr?_ku_change_checker]
+00000ACE    EF2FF5                         	LCALL abs
+00000AD1    89813E1C                       	CMP   _AX,#3E81h
+00000AD5    D61A                           	JGE   ??_61_IF
+00000AD7    A3245E1C                       	LD    _AX,5Eh[dnt_ptr?_ku_change_checker]
+00000ADB    EF22F5                         	LCALL abs
+00000ADE    89813E1C                       	CMP   _AX,#3E81h
+00000AE2    D60D                           	JGE   ??_61_IF
+00000AE4    A324061C                       	LD    _AX,06h[dnt_ptr?_ku_change_checker]
+00000AE8    EF15F5                         	LCALL abs
+00000AEB    89411F1C                       	CMP   _AX,#1F41h
+00000AEF    DE02                           	JLT   ??_61_ELSE
+                    ??_61_IF:
+00000AF1    20AD                           	SJMP  ??_84_COMMON
+                  ??_61_ELSE:
+;000373                else if ((abs(dnt_ptr->signal.value_min)  < 380) || (abs(dnt_ptr->zero.value_min) < 380) || (abs(dnt_ptr->current_result) < 320)) dnt_ptr->control.ku = 3;
+00000AF3    A3241C1C                       	LD    _AX,1Ch[dnt_ptr?_ku_change_checker]
+00000AF7    EF06F5                         	LCALL abs
+00000AFA    897C011C                       	CMP   _AX,#017Ch
+00000AFE    DE1A                           	JLT   ??_64_IF
+00000B00    A324601C                       	LD    _AX,60h[dnt_ptr?_ku_change_checker]
+00000B04    EFF9F4                         	LCALL abs
+00000B07    897C011C                       	CMP   _AX,#017Ch
+00000B0B    DE0D                           	JLT   ??_64_IF
+00000B0D    A324061C                       	LD    _AX,06h[dnt_ptr?_ku_change_checker]
+00000B11    EFECF4                         	LCALL abs
+00000B14    8940011C                       	CMP   _AX,#0140h
+00000B18    D608                           	JGE   ??_64_ELSE
+                    ??_64_IF:
+00000B1A    AD031E                         	LDBZE _BX,#03h
+00000B1D    C325B2001E                     	ST    _BX,00B2h[dnt_ptr?_ku_change_checker]
+                  ??_64_ELSE:
+;000374                break;
+00000B22    208B                           	SJMP  ??_57_BREAK
+                ??_57_CASE_1:
+;000376                if ((abs(dnt_ptr->signal.value_max) > 16000) || (abs(dnt_ptr->zero.value_max) > 16000) || (abs(dnt_ptr->current_result) > 8000)) dnt_ptr->control.ku = 0;
+00000B24    A3241A1C                       	LD    _AX,1Ah[dnt_ptr?_ku_change_checker]
+00000B28    EFD5F4                         	LCALL abs
+00000B2B    89813E1C                       	CMP   _AX,#3E81h
+00000B2F    D61A                           	JGE   ??_67_IF
+00000B31    A3245E1C                       	LD    _AX,5Eh[dnt_ptr?_ku_change_checker]
+00000B35    EFC8F4                         	LCALL abs
+00000B38    89813E1C                       	CMP   _AX,#3E81h
+00000B3C    D60D                           	JGE   ??_67_IF
+00000B3E    A324061C                       	LD    _AX,06h[dnt_ptr?_ku_change_checker]
+00000B42    EFBBF4                         	LCALL abs
+00000B45    89411F1C                       	CMP   _AX,#1F41h
+00000B49    DE02                           	JLT   ??_67_ELSE
+                    ??_67_IF:
+00000B4B    205D                           	SJMP  ??_83_COMMON
+                  ??_67_ELSE:
+;000377                else if ((abs(dnt_ptr->signal.value_min)  < 380) || (abs(dnt_ptr->zero.value_min) < 380) || (abs(dnt_ptr->current_result) < 320)) dnt_ptr->control.ku = 2;
+00000B4D    A3241C1C                       	LD    _AX,1Ch[dnt_ptr?_ku_change_checker]
+00000B51    EFACF4                         	LCALL abs
+00000B54    897C011C                       	CMP   _AX,#017Ch
+00000B58    DE1A                           	JLT   ??_70_IF
+00000B5A    A324601C                       	LD    _AX,60h[dnt_ptr?_ku_change_checker]
+00000B5E    EF9FF4                         	LCALL abs
+00000B61    897C011C                       	CMP   _AX,#017Ch
+00000B65    DE0D                           	JLT   ??_70_IF
+00000B67    A324061C                       	LD    _AX,06h[dnt_ptr?_ku_change_checker]
+00000B6B    EF92F4                         	LCALL abs
+00000B6E    8940011C                       	CMP   _AX,#0140h
+00000B72    D63B                           	JGE   ??_57_BREAK
+                    ??_70_IF:
+00000B74    AD021E                         	LDBZE _BX,#02h
 ;000378                break;
-;000379        }
-                 ??_56_BREAK:
-;000380    }
-00000B92    CC24                           	POP   _EX
-00000B94    F0                             	RET   
+00000B77    202A                           	SJMP  ??_85_COMMON
+                ??_57_CASE_0:
+;000380                if ((abs(dnt_ptr->signal.value_min) < 380) || (abs(dnt_ptr->zero.value_min) < 380) || (abs(dnt_ptr->current_result) < 320)) dnt_ptr->control.ku = 1;
+00000B79    A3241C1C                       	LD    _AX,1Ch[dnt_ptr?_ku_change_checker]
+00000B7D    EF80F4                         	LCALL abs
+00000B80    897C011C                       	CMP   _AX,#017Ch
+00000B84    DE1A                           	JLT   ??_73_IF
+00000B86    A324601C                       	LD    _AX,60h[dnt_ptr?_ku_change_checker]
+00000B8A    EF73F4                         	LCALL abs
+00000B8D    897C011C                       	CMP   _AX,#017Ch
+00000B91    DE0D                           	JLT   ??_73_IF
+00000B93    A324061C                       	LD    _AX,06h[dnt_ptr?_ku_change_checker]
+00000B97    EF66F4                         	LCALL abs
+00000B9A    8940011C                       	CMP   _AX,#0140h
+00000B9E    D60F                           	JGE   ??_57_BREAK
+                    ??_73_IF:
+                ??_84_COMMON:
+00000BA0    AD011E                         	LDBZE _BX,#01h
+                ??_85_COMMON:
+00000BA3    C325B2001E                     	ST    _BX,00B2h[dnt_ptr?_ku_change_checker]
+;000381                break;
+00000BA8    2005                           	SJMP  ??_57_BREAK
+               ??_57_DEFAULT:
+;000383                dnt_ptr->control.ku = 0;
+                ??_83_COMMON:
+00000BAA    C325B20000                     	ST    00h,00B2h[dnt_ptr?_ku_change_checker]
+;000384                break;
+;000385        }
+                 ??_57_BREAK:
+;000386    }
+00000BAF    CC24                           	POP   _EX
+00000BB1    F0                             	RET   
 .ENDF
           _get_frame_definer:
-;000382    uint16_t _get_frame_definer(typeDNTOperationData* dnt_ptr, uint8_t frame_type)
-00000B95    A01C20                         	LD    _CX,_AX
-;000385        tmp_var =   (uint16_t)((dnt_ptr->frame_modificator & 0x03) << 14) +   // модификатор кадра
-;000386                            (uint16_t)((dnt_ptr->device_number & 0x0F) << 10) +   // номер аппаратуры
-;000387                            (uint16_t)((dnt_ptr->zavod_number & 0x7F) << 3) +    // заводской номер
-;000388                            (uint16_t)(frame_type & 0x07);   // тип кадра
-00000B98    B320081C                       	LDB   tmp_var?_get_frame_definer,08h[dnt_ptr?_get_frame_definer]
-00000B9C    71031C                         	ANDB  tmp_var?_get_frame_definer,#03h
-00000B9F    090E1C                         	SHL   tmp_var?_get_frame_definer,#0Eh
-00000BA2    B3200922                       	LDB   _DL,09h[dnt_ptr?_get_frame_definer]
-00000BA6    710F22                         	ANDB  _DL,#0Fh
-00000BA9    090A22                         	SHL   _DX,#0Ah
-00000BAC    64221C                         	ADD   tmp_var?_get_frame_definer,_DX
-00000BAF    B3200A20                       	LDB   dnt_ptr?_get_frame_definer,0Ah[dnt_ptr?_get_frame_definer]
-00000BB3    717F20                         	ANDB  dnt_ptr?_get_frame_definer,#7Fh
-00000BB6    1121                           	CLRB  (dnt_ptr?_get_frame_definer+1)
-00000BB8    090320                         	SHL   dnt_ptr?_get_frame_definer,#03h
-00000BBB    64201C                         	ADD   tmp_var?_get_frame_definer,dnt_ptr?_get_frame_definer
-00000BBE    71071E                         	ANDB  frame_type?_get_frame_definer,#07h
-00000BC1    111F                           	CLRB  _BH
-00000BC3    641E1C                         	ADD   tmp_var?_get_frame_definer,frame_type?_get_frame_definer
-;000389        return  tmp_var;
-;000390    }
-00000BC6    F0                             	RET   
+;000388    uint16_t _get_frame_definer(typeDNTOperationData* dnt_ptr, uint8_t frame_type)
+00000BB2    A01C20                         	LD    _CX,_AX
+;000391        tmp_var =   (uint16_t)((dnt_ptr->frame_modificator & 0x03) << 14) +   // модификатор кадра
+;000392                            (uint16_t)((dnt_ptr->device_number & 0x0F) << 10) +   // номер аппаратуры
+;000393                            (uint16_t)((dnt_ptr->zavod_number & 0x7F) << 3) +    // заводской номер
+;000394                            (uint16_t)(frame_type & 0x07);   // тип кадра
+00000BB5    B320081C                       	LDB   tmp_var?_get_frame_definer,08h[dnt_ptr?_get_frame_definer]
+00000BB9    71031C                         	ANDB  tmp_var?_get_frame_definer,#03h
+00000BBC    090E1C                         	SHL   tmp_var?_get_frame_definer,#0Eh
+00000BBF    B3200922                       	LDB   _DL,09h[dnt_ptr?_get_frame_definer]
+00000BC3    710F22                         	ANDB  _DL,#0Fh
+00000BC6    090A22                         	SHL   _DX,#0Ah
+00000BC9    64221C                         	ADD   tmp_var?_get_frame_definer,_DX
+00000BCC    B3200A20                       	LDB   dnt_ptr?_get_frame_definer,0Ah[dnt_ptr?_get_frame_definer]
+00000BD0    717F20                         	ANDB  dnt_ptr?_get_frame_definer,#7Fh
+00000BD3    1121                           	CLRB  (dnt_ptr?_get_frame_definer+1)
+00000BD5    090320                         	SHL   dnt_ptr?_get_frame_definer,#03h
+00000BD8    64201C                         	ADD   tmp_var?_get_frame_definer,dnt_ptr?_get_frame_definer
+00000BDB    71071E                         	ANDB  frame_type?_get_frame_definer,#07h
+00000BDE    111F                           	CLRB  _BH
+00000BE0    641E1C                         	ADD   tmp_var?_get_frame_definer,frame_type?_get_frame_definer
+;000395        return  tmp_var;
+;000396    }
+00000BE3    F0                             	RET   
 .ENDF
  _grid_voltage_duty_feedback:
-;000392    uint8 _grid_voltage_duty_feedback (uint16 MON_50V, uint8 Duty)
-00000BC7    A01C20                         	LD    _CX,_AX
-00000BCA    B01E1C                         	LDB   _AL,_BL
-;000394      if (MON_50V/256 > 54) return Duty-1;
-00000BCD    080820                         	SHR   MON_50V?_grid_voltage_duty_feedback,#08h
-00000BD0    89370020                       	CMP   MON_50V?_grid_voltage_duty_feedback,#0037h
-00000BD4    D303                           	JNC   ??_75_ELSE
-00000BD6    151C                           	DECB  Duty?_grid_voltage_duty_feedback
-00000BD8    F0                             	RET   
-                  ??_75_ELSE:
-;000395      else if (MON_50V/256 < 50) return Duty+1;
-00000BD9    89320020                       	CMP   _CX,#0032h
-00000BDD    DB02                           	JC    ??_76_ELSE
-00000BDF    171C                           	INCB  Duty?_grid_voltage_duty_feedback
+;000398    uint8 _grid_voltage_duty_feedback (uint16 MON_50V, uint8 Duty)
+00000BE4    A01C20                         	LD    _CX,_AX
+00000BE7    B01E1C                         	LDB   _AL,_BL
+;000400      if (MON_50V/256 > 54) return Duty-1;
+00000BEA    080820                         	SHR   MON_50V?_grid_voltage_duty_feedback,#08h
+00000BED    89370020                       	CMP   MON_50V?_grid_voltage_duty_feedback,#0037h
+00000BF1    D303                           	JNC   ??_76_ELSE
+00000BF3    151C                           	DECB  Duty?_grid_voltage_duty_feedback
+00000BF5    F0                             	RET   
                   ??_76_ELSE:
-;000396    }
-00000BE1    F0                             	RET   
+;000401      else if (MON_50V/256 < 50) return Duty+1;
+00000BF6    89320020                       	CMP   _CX,#0032h
+00000BFA    DB02                           	JC    ??_77_ELSE
+00000BFC    171C                           	INCB  Duty?_grid_voltage_duty_feedback
+                  ??_77_ELSE:
+;000402    }
+00000BFE    F0                             	RET   
 .ENDF
 uint16_buffer_rev_to_uint8_buffer:
-;000398    void uint16_buffer_rev_to_uint8_buffer(uint16_t *u16_buff, uint8_t * u8_buff, uint8_t u16_len)
-00000BE2    C824                           	PUSH  _EX
-00000BE4    C826                           	PUSH  _FX
-00000BE6    C828                           	PUSH  _GX
-00000BE8    B02028                         	LDB   _GL,_CL
-;000401        for(i=0; i<u16_len; i++){
-00000BEB    0120                           	CLR   i?uint16_buffer_rev_to_uint8_buffer
-00000BED    2027                           	SJMP  ??_77_CHECK
-                  ??_77_LOOP:
-;000402            u8_buff[2*i + 0] = u16_buff[i] >> 8;
-00000BEF    A02022                         	LD    _DX,i?uint16_buffer_rev_to_uint8_buffer
-00000BF2    090122                         	SHL   _DX,#01h
-00000BF5    441E2226                       	ADD   _FX,_DX,u8_buff?uint16_buffer_rev_to_uint8_buffer
-00000BF9    441C2224                       	ADD   _EX,_DX,u16_buff?uint16_buffer_rev_to_uint8_buffer
-00000BFD    A22424                         	LD    _EX,[_EX]
-00000C00    080824                         	SHR   _EX,#08h
-00000C03    C62624                         	STB   _EL,[_FX]
-;000403            u8_buff[2*i + 1] = u16_buff[i] >> 0;
-00000C06    441E2224                       	ADD   _EX,_DX,u8_buff?uint16_buffer_rev_to_uint8_buffer
-00000C0A    641C22                         	ADD   _DX,u16_buff?uint16_buffer_rev_to_uint8_buffer
-00000C0D    AE2222                         	LDBZE _DX,[_DX]
-00000C10    C7240122                       	STB   _DL,01h[_EX]
-;000404        }
-00000C14    0720                           	INC   i?uint16_buffer_rev_to_uint8_buffer
-                 ??_77_CHECK:
-00000C16    AC2822                         	LDBZE _DX,u16_len?uint16_buffer_rev_to_uint8_buffer
-00000C19    882220                         	CMP   i?uint16_buffer_rev_to_uint8_buffer,_DX
-00000C1C    D3D1                           	JNC   ??_77_LOOP
-;000405    }
-00000C1E    2075                           	SJMP  COMMON?END_uint16_buffer_rev_to_uint8_buffer
+;000404    void uint16_buffer_rev_to_uint8_buffer(uint16_t *u16_buff, uint8_t * u8_buff, uint8_t u16_len)
+00000BFF    C824                           	PUSH  _EX
+00000C01    C826                           	PUSH  _FX
+00000C03    C828                           	PUSH  _GX
+00000C05    B02028                         	LDB   _GL,_CL
+;000407        for(i=0; i<u16_len; i++){
+00000C08    0120                           	CLR   i?uint16_buffer_rev_to_uint8_buffer
+00000C0A    2027                           	SJMP  ??_78_CHECK
+                  ??_78_LOOP:
+;000408            u8_buff[2*i + 0] = u16_buff[i] >> 8;
+00000C0C    A02022                         	LD    _DX,i?uint16_buffer_rev_to_uint8_buffer
+00000C0F    090122                         	SHL   _DX,#01h
+00000C12    441E2226                       	ADD   _FX,_DX,u8_buff?uint16_buffer_rev_to_uint8_buffer
+00000C16    441C2224                       	ADD   _EX,_DX,u16_buff?uint16_buffer_rev_to_uint8_buffer
+00000C1A    A22424                         	LD    _EX,[_EX]
+00000C1D    080824                         	SHR   _EX,#08h
+00000C20    C62624                         	STB   _EL,[_FX]
+;000409            u8_buff[2*i + 1] = u16_buff[i] >> 0;
+00000C23    441E2224                       	ADD   _EX,_DX,u8_buff?uint16_buffer_rev_to_uint8_buffer
+00000C27    641C22                         	ADD   _DX,u16_buff?uint16_buffer_rev_to_uint8_buffer
+00000C2A    AE2222                         	LDBZE _DX,[_DX]
+00000C2D    C7240122                       	STB   _DL,01h[_EX]
+;000410        }
+00000C31    0720                           	INC   i?uint16_buffer_rev_to_uint8_buffer
+                 ??_78_CHECK:
+00000C33    AC2822                         	LDBZE _DX,u16_len?uint16_buffer_rev_to_uint8_buffer
+00000C36    882220                         	CMP   i?uint16_buffer_rev_to_uint8_buffer,_DX
+00000C39    D3D1                           	JNC   ??_78_LOOP
+;000411    }
+00000C3B    2075                           	SJMP  COMMON?END_uint16_buffer_rev_to_uint8_buffer
 .ENDF
                   COMAnsForm:
-;000407    uint16 COMAnsForm (uint8 req_id, uint8 self_id, uint8 sub_adress, uint8 *seq_num, uint8 com, uint8 leng, uint8* com_data, uint8* ans_com) //функция для формирования ответов на команды
-00000C20    C824                           	PUSH  _EX
-00000C22    C826                           	PUSH  _FX
-00000C24    C828                           	PUSH  _GX
-00000C26    B01E1F                         	LDB   _BH,_BL
-00000C29    A3180A24                       	LD    _EX,0Ah[_SP]
-00000C2D    B02326                         	LDB   _FL,_DH
-00000C30    A3180828                       	LD    _GX,08h[_SP]
-;000411      *seq_num += 1;
-00000C34    B2201E                         	LDB   _BL,[seq_num?COMAnsForm]
-00000C37    171E                           	INCB  _BL
-00000C39    C6201E                         	STB   _BL,[seq_num?COMAnsForm]
-;000412      ans_com[0] = req_id & 0xFF;
-00000C3C    C6241C                         	STB   req_id?COMAnsForm,[ans_com?COMAnsForm]
-;000413      ans_com[1] = self_id & 0xFF;
-00000C3F    C724011D                       	STB   self_id?COMAnsForm,01h[ans_com?COMAnsForm]
-;000414      ans_com[2] = sub_adress & 0xFF;
-00000C43    C724021F                       	STB   sub_adress?COMAnsForm,02h[ans_com?COMAnsForm]
-;000415      ans_com[3] = (*seq_num) & 0xFF; //не забываем проинкрементировать последовательный номер ответа
-00000C47    B2201C                         	LDB   _AL,[seq_num?COMAnsForm]
-00000C4A    C724031C                       	STB   _AL,03h[ans_com?COMAnsForm]
-;000416      ans_com[4] = com & 0xFF;
-00000C4E    C7240422                       	STB   com?COMAnsForm,04h[ans_com?COMAnsForm]
-;000417      ans_com[5] = leng & 0xFF;
-00000C52    C7240526                       	STB   leng?COMAnsForm,05h[ans_com?COMAnsForm]
-;000418      for(j=0; j < leng; j++)
-00000C56    1120                           	CLRB  j?COMAnsForm
-00000C58    2013                           	SJMP  ??_78_CHECK
-                  ??_78_LOOP:
-;000419      {
-;000420        ans_com[j+6] = com_data[j];
-00000C5A    AC201E                         	LDBZE _BX,j?COMAnsForm
-00000C5D    44241E22                       	ADD   _DX,_BX,ans_com?COMAnsForm
-00000C61    64281E                         	ADD   _BX,com_data?COMAnsForm
-00000C64    B21E1C                         	LDB   _AL,[_BX]
-00000C67    C722061C                       	STB   _AL,06h[_DX]
-;000421      }
-00000C6B    1720                           	INCB  j?COMAnsForm
-                 ??_78_CHECK:
-00000C6D    982620                         	CMPB  j?COMAnsForm,leng?COMAnsForm
-00000C70    D3E8                           	JNC   ??_78_LOOP
-;000422      crc = crc16_ccitt(ans_com, leng+6);
-00000C72    5506261E                       	ADDB  _BL,leng?COMAnsForm,#06h
-00000C76    A0241C                         	LD    crc?COMAnsForm,ans_com?COMAnsForm
-00000C79    EF84F3                         	LCALL crc16_ccitt
-;000423      ans_com[leng+6] = (uint8)((crc>>8) & 0xFF);
-00000C7C    1127                           	CLRB  _FH
-00000C7E    4424261E                       	ADD   _BX,leng?COMAnsForm,ans_com?COMAnsForm
-00000C82    A01C20                         	LD    _CX,crc?COMAnsForm
-00000C85    080820                         	SHR   _CX,#08h
-00000C88    C71E0620                       	STB   _CL,06h[_BX]
-;000424      ans_com[leng+7] = (uint8)((crc>>0) & 0xFF);
-00000C8C    C71E071C                       	STB   crc?COMAnsForm,07h[_BX]
-;000425      return leng+8;
-00000C90    450800261C                     	ADD   _AX,_FX,#0008h
-;000426    }
+;000413    uint16 COMAnsForm (uint8 req_id, uint8 self_id, uint8 sub_adress, uint8 *seq_num, uint8 com, uint8 leng, uint8* com_data, uint8* ans_com) //функция для формирования ответов на команды
+00000C3D    C824                           	PUSH  _EX
+00000C3F    C826                           	PUSH  _FX
+00000C41    C828                           	PUSH  _GX
+00000C43    B01E1F                         	LDB   _BH,_BL
+00000C46    A3180A24                       	LD    _EX,0Ah[_SP]
+00000C4A    B02326                         	LDB   _FL,_DH
+00000C4D    A3180828                       	LD    _GX,08h[_SP]
+;000417      *seq_num += 1;
+00000C51    B2201E                         	LDB   _BL,[seq_num?COMAnsForm]
+00000C54    171E                           	INCB  _BL
+00000C56    C6201E                         	STB   _BL,[seq_num?COMAnsForm]
+;000418      ans_com[0] = req_id & 0xFF;
+00000C59    C6241C                         	STB   req_id?COMAnsForm,[ans_com?COMAnsForm]
+;000419      ans_com[1] = self_id & 0xFF;
+00000C5C    C724011D                       	STB   self_id?COMAnsForm,01h[ans_com?COMAnsForm]
+;000420      ans_com[2] = sub_adress & 0xFF;
+00000C60    C724021F                       	STB   sub_adress?COMAnsForm,02h[ans_com?COMAnsForm]
+;000421      ans_com[3] = (*seq_num) & 0xFF; //не забываем проинкрементировать последовательный номер ответа
+00000C64    B2201C                         	LDB   _AL,[seq_num?COMAnsForm]
+00000C67    C724031C                       	STB   _AL,03h[ans_com?COMAnsForm]
+;000422      ans_com[4] = com & 0xFF;
+00000C6B    C7240422                       	STB   com?COMAnsForm,04h[ans_com?COMAnsForm]
+;000423      ans_com[5] = leng & 0xFF;
+00000C6F    C7240526                       	STB   leng?COMAnsForm,05h[ans_com?COMAnsForm]
+;000424      for(j=0; j < leng; j++)
+00000C73    1120                           	CLRB  j?COMAnsForm
+00000C75    2013                           	SJMP  ??_79_CHECK
+                  ??_79_LOOP:
+;000425      {
+;000426        ans_com[j+6] = com_data[j];
+00000C77    AC201E                         	LDBZE _BX,j?COMAnsForm
+00000C7A    44241E22                       	ADD   _DX,_BX,ans_com?COMAnsForm
+00000C7E    64281E                         	ADD   _BX,com_data?COMAnsForm
+00000C81    B21E1C                         	LDB   _AL,[_BX]
+00000C84    C722061C                       	STB   _AL,06h[_DX]
+;000427      }
+00000C88    1720                           	INCB  j?COMAnsForm
+                 ??_79_CHECK:
+00000C8A    982620                         	CMPB  j?COMAnsForm,leng?COMAnsForm
+00000C8D    D3E8                           	JNC   ??_79_LOOP
+;000428      crc = crc16_ccitt(ans_com, leng+6);
+00000C8F    5506261E                       	ADDB  _BL,leng?COMAnsForm,#06h
+00000C93    A0241C                         	LD    crc?COMAnsForm,ans_com?COMAnsForm
+00000C96    EF67F3                         	LCALL crc16_ccitt
+;000429      ans_com[leng+6] = (uint8)((crc>>8) & 0xFF);
+00000C99    1127                           	CLRB  _FH
+00000C9B    4424261E                       	ADD   _BX,leng?COMAnsForm,ans_com?COMAnsForm
+00000C9F    A01C20                         	LD    _CX,crc?COMAnsForm
+00000CA2    080820                         	SHR   _CX,#08h
+00000CA5    C71E0620                       	STB   _CL,06h[_BX]
+;000430      ans_com[leng+7] = (uint8)((crc>>0) & 0xFF);
+00000CA9    C71E071C                       	STB   crc?COMAnsForm,07h[_BX]
+;000431      return leng+8;
+00000CAD    450800261C                     	ADD   _AX,_FX,#0008h
+;000432    }
 COMMON?END_uint16_buffer_rev_to_uint8_buffer:
-00000C95    CC28                           	POP   _GX
-00000C97    CC26                           	POP   _FX
-00000C99    CC24                           	POP   _EX
-00000C9B    F0                             	RET   
+00000CB2    CC28                           	POP   _GX
+00000CB4    CC26                           	POP   _FX
+00000CB6    CC24                           	POP   _EX
+00000CB8    F0                             	RET   
 .ENDF
 
-.\TestLinear\dnt_fun.c: 3228 byte(s), 3435 line(s), 0 error(s), 3 warning(s)
+.\TestLinear\dnt_fun.c: 3257 byte(s), 3448 line(s), 0 error(s), 3 warning(s)
 

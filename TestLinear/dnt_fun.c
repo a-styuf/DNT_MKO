@@ -47,12 +47,19 @@ void DNT_Frame_Create(typeDNTFrame *dnt_data_frame_ptr, typeDNTOperationData* dn
     dnt_data_frame_ptr->time_hi = (dnt_ptr->time >> 16);
     dnt_data_frame_ptr->time_lo = dnt_ptr->time & 0xFFFF;
     //данные
-    dnt_data_frame_ptr->current = dnt_ptr->current_result;
-    dnt_data_frame_ptr->temperature = dnt_ptr->temperature.value;
+    if (dnt_ptr->control.mode & 0x10){  // режим констант
+        dnt_data_frame_ptr->dnt_state = 0x0003;
+        dnt_data_frame_ptr->current = 0x0102;
+        dnt_data_frame_ptr->temperature = 0x0405;
+    }
+    else{  // нормальный режим
+        dnt_data_frame_ptr->dnt_state = dnt_ptr->control.ku & 0x03;
+        dnt_data_frame_ptr->current = dnt_ptr->current_result;
+        dnt_data_frame_ptr->temperature = dnt_ptr->temperature.value;
+    }
     dnt_data_frame_ptr->shut_off_grid_voltage = dnt_ptr->shut_off_grid.value;
     dnt_data_frame_ptr->signal = dnt_ptr->signal.value;
     dnt_data_frame_ptr->zero = dnt_ptr->zero.value;
-    dnt_data_frame_ptr->dnt_state = dnt_ptr->control.ku & 0x03;
     //обязательная часть кадра - контрольная сумма
     dnt_data_frame_ptr->crc16 = crc16_ccitt((uint8_t*)dnt_data_frame_ptr, 62);
     //
@@ -64,26 +71,25 @@ void Update_DNT_Prameters_from_MKO(typeDNTOperationData* dnt_ptr)
   uint16_t dnt_data[32] = {0};
    //форматируем весь кадр значением 0xFE
     memset((uint8_t*)dnt_data, 0xFE, sizeof(typeDNTFrame));
-	//
+    //
   MKO_receive_data(dnt_data, 29);
   //
-  if ((dnt_data[0] == 0x0FF1) && (dnt_data[1] == (_get_frame_definer(dnt_ptr, 1)&0xFC07))) // проверка на запись в субадрес, но исключаем заводской номер (как заготовка под широковещ. команду)
+  if ((dnt_data[0] == 0x0FF1) && ((dnt_data[1]&0xFC07) == (_get_frame_definer(dnt_ptr, 1)&0xFC07))) // проверка на запись в субадрес, но исключаем заводской номер (как заготовка под широковещ. команду)
   {
     dnt_ptr->control.measure_leng_s = (uint16_t)_check_bounds(dnt_data[2], 1, 20);
     dnt_ptr->control.dead_time_ms = (uint16_t)_check_bounds(dnt_data[3], 20, (dnt_ptr->control.measure_leng_s*1000/4));
     dnt_ptr->control.osc_mode = dnt_data[4] & 0x01;
     dnt_ptr->control.osc_ku = dnt_data[5] & 0x3;
     //
-	
     dnt_ptr->control.mode = dnt_data[6] & 0xFF;
-	Update_MKO_from_DNT_Parameters(dnt_ptr);
+    Update_MKO_from_DNT_Parameters(dnt_ptr);
     if (dnt_data[6]&0x01 != 0)
     {
-		// SBUF_TX1 = ((dnt_ptr->control.osc_mode & 0x0F) << 4) + (dnt_ptr->control.osc_mode & 0x0F);
+        // SBUF_TX1 = ((dnt_ptr->control.osc_mode & 0x0F) << 4) + (dnt_ptr->control.osc_mode & 0x0F);
         Oscilloscope(dnt_ptr->control.osc_ku, dnt_ptr->control.osc_mode, dnt_ptr->control.dead_time_ms);
         dnt_data[6] = 0;
-		dnt_ptr->control.mode = dnt_data[6] & 0xFF;
-		Update_MKO_from_DNT_Parameters(dnt_ptr);
+        dnt_ptr->control.mode = dnt_data[6] & 0xFF;
+        Update_MKO_from_DNT_Parameters(dnt_ptr);
     }
   }
 }

@@ -5,11 +5,15 @@
 *                                                                             *
 *******************************************************************************
 
+Warning[C23] .\TestLinear\uart.c(30,24): Constant is long
+Warning[C23] .\TestLinear\uart.c(30,24): Constant is long
+Warning[C23] .\TestLinear\uart.c(34,24): Constant is long
+Warning[C23] .\TestLinear\uart.c(34,24): Constant is long
                    UART_Init:
 ;FILE: .\TestLinear\uart.c
 ;000026    void UART_Init()
 00000000    C800                           	PUSH  00h
-;000030      BAUD_RATE1 = 0x1F;  //38400
+;000030      BAUD_RATE1 = (uint8_t)UART1_BR_VAL;
 00000002    B11F1C                         	LDB   _AL,#1Fh
 00000005    C70100001C                     	STB   _AL,BAUD_RATE1
 ;000031      BAUD_RATE1 = 0x80;
@@ -18,7 +22,7 @@
 ;000032      SP_CON1     = 0x19;
 00000012    B1191C                         	LDB   _AL,#19h
 00000015    C70100001C                     	STB   _AL,SP_CON1
-;000034      BAUD_RATE0 = 0x1F;  //38400
+;000034      BAUD_RATE0 = (uint8_t)UART0_BR_VAL;
 0000001A    B11F00                         	LDB   BAUD_RATE0,#1Fh
 ;000035      BAUD_RATE0 = 0x80;
 0000001D    B18000                         	LDB   BAUD_RATE0,#80h
@@ -72,58 +76,58 @@
 00000000    F4                             	PUSHA 
 00000001    C81C                           	PUSH  _AX
 00000003    C81E                           	PUSH  _BX
-;000059    	_di_(); // запрет обработки прерываний
+;000059        _di_(); // запрет обработки прерываний
 00000005    FA                             	DI    
-;000060    	status_uart1 = SP_STAT1;
+;000060        status_uart1 = SP_STAT1;
 00000006    B30100001C                     	LDB   _AL,SP_STAT1
 0000000B    C7018C001C                     	STB   _AL,status_uart1
-;000061    	if (status_uart1 & 0x40) //oбрабатываем прерывание по приему
+;000061        if (status_uart1 & 0x40) //oбрабатываем прерывание по приему
 00000010    361C47                         	JBC   _AL,6h,??_1_ELSE
-;000062    	{
-;000063    		if (INT_PEND1 & 0x10) 
+;000062        {
+;000063            if (INT_PEND1 & 0x10)
 00000013    34000C                         	JBC   INT_PEND1,4h,??_2_ELSE
-;000064    		{
-;000065    			len_rx1 = 0;
+;000064            {
+;000065                len_rx1 = 0;
 00000016    C7018A0000                     	STB   00h,len_rx1
-;000066    			UART1_RX_array[len_rx1] = SBUF_RX1; 
+;000066                UART1_RX_array[len_rx1] = SBUF_RX1;
 0000001B    AF018A001C                     	LDBZE _AX,len_rx1
-;000068    		}
+;000068            }
 00000020    201A                           	SJMP  ??_9_COMMON
                    ??_2_ELSE:
-;000069    		else if (len_rx1 > 63)
+;000069            else if (len_rx1 > 63)
 00000022    B3018A001C                     	LDB   _AL,len_rx1
 00000027    99401C                         	CMPB  _AL,#40h
 0000002A    D307                           	JNC   ??_3_ELSE
-;000070    		{
-;000071    			len_rx1 = 0;
+;000070            {
+;000071                len_rx1 = 0;
 0000002C    C7018A0000                     	STB   00h,len_rx1
-;000072    		}
+;000072            }
 00000031    2013                           	SJMP  ??_3_END
                    ??_3_ELSE:
-;000074    		{
-;000075    			len_rx1 ++;
+;000074            {
+;000075                len_rx1 ++;
 00000033    171C                           	INCB  _AL
 00000035    C7018A001C                     	STB   _AL,len_rx1
-;000076    			UART1_RX_array[len_rx1] = SBUF_RX1;
+;000076                UART1_RX_array[len_rx1] = SBUF_RX1;
 0000003A    111D                           	CLRB  _AH
                  ??_9_COMMON:
 0000003C    B30100001E                     	LDB   _BL,SBUF_RX1
 00000041    C71D08001E                     	STB   _BL,UART1_RX_array[_AX]
-;000078    		}
+;000078            }
                     ??_3_END:
-;000079    		len_rx1 &= 0x3F;
+;000079            len_rx1 &= 0x3F;
 00000046    B3018A001C                     	LDB   _AL,len_rx1
 0000004B    713F1C                         	ANDB  _AL,#3Fh
 0000004E    C7018A001C                     	STB   _AL,len_rx1
-;000080    		INT_PEND1 &= ~0x10;  //сброс флага переполнения таймера 2
+;000080            INT_PEND1 &= ~0x10;  //сброс флага переполнения таймера 2
 00000053    71EF00                         	ANDB  INT_PEND1,#0EFh
-;000081    		TIMER2 = 0xF63C;  //межпакетный интервал 2ms
+;000081            TIMER2 = 0xF63C;  //межпакетный интервал 2ms
 00000056    A13CF600                       	LD    TIMER2,#0F63Ch
-;000082    		}
+;000082            }
                    ??_1_ELSE:
-;000084    	{
-;000087    	}
-;000088    	_ei_(); //разрешение обработки прерываний
+;000084        {
+;000087        }
+;000088        _ei_(); //разрешение обработки прерываний
 0000005A    FB                             	EI    
 ;000089    }
 0000005B    CC1E                           	POP   _BX
@@ -142,13 +146,13 @@
 00000082    DF15                           	JE    ??_4_ELSE
 00000084    340012                         	JBC   INT_PEND1,4h,??_4_ELSE
 ;000095      {
-;000096    	len_tmp =  len_rx1 + 1; 
+;000096        len_tmp =  len_rx1 + 1;
 00000087    55012024                       	ADDB  len_tmp?UART1_RX,_CL,#01h
 ;000098        memcpy(buff, UART1_RX_array, len_rx1);
 0000008B    1121                           	CLRB  _CH
 0000008D    A108001E                       	LD    _BX,#UART1_RX_array
 00000091    EF6CFF                         	LCALL memcpy
-;000099    	len_rx1 = 0;
+;000099        len_rx1 = 0;
 00000094    C7018A0000                     	STB   00h,len_rx1
 ;000100      }
                    ??_4_ELSE:
@@ -226,9 +230,10 @@
 ;000128      SBUF_TX1 = UART1_TX_array[0];
 0000011D    B30148001F                     	LDB   _BH,UART1_TX_array
 00000122    C70100001F                     	STB   _BH,SBUF_TX1
-;000129    }00000127    CC24                           	POP   _EX
+;000129    }
+00000127    CC24                           	POP   _EX
 00000129    F0                             	RET   
 .ENDF
 
-.\TestLinear\uart.c: 395 byte(s), 2818 line(s), 0 error(s), 0 warning(s)
+.\TestLinear\uart.c: 395 byte(s), 2825 line(s), 0 error(s), 4 warning(s)
 

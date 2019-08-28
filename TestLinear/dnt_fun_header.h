@@ -2,9 +2,10 @@
 #ifndef _DNT_FUN_HEADER_H_
 #define _DNT_FUN_HEADER_H_
 
+
 // #pragma pack(1)  не работает с компилятором от производителя для МК 1874ВЕ7Т
 
-typedef struct //кадр с данными ДНТ ПА30 !!! нельзя делать 32-битные поля, иначе потом есть проблемы с выкладыванием на подадрес !!!
+typedef struct //кадр с данными ДНТ ПА30 !!! 
 {
     uint16_t label;  //+0
     uint16_t definer; //+2 
@@ -58,7 +59,7 @@ typedef struct //данные для работы с температурой
 
 typedef struct //флаги и параметры для управления работой ДНТ
 {
-	uint16_t mode; //флаги для управления режимами: 0x01 - осциллограмма, 0х02 - единичный запуск измерения, 0х04 - цикличные измерения, 0х10 - режим констант, 0х20 - режим отладки
+	uint16_t mode; //флаги для управления режимами: 0x01 - осциллограмма, 0х02 - единичный запуск измерения, 0х04 - цикличные измерения, 0х10 - режим констант
 	uint16_t measure_leng_s; //длительность одиночного измерения
 	uint16_t dead_time_ms; //время после переключения КУ или калибровки, которое исключается из подсчета тока
 	uint16_t ku; //коэффициент усиления: 0-1, 1-10, 2-100, 3-1000
@@ -101,6 +102,7 @@ void DNT_Frame_Create(typeDNTFrame *dnt_data_frame_ptr, typeDNTOperationData* dn
 void DNT_Parameters_Init(typeDNTOperationData* dnt_ptr, uint16_t meas_leng_s, uint16_t dead_time_ms, uint16_t mode);
 void DNT_Frame_Definer_Init(typeDNTOperationData* dnt_ptr, uint8_t dev_type, uint8_t zav_num);
 void Update_MKO_from_DNT_Parameters(typeDNTOperationData* dnt_ptr);
+void Update_DNT_Prameters_from_MKO(typeDNTOperationData* dnt_ptr);
 uint16_t _get_frame_definer(typeDNTOperationData* dnt_ptr, uint8_t frame_type);
 //current measurement
 uint8_t Current_Calc_Step_10ms(typeDNTOperationData* dnt_ptr); //некая  функция, которая должна запускать один раз в 1 мс, для осуществления итеративного процесса подсчета тока
