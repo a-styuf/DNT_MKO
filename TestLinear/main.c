@@ -139,6 +139,16 @@ void main()
                     leng = COMAnsForm(req_id, ID, request[2], &seq_num, request[4], 64, com_data, answer);
                     UART1_TX(answer, leng);
                 }
+                else if(request[4] == 0x06)// команда для чтения параметров ДНТ по умолчанию
+                {
+                    u16_buff[0] = ZAV_NUMBER;
+                    u16_buff[1] = DEVICE_TYPE;
+                    u16_buff[2] = MEAS_LENG_S;
+                    u16_buff[3] = DEAD_TIME_MS;
+                    uint16_buffer_rev_to_uint8_buffer(u16_buff, com_data, 4);
+                    leng = COMAnsForm(req_id, ID, request[2], &seq_num, request[4], 64, com_data, answer);
+                    UART1_TX(answer, leng);
+                }
                 else if(request[4] == 0xF1)// управление режимом
                 {
                     dnt.control.mode = request[6];

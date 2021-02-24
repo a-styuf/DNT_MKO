@@ -604,9 +604,9 @@ file_name=Other output files|Другие выходные файлы
 Scheme name=Default
 
 [[Main window32]]
-Style=382664704
+Style=399441920
 ExStyle=262400
-WINDOWPLACEMENT=2C0000000200000001000000BB82FFFF0083FFFFFFFFFFFFFFFFFFFFC402000032000000D00700004F050000
+WINDOWPLACEMENT=2C0000000200000003000000BAFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFC402000032000000D00700004F050000
 
 [[Desktop options]]
 EditToolbar=0
@@ -674,7 +674,7 @@ W=440
 H=185
 
 [[[21552]]]
-X=1031
+X=1044
 Y=560
 W=402
 H=297
@@ -1322,55 +1322,6 @@ LFPointSize=9
 
 [[Window32_0]]
 Base=1
-Id=21565
-ActiveSplitter=0
-Style=1443823616
-ExStyle=320
-WINDOWPLACEMENT=2C00000000000000010000000000000000000000000000000000000000000000D4020000F904000016050000
-Title=1
-
-[[Window32_0_Pane_0]]
-Id=21565
-Splitter=0
-W=1257
-H=509
-CaretX=0
-CaretY=0
-Toolbar=1
-StartItem=0
-StartHItem=0
-NumItems=0
-NumHItems=512
-CurItem=0
-LOGFONT=F4FFFFFF000000000000000000000000000000000000000100000200436F7572696572204E6577000000000000000000000000000000000000000000
-LFPointSize=9
-VerticalGrid=0
-HorizontalGrid=0
-TabTitle=Errors/Warnings
-NoWarnings=0
-
-[[Window32_0_Pane_1]]
-Id=21565
-Splitter=1
-W=1257
-H=509
-CaretX=0
-CaretY=0
-Toolbar=1
-StartItem=0
-StartHItem=0
-NumItems=1
-NumHItems=0
-CurItem=0
-LOGFONT=F4FFFFFF000000000000000000000000000000000000000100000200436F7572696572204E6577000000000000000000000000000000000000000000
-LFPointSize=9
-VerticalGrid=0
-HorizontalGrid=0
-TabTitle=Build Log
-NoWarnings=0
-
-[[Window32_1]]
-Base=1
 Id=21665
 ActiveSplitter=1
 Style=1443823616
@@ -1378,10 +1329,10 @@ ExStyle=320
 WINDOWPLACEMENT=2C0000000000000001000000FFFFFFFFFFFFFFFFF9FFFFFFF9FFFFFF00000000000000005C020000D4020000
 Title=1
 
-[[Window32_1_Pane_0]]
+[[Window32_0_Pane_0]]
 Id=21665
 Splitter=0
-W=331
+W=588
 H=635
 CaretX=4294967295
 CaretY=4294967295
@@ -1405,7 +1356,7 @@ State=114
 [[[[0_4_]]]]
 State=96
 
-[[Window32_1_Pane_1]]
+[[Window32_0_Pane_1]]
 Id=21665
 Splitter=1
 W=588
@@ -1435,10 +1386,7 @@ State=96
 [[[[[0_1_1_]]]]]
 State=96
 
-[[[[[[0_1_1_0_]]]]]]
-State=98
-
-[[Window32_2]]
+[[Window32_1]]
 Base=1
 Id=27
 ActiveSplitter=8
@@ -1447,7 +1395,7 @@ ExStyle=320
 WINDOWPLACEMENT=2C0000000000000001000000FFFFFFFFFFFFFFFFF9FFFFFFF9FFFFFF6A01000000000000F7040000D4020000
 Title=1
 
-[[Window32_2_Pane_0]]
+[[Window32_1_Pane_0]]
 Id=27
 Splitter=0
 W=714
@@ -1474,7 +1422,7 @@ BlockCol1=33
 BlockCol2=34
 LineNumbersOn=0
 
-[[Window32_2_Pane_1]]
+[[Window32_1_Pane_1]]
 Id=527
 Splitter=0
 W=172
@@ -1493,7 +1441,7 @@ VerticalGrid=0
 HorizontalGrid=0
 TabTitle=adc_header.h
 
-[[Window32_2_Pane_2]]
+[[Window32_1_Pane_2]]
 Id=27
 Splitter=1
 W=0
@@ -1503,8 +1451,8 @@ CaretY=0
 Toolbar=1
 StartItem=0
 StartHItem=0
-NumItems=19
-NumHItems=32760
+NumItems=0
+NumHItems=0
 CurItem=0
 LOGFONT=F4FFFFFF000000000000000000000000000000000000000100000200436F7572696572204E6577000000000000000000000000000000000000000000
 LFPointSize=9
@@ -1520,7 +1468,7 @@ BlockCol1=0
 BlockCol2=0
 LineNumbersOn=0
 
-[[Window32_2_Pane_3]]
+[[Window32_1_Pane_3]]
 Id=27
 Splitter=2
 W=0
@@ -1547,7 +1495,7 @@ BlockCol1=17022218
 BlockCol2=842661888
 LineNumbersOn=0
 
-[[Window32_2_Pane_4]]
+[[Window32_1_Pane_4]]
 Id=27
 Splitter=3
 W=0
@@ -1574,7 +1522,7 @@ BlockCol1=7
 BlockCol2=41
 LineNumbersOn=0
 
-[[Window32_2_Pane_5]]
+[[Window32_1_Pane_5]]
 Id=27
 Splitter=4
 W=0
@@ -1601,7 +1549,7 @@ BlockCol1=17
 BlockCol2=27
 LineNumbersOn=0
 
-[[Window32_2_Pane_6]]
+[[Window32_1_Pane_6]]
 Id=27
 Splitter=5
 W=0
@@ -1628,7 +1576,7 @@ BlockCol1=0
 BlockCol2=268435456
 LineNumbersOn=0
 
-[[Window32_2_Pane_7]]
+[[Window32_1_Pane_7]]
 Id=27
 Splitter=6
 W=0
@@ -1655,7 +1603,7 @@ BlockCol1=0
 BlockCol2=0
 LineNumbersOn=0
 
-[[Window32_2_Pane_8]]
+[[Window32_1_Pane_8]]
 Id=27
 Splitter=7
 W=0
@@ -1682,7 +1630,7 @@ BlockCol1=42
 BlockCol2=42
 LineNumbersOn=0
 
-[[Window32_2_Pane_9]]
+[[Window32_1_Pane_9]]
 Id=27
 Splitter=8
 W=893
@@ -1709,7 +1657,7 @@ BlockCol1=376353
 BlockCol2=2499805184
 LineNumbersOn=0
 
-[[Window32_2_Pane_10]]
+[[Window32_1_Pane_10]]
 Id=27
 Splitter=9
 W=0
@@ -1736,17 +1684,17 @@ BlockCol1=42
 BlockCol2=42
 LineNumbersOn=0
 
-[[Window32_2_Pane_11]]
+[[Window32_1_Pane_11]]
 Id=27
 Splitter=10
-W=893
-H=638
+W=0
+H=0
 CaretX=6
 CaretY=54
 Toolbar=1
-StartItem=27
+StartItem=53
 StartHItem=0
-NumItems=178
+NumItems=177
 NumHItems=32760
 CurItem=0
 LOGFONT=F4FFFFFF000000000000000000000000000000000000000100000200436F7572696572204E6577000000000000000000000000000000000000000000
@@ -1756,14 +1704,14 @@ HorizontalGrid=0
 TabTitle=main.c
 FileName=D:\YandexDisk\Work\Microcontrolers\1874ВЕ7Т\DNT_MKO\TestLinear\main.c
 InsertMode=1
-BlockStat=3
+BlockStat=0
 BlockLine1=54
 BlockLine2=54
 BlockCol1=4
 BlockCol2=11
 LineNumbersOn=0
 
-[[Window32_2_Pane_12]]
+[[Window32_1_Pane_12]]
 Id=27
 Splitter=11
 W=0
@@ -1790,7 +1738,7 @@ BlockCol1=39
 BlockCol2=47
 LineNumbersOn=0
 
-[[Window32_2_Pane_13]]
+[[Window32_1_Pane_13]]
 Id=27
 Splitter=12
 W=0
@@ -1817,7 +1765,7 @@ BlockCol1=0
 BlockCol2=22
 LineNumbersOn=0
 
-[[Window32_2_Pane_14]]
+[[Window32_1_Pane_14]]
 Id=27
 Splitter=13
 W=0
@@ -1844,7 +1792,7 @@ BlockCol1=23
 BlockCol2=29
 LineNumbersOn=0
 
-[[Window32_2_Pane_15]]
+[[Window32_1_Pane_15]]
 Id=27
 Splitter=14
 W=0
@@ -1871,7 +1819,7 @@ BlockCol1=0
 BlockCol2=18
 LineNumbersOn=0
 
-[[Window32_2_Pane_16]]
+[[Window32_1_Pane_16]]
 Id=27
 Splitter=15
 W=0
@@ -1897,6 +1845,55 @@ BlockLine2=0
 BlockCol1=0
 BlockCol2=536870912
 LineNumbersOn=0
+
+[[Window32_2]]
+Base=1
+Id=21565
+ActiveSplitter=0
+Style=1443823616
+ExStyle=320
+WINDOWPLACEMENT=2C00000000000000010000000000000000000000000000000000000000000000D4020000F904000016050000
+Title=1
+
+[[Window32_2_Pane_0]]
+Id=21565
+Splitter=0
+W=1257
+H=509
+CaretX=0
+CaretY=0
+Toolbar=1
+StartItem=0
+StartHItem=0
+NumItems=10
+NumHItems=512
+CurItem=0
+LOGFONT=F4FFFFFF000000000000000000000000000000000000000100000200436F7572696572204E6577000000000000000000000000000000000000000000
+LFPointSize=9
+VerticalGrid=0
+HorizontalGrid=0
+TabTitle=Errors/Warnings
+NoWarnings=0
+
+[[Window32_2_Pane_1]]
+Id=21565
+Splitter=1
+W=1257
+H=509
+CaretX=0
+CaretY=0
+Toolbar=1
+StartItem=18
+StartHItem=0
+NumItems=49
+NumHItems=512
+CurItem=18
+LOGFONT=F4FFFFFF000000000000000000000000000000000000000100000200436F7572696572204E6577000000000000000000000000000000000000000000
+LFPointSize=9
+VerticalGrid=0
+HorizontalGrid=0
+TabTitle=Build Log
+NoWarnings=0
 
 [Config_Debug]
 ConfName=Debug
@@ -2311,19 +2308,19 @@ USETOOLIW=1
 [[[K1874BE7T Rev.2]]]
 [[[[0]]]]
 Name=Default
-StartAddr=0x100
-EndAddr=0x7FF
+StartAddr=0x800
+EndAddr=0x17FF
 AddrSpaceName=Data
-AddrAreaName=Data
+AddrAreaName=Память сообщений
 CodeAllowed=0
 DataAllowed=1
 
 [[[[1]]]]
 Name=Default
-StartAddr=0x800
-EndAddr=0x17FF
+StartAddr=0x100
+EndAddr=0x7FF
 AddrSpaceName=Data
-AddrAreaName=Память сообщений
+AddrAreaName=Data
 CodeAllowed=0
 DataAllowed=1
 
@@ -2749,19 +2746,19 @@ USETOOLIW=1
 [[[K1874BE7T Rev.2]]]
 [[[[0]]]]
 Name=Default
-StartAddr=0x100
-EndAddr=0x7FF
+StartAddr=0x800
+EndAddr=0x17FF
 AddrSpaceName=Data
-AddrAreaName=Data
+AddrAreaName=Память сообщений
 CodeAllowed=0
 DataAllowed=1
 
 [[[[1]]]]
 Name=Default
-StartAddr=0x800
-EndAddr=0x17FF
+StartAddr=0x100
+EndAddr=0x7FF
 AddrSpaceName=Data
-AddrAreaName=Память сообщений
+AddrAreaName=Data
 CodeAllowed=0
 DataAllowed=1
 

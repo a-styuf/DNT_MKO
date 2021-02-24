@@ -18,7 +18,7 @@
     -m
     -t
     -A (code)CODE(02000H-07FFFH)
-    -A (data)DATA(0800H-017FFH,0100H-07FFH)
+    -A (data)DATA(0100H-07FFH,0800H-017FFH)
     -Z CSTACK(256)
     -Z HEAP(0)
 
@@ -161,7 +161,7 @@
     -m
     -t
     -A (code)CODE(02000H-07FFFH)
-    -A (data)DATA(0800H-017FFH,0100H-07FFH)
+    -A (data)DATA(0100H-07FFH,0800H-017FFH)
     -Z CSTACK(256)
     -Z HEAP(0)
     -K data(01F60h-01FFFh)
@@ -480,9 +480,9 @@
   ------------------------------------------------------------
   Module                      Size        Align        Offset 
   ============================================================
-  MAIN                      00000396        00        00000000
+  MAIN                      000003C8        00        00000000
   ============================================================
-  Total:                    00000396        00
+  Total:                    000003C8        00
 
 
   Segment: FUN_CODE__MEMCPY                        code    REL
@@ -800,12 +800,12 @@
 
   Segment:                       FUN_CODE__MAIN
   Allocation:                    code
-  Size:                          00000396
+  Size:                          000003C8
   Align:                         00
   Address area:                  CODE
   Border:                        >00000000
   Placed at:                     000037D3
-  Ends at:                       00003B68
+  Ends at:                       00003B9A
 
 
   Segment:                       FUN_CODE__MKO_UD
@@ -814,8 +814,8 @@
   Align:                         00
   Address area:                  CODE
   Border:                        >00000000
-  Placed at:                     00003B69
-  Ends at:                       00003CB8
+  Placed at:                     00003B9B
+  Ends at:                       00003CEA
 
 
   Segment:                       FUN_CODE__PWM
@@ -824,8 +824,8 @@
   Align:                         00
   Address area:                  CODE
   Border:                        >00000000
-  Placed at:                     00003CB9
-  Ends at:                       00003CD1
+  Placed at:                     00003CEB
+  Ends at:                       00003D03
 
 
   Segment:                       FUN_CODE__TIMERS
@@ -834,8 +834,8 @@
   Align:                         00
   Address area:                  CODE
   Border:                        >00000000
-  Placed at:                     00003CD2
-  Ends at:                       00003D07
+  Placed at:                     00003D04
+  Ends at:                       00003D39
 
 
   Segment:                       FUN_CODE__UART
@@ -844,8 +844,8 @@
   Align:                         00
   Address area:                  CODE
   Border:                        >00000000
-  Placed at:                     00003D08
-  Ends at:                       00003DE5
+  Placed at:                     00003D3A
+  Ends at:                       00003E17
 
 
   Segment:                       IDATA_INI__MKO_UD
@@ -854,8 +854,8 @@
   Align:                         00
   Address area:                  CODE
   Border:                        >00000000
-  Placed at:                     00003DE6
-  Ends at:                       00003DEA
+  Placed at:                     00003E18
+  Ends at:                       00003E1C
 
 
   Segment:                       ISR_CODE__MKO_UD
@@ -864,8 +864,8 @@
   Align:                         00
   Address area:                  CODE
   Border:                        >00000000
-  Placed at:                     00003DEB
-  Ends at:                       00003E1E
+  Placed at:                     00003E1D
+  Ends at:                       00003E50
 
 
   Segment:                       ISR_CODE__TIMERS
@@ -874,8 +874,8 @@
   Align:                         00
   Address area:                  CODE
   Border:                        >00000000
-  Placed at:                     00003E1F
-  Ends at:                       00003E98
+  Placed at:                     00003E51
+  Ends at:                       00003ECA
 
 
   Segment:                       ISR_CODE__UART
@@ -884,8 +884,8 @@
   Align:                         00
   Address area:                  CODE
   Border:                        >00000000
-  Placed at:                     00003E99
-  Ends at:                       00003EF9
+  Placed at:                     00003ECB
+  Ends at:                       00003F2B
 
 
   Segment:                       CSTACK
@@ -979,16 +979,16 @@
   FUN_CODE__ADC                  0     0000293A    00002B1C  000001E3    483
   FUN_CODE__CRC16                0     00002B1D    00002B67  0000004B    75
   FUN_CODE__DNT_FUN              0     00002B68    000037D2  00000C6B    3179
-  FUN_CODE__MAIN                 0     000037D3    00003B68  00000396    918
-  FUN_CODE__MKO_UD               0     00003B69    00003CB8  00000150    336
-  FUN_CODE__PWM                  0     00003CB9    00003CD1  00000019    25
-  FUN_CODE__TIMERS               0     00003CD2    00003D07  00000036    54
-  FUN_CODE__UART                 0     00003D08    00003DE5  000000DE    222
-  IDATA_INI__MKO_UD              0     00003DE6    00003DEA  00000005    5
-  ISR_CODE__MKO_UD               0     00003DEB    00003E1E  00000034    52
-  ISR_CODE__TIMERS               0     00003E1F    00003E98  0000007A    122
-  ISR_CODE__UART                 0     00003E99    00003EF9  00000061    97
-  *** GAP ***                    -     00003EFA    00007FFF  00004106    16646
+  FUN_CODE__MAIN                 0     000037D3    00003B9A  000003C8    968
+  FUN_CODE__MKO_UD               0     00003B9B    00003CEA  00000150    336
+  FUN_CODE__PWM                  0     00003CEB    00003D03  00000019    25
+  FUN_CODE__TIMERS               0     00003D04    00003D39  00000036    54
+  FUN_CODE__UART                 0     00003D3A    00003E17  000000DE    222
+  IDATA_INI__MKO_UD              0     00003E18    00003E1C  00000005    5
+  ISR_CODE__MKO_UD               0     00003E1D    00003E50  00000034    52
+  ISR_CODE__TIMERS               0     00003E51    00003ECA  0000007A    122
+  ISR_CODE__UART                 0     00003ECB    00003F2B  00000061    97
+  *** GAP ***                    -     00003F2C    00007FFF  000040D4    16596
 
 
   Address area: DATA
@@ -1021,7 +1021,7 @@
   Name                           Segment          Value       Type info
 
   ?CCB_DATA                      n/a             0000001F     n/a
-  ?INTERRUPT00                   ISR_CODE__TIMER 00003E1F     n/a
+  ?INTERRUPT00                   ISR_CODE__TIMER 00003E51     n/a
   ?INTERRUPT01                   CSEG__??ISR     000025D6     n/a
   ?INTERRUPT02                   CSEG__??ISR     000025D9     n/a
   ?INTERRUPT03                   CSEG__??ISR     000025DC     n/a
@@ -1029,8 +1029,8 @@
   ?INTERRUPT05                   CSEG__??ISR     000025E2     n/a
   ?INTERRUPT06                   CSEG__??ISR     000025E5     n/a
   ?INTERRUPT07                   CSEG__??ISR     000025E8     n/a
-  ?INTERRUPT08                   ISR_CODE__UART  00003E99     n/a
-  ?INTERRUPT09                   ISR_CODE__MKO_U 00003DEB     n/a
+  ?INTERRUPT08                   ISR_CODE__UART  00003ECB     n/a
+  ?INTERRUPT09                   ISR_CODE__MKO_U 00003E1D     n/a
   ?INTERRUPT10                   CSEG__??ISR     000025EB     n/a
   ?INTERRUPT11                   CSEG__??ISR     000025EE     n/a
   ?INTERRUPT12                   CSEG__??ISR     000025F1     n/a
@@ -1098,14 +1098,14 @@
   IOS0                           ??ABS_REG       00000015 *** unsigned char
   IOS1                           ??ABS_REG       00000016     unsigned char
   IOS2                           ??ABS_REG       00000017 *** unsigned char
-  IRQ_MKO_UD                     ISR_CODE__MKO_U 00003DEB *** <function>
-  IRQ_Timer1                     ISR_CODE__TIMER 00003E1F *** <function>
-  IRQ_uart_rx_tx                 ISR_CODE__UART  00003E99 *** <function>
-  MKO_UD_Init                    FUN_CODE__MKO_U 00003B69     <function>
-  MKO_data_to_transmit           FUN_CODE__MKO_U 00003B82     <function>
-  MKO_get_data_from_transmit_sub FUN_CODE__MKO_U 00003C74     <function>
-  MKO_receive_data               FUN_CODE__MKO_U 00003BCB     <function>
-  MKO_receive_data_change        FUN_CODE__MKO_U 00003C21     <function>
+  IRQ_MKO_UD                     ISR_CODE__MKO_U 00003E1D *** <function>
+  IRQ_Timer1                     ISR_CODE__TIMER 00003E51 *** <function>
+  IRQ_uart_rx_tx                 ISR_CODE__UART  00003ECB *** <function>
+  MKO_UD_Init                    FUN_CODE__MKO_U 00003B9B     <function>
+  MKO_data_to_transmit           FUN_CODE__MKO_U 00003BB4     <function>
+  MKO_get_data_from_transmit_sub FUN_CODE__MKO_U 00003CA6     <function>
+  MKO_receive_data               FUN_CODE__MKO_U 00003BFD     <function>
+  MKO_receive_data_change        FUN_CODE__MKO_U 00003C53     <function>
   MKO_rv_data                    IDATA__MKO_UD   00000200 *** <pointer>
   MKO_tr_data                    IDATA__MKO_UD   00000202     <pointer>
   Oscilloscope                   FUN_CODE__ADC   00002A35     <function>
@@ -1118,8 +1118,8 @@
   PWM0_CONTROL                   ??ABS_REG       00000017 *** unsigned char
   PWM1_CONTROL                   ??ABS_REG       00000016     unsigned char
   PWM2_CONTROL                   ??ABS_REG       00000017 *** unsigned char
-  PWM_Duty                       FUN_CODE__PWM   00003CC1     <function>
-  PWM_Init                       FUN_CODE__PWM   00003CB9     <function>
+  PWM_Duty                       FUN_CODE__PWM   00003CF3     <function>
+  PWM_Init                       FUN_CODE__PWM   00003CEB     <function>
   SBUF_RX0                       ??ABS_REG       00000007 *** unsigned char
   SBUF_RX1                       ??ABS_DATA      00001FAB     unsigned char
   SBUF_TX0                       ??ABS_REG       00000007     unsigned char
@@ -1140,13 +1140,13 @@
   TIMER2_LO                      ??ABS_REG       0000000C *** unsigned char
   TIMER_10MS                     UDATA__TIMERS   000004E6     unsigned int
   Temp_Calc_Step_10ms            FUN_CODE__DNT_F 00003030     <function>
-  Timer10ms_Flag                 FUN_CODE__TIMER 00003CF2     <function>
-  Timer_Init                     FUN_CODE__TIMER 00003CD2     <function>
-  UART1_RX                       FUN_CODE__UART  00003D7E     <function>
+  Timer10ms_Flag                 FUN_CODE__TIMER 00003D24     <function>
+  Timer_Init                     FUN_CODE__TIMER 00003D04     <function>
+  UART1_RX                       FUN_CODE__UART  00003DB0     <function>
   UART1_RX_array                 UDATA__UART     000004F4 *** <array>
-  UART1_TX                       FUN_CODE__UART  00003DA7     <function>
+  UART1_TX                       FUN_CODE__UART  00003DD9     <function>
   UART1_TX_array                 UDATA__UART     00000534 *** <array>
-  UART_Init                      FUN_CODE__UART  00003D08     <function>
+  UART_Init                      FUN_CODE__UART  00003D3A     <function>
   UartPTS                        UDATA__UART     000004EC *** <struct>
   Update_DNT_Prameters_from_MKO  FUN_CODE__DNT_F 00002C78     <function>
   Update_MKO_from_DNT_Parameters FUN_CODE__DNT_F 00002D76     <function>
