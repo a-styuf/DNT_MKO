@@ -48,7 +48,7 @@
 ;000063        DNT_Frame_Definer_Init(&dnt, DEVICE_TYPE, ZAV_NUMBER);
 00000052    A100001C                       	LD    _AX,#dnt
 00000056    B1021E                         	LDB   _BL,#02h
-00000059    B10A1F                         	LDB   _BH,#0Ah
+00000059    B10C1F                         	LDB   _BH,#0Ch
 0000005C    EFA1FF                         	LCALL DNT_Frame_Definer_Init
 ;000064        DNT_Frame_Init(&dnt_data_frame, &dnt);
 0000005F    A100001C                       	LD    _AX,#dnt_data_frame
@@ -285,7 +285,7 @@
 0000024A    D74F                           	JNE   ??_15_ELSE
 ;000143                    {
 ;000144                        u16_buff[0] = ZAV_NUMBER;
-0000024C    AD0A1C                         	LDBZE _AX,#0Ah
+0000024C    AD0C1C                         	LDBZE _AX,#0Ch
 0000024F    C30102001C                     	ST    _AX,u16_buff
 ;000145                        u16_buff[1] = DEVICE_TYPE;
 00000254    AD021C                         	LDBZE _AX,#02h
