@@ -18,7 +18,7 @@
     -m
     -t
     -A (code)CODE(02000H-07FFFH)
-    -A (data)DATA(0100H-07FFH,0800H-017FFH)
+    -A (data)DATA(0800H-017FFH,0100H-07FFH)
     -Z CSTACK(256)
     -Z HEAP(0)
 
@@ -161,7 +161,7 @@
     -m
     -t
     -A (code)CODE(02000H-07FFFH)
-    -A (data)DATA(0100H-07FFH,0800H-017FFH)
+    -A (data)DATA(0800H-017FFH,0100H-07FFH)
     -Z CSTACK(256)
     -Z HEAP(0)
     -K data(01F60h-01FFFh)
