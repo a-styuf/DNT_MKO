@@ -19,7 +19,7 @@
 /*----параметры по умолчанию для измерения тока---*/
 #define MEAS_LENG_S 1
 #define DEAD_TIME_MS 100
-#define MODE DNT_MODE_CYCLIC_MEAS
+#define MODE DNT_MODE_SINGLE_MEAS
 /*---параметры рибора----*/
 #define DEVICE_TYPE 2 // 2 - ДНТ (Формат кадров определял Игорь Щепихин)
 #define ZAV_NUMBER 13 // 3 - реестр, 4 - СУХД, 9-12 - МБКАП з.н.02-05, 13 - ОАИ ДНТ
