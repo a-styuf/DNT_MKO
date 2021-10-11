@@ -604,9 +604,9 @@ file_name=Other output files|Другие выходные файлы
 Scheme name=Default
 
 [[Main window32]]
-Style=399441920
+Style=382664704
 ExStyle=262400
-WINDOWPLACEMENT=2C0000000200000003000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFC402000032000000D00700004F050000
+WINDOWPLACEMENT=2C00000000000000010000009982FFFF0083FFFFFFFFFFFFFFFFFFFF260D00007500000032120000C3050000
 
 [[Desktop options]]
 EditToolbar=0
@@ -632,9 +632,9 @@ W=344
 H=292
 
 [[[20512]]]
-X=1008
+X=1087
 Y=620
-W=474
+W=316
 H=177
 
 [[[6526]]]
@@ -662,7 +662,7 @@ W=476
 H=594
 
 [[[22271]]]
-X=793
+X=776
 Y=449
 W=905
 H=518
@@ -674,7 +674,7 @@ W=440
 H=185
 
 [[[21552]]]
-X=1044
+X=1027
 Y=560
 W=402
 H=297
@@ -686,10 +686,10 @@ W=345
 H=227
 
 [[[13100]]]
-X=1008
-Y=495
-W=464
-H=421
+X=1053
+Y=537
+W=350
+H=343
 
 [[[20480]]]
 X=743
@@ -1028,10 +1028,10 @@ W=572
 H=333
 
 [[[21678]]]
-X=978
-Y=436
-W=524
-H=539
+X=994
+Y=518
+W=503
+H=380
 
 [[[22221]]]
 X=1061
@@ -1326,14 +1326,14 @@ Id=21665
 ActiveSplitter=1
 Style=1443823616
 ExStyle=320
-WINDOWPLACEMENT=2C0000000000000001000000FFFFFFFFFFFFFFFFF9FFFFFFF9FFFFFF00000000000000005C020000D4020000
+WINDOWPLACEMENT=2C0000000000000001000000FFFFFFFFFFFFFFFFF9FFFFFFF9FFFFFF000000000000000062010000DD030000
 Title=1
 
 [[Window32_0_Pane_0]]
 Id=21665
 Splitter=0
-W=588
-H=635
+W=338
+H=900
 CaretX=4294967295
 CaretY=4294967295
 Toolbar=1
@@ -1359,8 +1359,8 @@ State=96
 [[Window32_0_Pane_1]]
 Id=21665
 Splitter=1
-W=588
-H=634
+W=338
+H=899
 CaretX=4294967295
 CaretY=4294967295
 Toolbar=1
@@ -1381,25 +1381,25 @@ TreeHPos=0
 State=96
 
 [[[[0_1_]]]]
-State=96
+State=98
 
 [[[[[0_1_1_]]]]]
-State=98
+State=96
 
 [[Window32_1]]
 Base=1
 Id=27
-ActiveSplitter=10
+ActiveSplitter=11
 Style=1443823616
 ExStyle=320
-WINDOWPLACEMENT=2C0000000000000001000000FFFFFFFFFFFFFFFFF9FFFFFFF9FFFFFF6A01000000000000F7040000D4020000
+WINDOWPLACEMENT=2C0000000000000001000000FFFFFFFFFFFFFFFFF9FFFFFFF9FFFFFF6201000000000000CB040000DD030000
 Title=1
 
 [[Window32_1_Pane_0]]
 Id=27
 Splitter=0
 W=714
-H=638
+H=903
 CaretX=37
 CaretY=11
 Toolbar=1
@@ -1425,8 +1425,8 @@ LineNumbersOn=0
 [[Window32_1_Pane_1]]
 Id=527
 Splitter=0
-W=172
-H=638
+W=136
+H=903
 CaretX=4294967295
 CaretY=4294967295
 Toolbar=1
@@ -1530,10 +1530,10 @@ H=0
 CaretX=50
 CaretY=76
 Toolbar=1
-StartItem=44
+StartItem=75
 StartHItem=0
-NumItems=0
-NumHItems=0
+NumItems=98
+NumHItems=32760
 CurItem=0
 LOGFONT=F4FFFFFF000000000000000000000000000000000000000100000200436F7572696572204E6577000000000000000000000000000000000000000000
 LFPointSize=9
@@ -1633,15 +1633,15 @@ LineNumbersOn=0
 [[Window32_1_Pane_9]]
 Id=27
 Splitter=8
-W=893
-H=638
+W=0
+H=0
 CaretX=0
 CaretY=2522
 Toolbar=1
 StartItem=2500
 StartHItem=0
-NumItems=2529
-NumHItems=32760
+NumItems=0
+NumHItems=0
 CurItem=0
 LOGFONT=F4FFFFFF000000000000000000000000000000000000000100000200436F7572696572204E6577000000000000000000000000000000000000000000
 LFPointSize=9
@@ -1687,12 +1687,12 @@ LineNumbersOn=0
 [[Window32_1_Pane_11]]
 Id=27
 Splitter=10
-W=893
-H=638
-CaretX=6
-CaretY=1
+W=857
+H=903
+CaretX=17
+CaretY=160
 Toolbar=1
-StartItem=0
+StartItem=109
 StartHItem=0
 NumItems=187
 NumHItems=32760
@@ -1705,24 +1705,24 @@ TabTitle=main.c
 FileName=D:\YandexDisk\Work\Microcontrolers\1874ВЕ7Т\DNT_MKO\TestLinear\main.c
 InsertMode=1
 BlockStat=0
-BlockLine1=54
-BlockLine2=54
+BlockLine1=52
+BlockLine2=52
 BlockCol1=4
-BlockCol2=11
+BlockCol2=15
 LineNumbersOn=0
 
 [[Window32_1_Pane_12]]
 Id=27
 Splitter=11
-W=0
-H=0
-CaretX=24
-CaretY=66
+W=857
+H=903
+CaretX=49
+CaretY=47
 Toolbar=1
-StartItem=65
+StartItem=33
 StartHItem=0
-NumItems=0
-NumHItems=0
+NumItems=433
+NumHItems=32760
 CurItem=0
 LOGFONT=F4FFFFFF000000000000000000000000000000000000000100000200436F7572696572204E6577000000000000000000000000000000000000000000
 LFPointSize=9
@@ -1732,10 +1732,10 @@ TabTitle=dnt_fun.c
 FileName=D:\YandexDisk\Work\Microcontrolers\1874ВЕ7Т\DNT_MKO\TestLinear\dnt_fun.c
 InsertMode=1
 BlockStat=0
-BlockLine1=95
-BlockLine2=95
-BlockCol1=39
-BlockCol2=47
+BlockLine1=46
+BlockLine2=46
+BlockCol1=55
+BlockCol2=63
 LineNumbersOn=0
 
 [[Window32_1_Pane_13]]
@@ -1746,10 +1746,10 @@ H=0
 CaretX=3
 CaretY=96
 Toolbar=1
-StartItem=63
+StartItem=95
 StartHItem=0
-NumItems=0
-NumHItems=0
+NumItems=141
+NumHItems=32760
 CurItem=0
 LOGFONT=F4FFFFFF000000000000000000000000000000000000000100000200436F7572696572204E6577000000000000000000000000000000000000000000
 LFPointSize=9
@@ -1852,14 +1852,14 @@ Id=21565
 ActiveSplitter=0
 Style=1443823616
 ExStyle=320
-WINDOWPLACEMENT=2C00000000000000010000000000000000000000000000000000000000000000D4020000F904000016050000
+WINDOWPLACEMENT=2C0000000000000001000000FFFFFFFFFFFFFFFF0000000000000000FFFFFFFFDD030000CA04000004050000
 Title=1
 
 [[Window32_2_Pane_0]]
 Id=21565
 Splitter=0
-W=1257
-H=509
+W=1211
+H=226
 CaretX=0
 CaretY=0
 Toolbar=1
@@ -1878,16 +1878,16 @@ NoWarnings=0
 [[Window32_2_Pane_1]]
 Id=21565
 Splitter=1
-W=1257
-H=509
+W=1211
+H=226
 CaretX=0
 CaretY=0
 Toolbar=1
-StartItem=17
+StartItem=36
 StartHItem=0
-NumItems=48
+NumItems=49
 NumHItems=512
-CurItem=17
+CurItem=36
 LOGFONT=F4FFFFFF000000000000000000000000000000000000000100000200436F7572696572204E6577000000000000000000000000000000000000000000
 LFPointSize=9
 VerticalGrid=0
@@ -2308,19 +2308,19 @@ USETOOLIW=1
 [[[K1874BE7T Rev.2]]]
 [[[[0]]]]
 Name=Default
-StartAddr=0x100
-EndAddr=0x7FF
+StartAddr=0x800
+EndAddr=0x17FF
 AddrSpaceName=Data
-AddrAreaName=Data
+AddrAreaName=Память сообщений
 CodeAllowed=0
 DataAllowed=1
 
 [[[[1]]]]
 Name=Default
-StartAddr=0x800
-EndAddr=0x17FF
+StartAddr=0x100
+EndAddr=0x7FF
 AddrSpaceName=Data
-AddrAreaName=Память сообщений
+AddrAreaName=Data
 CodeAllowed=0
 DataAllowed=1
 
@@ -2441,7 +2441,7 @@ CreateBAK=0
 VerticalBlocks=0
 PersistentBlocks=0
 SrcCaseSensitive=0
-SrcWholeWords=0
+SrcWholeWords=1
 SrcRegExprs=0
 SrcGlobal=0
 WriteUpScanRange=24
@@ -2591,7 +2591,7 @@ OS=Windows Windows 8 x64 [ver. 6.2, build = 9200, SP: '']
 Arch=Intel
 NumProcessors=8
 ActiveProcessors=0xFF
-Resolution=2491x1417
+Resolution=2457x1417
 Project=CM-96
 ProjectVersion=1.30.01
 Component=CM-96
@@ -2746,19 +2746,19 @@ USETOOLIW=1
 [[[K1874BE7T Rev.2]]]
 [[[[0]]]]
 Name=Default
-StartAddr=0x100
-EndAddr=0x7FF
+StartAddr=0x800
+EndAddr=0x17FF
 AddrSpaceName=Data
-AddrAreaName=Data
+AddrAreaName=Память сообщений
 CodeAllowed=0
 DataAllowed=1
 
 [[[[1]]]]
 Name=Default
-StartAddr=0x800
-EndAddr=0x17FF
+StartAddr=0x100
+EndAddr=0x7FF
 AddrSpaceName=Data
-AddrAreaName=Память сообщений
+AddrAreaName=Data
 CodeAllowed=0
 DataAllowed=1
 

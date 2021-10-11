@@ -44,8 +44,8 @@ void DNT_Frame_Create(typeDNTFrame *dnt_data_frame_ptr, typeDNTOperationData* dn
     dnt_ptr->frame_num ++;
     //заполняем данные для кадра
     dnt_data_frame_ptr->num = dnt_ptr->frame_num;
-    dnt_data_frame_ptr->time_hi = (dnt_ptr->time >> 16);
-    dnt_data_frame_ptr->time_lo = dnt_ptr->time & 0xFFFF;
+    dnt_data_frame_ptr->time_hi = (dnt_ptr->time >> 16) & 0xFFFF;
+    dnt_data_frame_ptr->time_lo = (dnt_ptr->time) & 0xFFFF;
     //данные
     if (dnt_ptr->control.mode & 0x10){  // режим констант
         dnt_data_frame_ptr->dnt_state = 0x0003;
@@ -149,7 +149,7 @@ uint8_t Current_Calc_Step_10ms(typeDNTOperationData* dnt_ptr) //некая  фу
             if ((dnt_ptr->control.measure_cycle_time_ms > 0) && (dnt_ptr->control.measure_cycle_time_ms < dnt_ptr->control.zero_cycle_ref_point)){ //определяем мертвое время для измерения нуля
                 IOPORT1 = 0x38&(0x00|ku_gpio_set(dnt_ptr->control.ku)); //определяем состояние gpio и КУ для измерения  нуля
                 if ((dnt_ptr->control.measure_cycle_time_ms >=  dnt_ptr->control.zero_dead_time_ref_point)){ //измерение нуля
-                     _adc_data_get(&dnt_ptr->zero);
+                    _adc_data_get(&dnt_ptr->zero);
                 }
             }
             else if ((dnt_ptr->control.measure_cycle_time_ms >= dnt_ptr->control.zero_cycle_ref_point) && (dnt_ptr->control.measure_cycle_time_ms < dnt_ptr->control.signal_cycle_ref_point)){ //мертвое время измерения сигнала
@@ -256,13 +256,13 @@ void _cycle_measure_struct_init(typeDNTOperationData* dnt_ptr)
   //
   dnt_ptr->signal.value_summ_buffer = 0;
   dnt_ptr->signal.value_summ_number = 0;
-  dnt_ptr->signal.value_max = 0;
-  dnt_ptr->signal.value_min = 17000;
+  dnt_ptr->signal.value_max = DNT_ADC_VALUE_MIN;
+  dnt_ptr->signal.value_min = DNT_ADC_VALUE_MAX;
   //
   dnt_ptr->zero.value_summ_buffer = 0;
   dnt_ptr->zero.value_summ_number = 0;
-  dnt_ptr->zero.value_max = 0;
-  dnt_ptr->zero.value_min = 17000;
+  dnt_ptr->zero.value_max = DNT_ADC_VALUE_MIN;
+  dnt_ptr->zero.value_min = DNT_ADC_VALUE_MAX;
 }
 
 void _single_measure_struct_init(typeDNTOperationData* dnt_ptr)
@@ -289,13 +289,13 @@ void _single_measure_struct_init(typeDNTOperationData* dnt_ptr)
     for(i=0; i<4; i++){
         dnt_ptr->signal.value_summ_buffer_arr[i] = 0;
         dnt_ptr->signal.value_summ_number_arr[i] = 0;
-        dnt_ptr->signal.value_max_arr[i] = 0;
-        dnt_ptr->signal.value_min_arr[i] = 17000;
+        dnt_ptr->signal.value_max_arr[i] = DNT_ADC_VALUE_MIN;
+        dnt_ptr->signal.value_min_arr[i] = DNT_ADC_VALUE_MAX;
         //
         dnt_ptr->zero.value_summ_buffer_arr[i] = 0;
         dnt_ptr->zero.value_summ_number_arr[i] = 0;
-        dnt_ptr->zero.value_max_arr[i] = 0;
-        dnt_ptr->zero.value_min_arr[i] = 17000;
+        dnt_ptr->zero.value_max_arr[i] = DNT_ADC_VALUE_MIN;
+        dnt_ptr->zero.value_min_arr[i] = DNT_ADC_VALUE_MAX;
     }
 }
 
@@ -334,14 +334,14 @@ void _single_meas_adc_data_get(typeDNTCurrent *signal_ptr, uint8_t ku)
     signal_ptr->value_summ_buffer_arr[ku] += adc_var;
     signal_ptr->value_summ_number_arr[ku] += 1;
     signal_ptr->value_max_arr[ku] = max(signal_ptr->value_max_arr[ku], adc_var);
-    signal_ptr->value_min_arr[ku] = min(signal_ptr->value_max_arr[ku], adc_var);
+    signal_ptr->value_min_arr[ku] = min(signal_ptr->value_min_arr[ku], adc_var);
 }
 
 void _single_meas_current_result_calc(typeDNTOperationData* dnt_ptr)
 {
     int8_t i;
     for (i=3; i>=0; i--){
-        if ((dnt_ptr->signal.value_max_arr[i]  <=  16000) & (dnt_ptr->zero.value_max_arr[i]  <= 16000)) //проверяем, подходит ли нам данный КУ
+        if ((dnt_ptr->signal.value_max_arr[i]  <=  DNT_ADC_VALUE_TOP_BOUND) & (dnt_ptr->zero.value_max_arr[i]  <= DNT_ADC_VALUE_TOP_BOUND)) //проверяем, подходит ли нам данный КУ
         {
             if ((dnt_ptr->signal.value_summ_number_arr[i] == 0) || (dnt_ptr->zero.value_summ_number_arr[i] == 0)) {
                 dnt_ptr->current_result = 0x0000;
@@ -366,18 +366,19 @@ void _ku_change_checker(typeDNTOperationData* dnt_ptr)
     switch (dnt_ptr->control.ku)
     {
         case 3:
-            if ((abs(dnt_ptr->signal.value_max) > 16000) || (abs(dnt_ptr->zero.value_max) > 16000) || (abs(dnt_ptr->current_result) > 8000)) dnt_ptr->control.ku = 2;
-            break;
         case 2:
-            if ((abs(dnt_ptr->signal.value_max) > 16000) || (abs(dnt_ptr->zero.value_max) > 16000) || (abs(dnt_ptr->current_result) > 8000)) dnt_ptr->control.ku = 1;
-            else if ((abs(dnt_ptr->signal.value_min)  < 380) || (abs(dnt_ptr->zero.value_min) < 380) || (abs(dnt_ptr->current_result) < 320)) dnt_ptr->control.ku = 3;
-            break;
         case 1:
-            if ((abs(dnt_ptr->signal.value_max) > 16000) || (abs(dnt_ptr->zero.value_max) > 16000) || (abs(dnt_ptr->current_result) > 8000)) dnt_ptr->control.ku = 0;
-            else if ((abs(dnt_ptr->signal.value_min)  < 380) || (abs(dnt_ptr->zero.value_min) < 380) || (abs(dnt_ptr->current_result) < 320)) dnt_ptr->control.ku = 2;
-            break;
         case 0:
-            if ((abs(dnt_ptr->signal.value_min) < 380) || (abs(dnt_ptr->zero.value_min) < 380) || (abs(dnt_ptr->current_result) < 320)) dnt_ptr->control.ku = 1;
+            if ((__check_range(abs(dnt_ptr->signal.value_max), (int)DNT_ADC_VALUE_TOP_BOUND, (int)DNT_ADC_VALUE_BOT_BOUND) == 0) ||
+                (__check_range(abs(dnt_ptr->zero.value_max), (int)DNT_ADC_VALUE_TOP_BOUND, (int)DNT_ADC_VALUE_BOT_BOUND) == 0) ||
+                (__check_range(abs(dnt_ptr->current_result), +(int)(DNT_ADC_VALUE_TOP_BOUND/2), -(int)(DNT_ADC_VALUE_TOP_BOUND/2)) == 0))
+            {
+                if(dnt_ptr->control.ku > 0) dnt_ptr->control.ku -= 1;
+            }
+            else if (__check_range(abs(dnt_ptr->current_result), +(int)(DNT_ADC_VALUE_BOT_BOUND/2), -(int)(DNT_ADC_VALUE_BOT_BOUND/2)))
+            {
+                if(dnt_ptr->control.ku < 3) dnt_ptr->control.ku += 1;
+            }
             break;
         default:
             dnt_ptr->control.ku = 0;
@@ -407,6 +408,23 @@ void uint16_buffer_rev_to_uint8_buffer(uint16_t *u16_buff, uint8_t * u8_buff, ui
     for(i=0; i<u16_len; i++){
         u8_buff[2*i + 0] = u16_buff[i] >> 8;
         u8_buff[2*i + 1] = u16_buff[i] >> 0;
+    }
+}
+
+/**
+  * @brief  проверка вхождения величины в границы
+  * @param  value значение для проверки
+  * @param  top_bound верхняя граница
+  * @param  bot_bound нижняя граница
+  * @retval 0 - не в границах, 1 - внутри границы
+  */
+uint8_t __check_range(int value, int top_bound, int bot_bound)
+{
+    if ((value < top_bound) && (value > bot_bound)){
+        return 1;
+    }
+    else{
+        return 0;
     }
 }
 

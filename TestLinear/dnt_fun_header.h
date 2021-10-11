@@ -5,6 +5,17 @@
 
 // #pragma pack(1)  не работает с компилятором от производителя для МК 1874ВЕ7Т
 
+#define DNT_MODE_SINGLE_MEAS 		(1<<1)
+#define DNT_MODE_OSCILLOGRAMMA 	(1<<0)
+#define DNT_MODE_CYCLIC_MEAS 		(1<<2)
+#define DNT_MODE_CONST_MODE 		(1<<4)
+
+#define DNT_ADC_RESOLUTION			(14)
+#define DNT_ADC_VALUE_MAX				(1<<DNT_ADC_RESOLUTION)
+#define DNT_ADC_VALUE_MIN				(0)
+#define DNT_ADC_VALUE_TOP_BOUND	(DNT_ADC_VALUE_MAX*0.8)
+#define DNT_ADC_VALUE_BOT_BOUND	(DNT_ADC_VALUE_MAX*0.1)
+
 typedef struct //кадр с данными ДНТ ПА30 !!! 
 {
     uint16_t label;  //+0
@@ -123,6 +134,7 @@ uint8_t Grid_Voltage_Calc_Step_10ms(typeDNTOperationData* dnt_ptr);
 uint8 _grid_voltage_duty_feedback (uint16 MON_50V, uint8 Duty);
 //general purpose
 int32_t _check_bounds(int32_t var, int32_t bound_min, int32_t bound_max);
+uint8_t __check_range(int value, int top_bound, int bot_bound);
 void uint16_buffer_rev_to_uint8_buffer(uint16_t *u16_buff, uint8_t * u8_buff, uint8_t u16_len);
 
 uint16 COMAnsForm (uint8 req_id, uint8 self_id, uint8 sub_adress, uint8 *seq_num, uint8 com, uint8 leng, uint8* com_data, uint8* ans_com);

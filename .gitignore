@@ -30,3 +30,9 @@
 
 # Debug files
 *.dSYM/
+
+# My
+*.mco
+/TestLinear/Release/*
+/TestLinear/Debug/*
+!/TestLinear/Release/Exe/*

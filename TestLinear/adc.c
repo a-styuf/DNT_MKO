@@ -16,33 +16,33 @@ void ADC_Init()
   ADC_SET = 0x38 & 0x20;
 }
 
-uint16_t adc_value_get()
+int16_t adc_value_get()
 {
   ADC_CON = 0x01 | (12 << 3); //канал для измерения тока DNT
   while((ADC_RESULT) & 0x8000);
   return ((ADC_RESULT&0x3FFF)-0x2000) & 0x3FFF;
 }
 
-uint16_t grid_voltage_adc_value_get()
+int16_t grid_voltage_adc_value_get()
 {
     ADC_CON = 0x01 | (4 << 3); //канал для измерения тока DNT
     while((ADC_RESULT) & 0x8000);
     return ((ADC_RESULT&0x3FFF)-0x2000) & 0x3FFF;
 }
 
-uint16_t grid_voltage_adc_to_voltage(int16_t adc_data)
+int16_t grid_voltage_adc_to_voltage(int16_t adc_data)
 {
     return (uint16_t)(adc_data*ALPHA+BETTA);
 }
 
-uint16_t temperature_adc_value_get()
+int16_t temperature_adc_value_get()
 {
     ADC_CON = 0x01 | (2 << 3); //канал для измерения тока DNT
     while((ADC_RESULT) & 0x8000);
     return ((ADC_RESULT&0x3FFF)-0x2000) & 0x3FFF;
 }
 
-uint16_t temperature_adc_to_degree(int16_t adc_data)
+int16_t temperature_adc_to_degree(int16_t adc_data)
 {
     float mean;
     float a = 8.19E-6, b = -9.445E-2, c= 2.039E+2;
