@@ -606,7 +606,7 @@ Scheme name=Default
 [[Main window32]]
 Style=382664704
 ExStyle=262400
-WINDOWPLACEMENT=2C000000000000000100000098FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF260D00007500000032120000C3050000
+WINDOWPLACEMENT=2C0000000000000001000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF260D00007500000032120000C3050000
 
 [[Desktop options]]
 EditToolbar=0
@@ -1471,15 +1471,15 @@ LineNumbersOn=0
 [[Window32_1_Pane_3]]
 Id=27
 Splitter=2
-W=857
-H=903
+W=0
+H=0
 CaretX=24
 CaretY=29
 Toolbar=1
 StartItem=0
 StartHItem=0
-NumItems=130
-NumHItems=32760
+NumItems=0
+NumHItems=0
 CurItem=0
 LOGFONT=F4FFFFFF000000000000000000000000000000000000000100000200436F7572696572204E6577000000000000000000000000000000000000000000
 LFPointSize=9
@@ -1633,15 +1633,15 @@ LineNumbersOn=0
 [[Window32_1_Pane_9]]
 Id=27
 Splitter=8
-W=857
-H=903
+W=0
+H=0
 CaretX=0
 CaretY=2522
 Toolbar=1
 StartItem=2500
 StartHItem=0
-NumItems=2529
-NumHItems=32760
+NumItems=0
+NumHItems=0
 CurItem=0
 LOGFONT=F4FFFFFF000000000000000000000000000000000000000100000200436F7572696572204E6577000000000000000000000000000000000000000000
 LFPointSize=9
@@ -1748,8 +1748,8 @@ CaretY=96
 Toolbar=1
 StartItem=95
 StartHItem=0
-NumItems=142
-NumHItems=32760
+NumItems=0
+NumHItems=0
 CurItem=0
 LOGFONT=F4FFFFFF000000000000000000000000000000000000000100000200436F7572696572204E6577000000000000000000000000000000000000000000
 LFPointSize=9
@@ -1822,15 +1822,15 @@ LineNumbersOn=0
 [[Window32_1_Pane_16]]
 Id=27
 Splitter=15
-W=857
-H=903
+W=0
+H=0
 CaretX=0
 CaretY=5
 Toolbar=1
 StartItem=0
 StartHItem=0
-NumItems=8
-NumHItems=32760
+NumItems=0
+NumHItems=0
 CurItem=0
 LOGFONT=F4FFFFFF000000000000000000000000000000000000000100000200436F7572696572204E6577000000000000000000000000000000000000000000
 LFPointSize=9
@@ -2308,19 +2308,19 @@ USETOOLIW=1
 [[[K1874BE7T Rev.2]]]
 [[[[0]]]]
 Name=Default
-StartAddr=0x100
-EndAddr=0x7FF
+StartAddr=0x800
+EndAddr=0x17FF
 AddrSpaceName=Data
-AddrAreaName=Data
+AddrAreaName=Память сообщений
 CodeAllowed=0
 DataAllowed=1
 
 [[[[1]]]]
 Name=Default
-StartAddr=0x800
-EndAddr=0x17FF
+StartAddr=0x100
+EndAddr=0x7FF
 AddrSpaceName=Data
-AddrAreaName=Память сообщений
+AddrAreaName=Data
 CodeAllowed=0
 DataAllowed=1
 
@@ -2746,19 +2746,19 @@ USETOOLIW=1
 [[[K1874BE7T Rev.2]]]
 [[[[0]]]]
 Name=Default
-StartAddr=0x100
-EndAddr=0x7FF
+StartAddr=0x800
+EndAddr=0x17FF
 AddrSpaceName=Data
-AddrAreaName=Data
+AddrAreaName=Память сообщений
 CodeAllowed=0
 DataAllowed=1
 
 [[[[1]]]]
 Name=Default
-StartAddr=0x800
-EndAddr=0x17FF
+StartAddr=0x100
+EndAddr=0x7FF
 AddrSpaceName=Data
-AddrAreaName=Память сообщений
+AddrAreaName=Data
 CodeAllowed=0
 DataAllowed=1
 
